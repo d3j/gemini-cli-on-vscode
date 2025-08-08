@@ -16,3 +16,25 @@
 
 # Development workspace
 /dev-workspace
+
+# VSIX packages
+*.vsix
+
+# Gemini CLI history (user data)
+.gemini-history/
+
+# npm/yarn logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories
+.idea/
+*.swp
+*.swo
+*~
+
+# Test coverage
+coverage/
+.nyc_output/

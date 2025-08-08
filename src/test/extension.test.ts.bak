@@ -1,0 +1,338 @@
+import * as assert from 'assert';
+import * as vscode from 'vscode';
+import * as sinon from 'sinon';
+import * as fs from 'fs';
+import { activate, deactivate } from '../extension';
+import { 
+    createTestContext, 
+    cleanupTestContext, 
+    createMockTerminal,
+    createMockEditor,
+    createMockWorkspaceFolder,
+    createMockUri,
+    createMockSelection
+} from './helpers/testUtils';
+import { 
+    createMockContext,
+    MockTabGroup,
+    MockTab,
+    MockTabInputText
+} from './mocks/vscode';
+
+suite('Extension Test Suite', () => {
+    let testContext: ReturnType<typeof createTestContext>;
+    let extensionContext: vscode.ExtensionContext;
+    let fsStubs: {
+        existsSync: sinon.SinonStub;
+        mkdirSync: sinon.SinonStub;
+        writeFileSync: sinon.SinonStub;
+        appendFileSync: sinon.SinonStub;
+    };
+
+    setup(() => {
+        testContext = createTestContext();
+        extensionContext = createMockContext();
+        
+        fsStubs = {
+            existsSync: testContext.sandbox.stub(fs, 'existsSync'),
+            mkdirSync: testContext.sandbox.stub(fs, 'mkdirSync'),
+            writeFileSync: testContext.sandbox.stub(fs, 'writeFileSync'),
+            appendFileSync: testContext.sandbox.stub(fs, 'appendFileSync')
+        };
+        
+        fsStubs.existsSync.returns(false);
+    });
+
+    teardown(() => {
+        cleanupTestContext(testContext);
+    });
+
+    suite('Activation', () => {
+        test('should register all commands on activation', () => {
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            
+            // Reset isActivated flag to allow activation
+            (global as any).isActivated = false;
+            
+            activate(extensionContext);
+            
+            assert.strictEqual(registerCommandStub.callCount, 6);
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInNewPane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInActivePane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePath'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.saveClipboardToHistory'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedText'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePath'));
+        });
+
+        test('should create status bar item on activation', () => {
+            const createStatusBarItemStub = testContext.sandbox.stub(vscode.window, 'createStatusBarItem');
+            const mockStatusBarItem = {
+                command: undefined,
+                text: '',
+                tooltip: '',
+                show: sinon.stub(),
+                hide: sinon.stub()
+            };
+            createStatusBarItemStub.returns(mockStatusBarItem as any);
+            
+            // Reset isActivated flag
+            (global as any).isActivated = false;
+            
+            activate(extensionContext);
+            
+            assert.ok(createStatusBarItemStub.calledOnce);
+            assert.strictEqual(mockStatusBarItem.command, 'gemini-cli-vscode.saveClipboardToHistory');
+            assert.strictEqual(mockStatusBarItem.text, '$(save) Save to History');
+        });
+    });
+
+    suite('Start Terminal Commands', () => {
+        test('startInNewPane should create terminal in beside view column', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            await startInNewPaneCallback();
+            
+            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            const createTerminalArgs = testContext.stubs.createTerminal.getCall(0).args[0];
+            assert.strictEqual(createTerminalArgs.name, 'Gemini CLI');
+            assert.strictEqual(createTerminalArgs.location.viewColumn, vscode.ViewColumn.Beside);
+        });
+
+        test('startInActivePane should create terminal in active view column', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInActivePaneCallback = registerCommandStub.getCall(1).args[1];
+            await startInActivePaneCallback();
+            
+            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            const createTerminalArgs = testContext.stubs.createTerminal.getCall(0).args[0];
+            assert.strictEqual(createTerminalArgs.name, 'Gemini CLI');
+            assert.strictEqual(createTerminalArgs.location.viewColumn, vscode.ViewColumn.Active);
+        });
+
+        test('should navigate to workspace folder and launch gemini', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            
+            const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace/project');
+            testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            await startInNewPaneCallback();
+            
+            assert.ok(mockTerminal.sendText.calledWith('cd "/workspace/project"'));
+            assert.ok(mockTerminal.sendText.calledWith('gemini'));
+            assert.ok(mockTerminal.show.called);
+        });
+
+        test('should reuse existing terminal if available', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            
+            await startInNewPaneCallback();
+            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            
+            await startInNewPaneCallback();
+            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            assert.strictEqual(mockTerminal.show.callCount, 2);
+        });
+    });
+
+    suite('Save to History', () => {
+        test('should save selected text from editor to history', async () => {
+            const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace');
+            testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
+            
+            const selectedText = 'Selected code snippet';
+            const mockEditor = createMockEditor('Some code\n' + selectedText + '\nMore code', 
+                createMockSelection(1, 0, 1, selectedText.length));
+            testContext.sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
+            
+            testContext.stubs.clipboardRead.resolves('Original clipboard');
+            testContext.stubs.clipboardWrite.resolves();
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const saveClipboardCallback = registerCommandStub.getCall(3).args[1];
+            await saveClipboardCallback();
+            
+            assert.ok(fsStubs.mkdirSync.called);
+            assert.ok(fsStubs.appendFileSync.called);
+            
+            const appendedContent = fsStubs.appendFileSync.getCall(0).args[1];
+            assert.ok(appendedContent.includes(selectedText));
+            assert.ok(testContext.stubs.showInformationMessage.calledWith('Saved to history'));
+        });
+
+        test('should handle no selection gracefully', async () => {
+            const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace');
+            testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
+            
+            const mockEditor = createMockEditor('Some code', createMockSelection(0, 0, 0, 0));
+            testContext.sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
+            
+            testContext.stubs.clipboardRead.resolves('');
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const saveClipboardCallback = registerCommandStub.getCall(3).args[1];
+            await saveClipboardCallback();
+            
+            assert.ok(testContext.stubs.showInformationMessage.calledWith(
+                'No text selected. Select text in terminal or editor first.'
+            ));
+        });
+
+        test('should handle no workspace folder', async () => {
+            testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
+            
+            testContext.stubs.clipboardRead.resolves('Some text');
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const saveClipboardCallback = registerCommandStub.getCall(3).args[1];
+            await saveClipboardCallback();
+            
+            assert.ok(testContext.stubs.showErrorMessage.calledWith('No workspace folder open'));
+        });
+    });
+
+    suite('Send Selected Text', () => {
+        test('should send selected text to Gemini terminal', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);
+            
+            const selectedText = 'Selected code to send';
+            const mockEditor = createMockEditor('Code\n' + selectedText + '\nMore',
+                createMockSelection(1, 0, 1, selectedText.length));
+            testContext.sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            await startInNewPaneCallback();
+            
+            const sendSelectedCallback = registerCommandStub.getCall(4).args[1];
+            await sendSelectedCallback();
+            
+            await new Promise(resolve => setTimeout(resolve, 150));
+            
+            assert.ok(mockTerminal.sendText.calledWith(selectedText + ' ', false));
+            assert.ok(testContext.stubs.showInformationMessage.calledWith('Sent selected text to Gemini CLI'));
+        });
+
+        test('should show warning when no Gemini terminal is running', async () => {
+            testContext.sandbox.stub(vscode.window, 'terminals').value([]);
+            
+            const mockEditor = createMockEditor('Some code', createMockSelection(0, 0, 0, 9));
+            testContext.sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const sendSelectedCallback = registerCommandStub.getCall(4).args[1];
+            await sendSelectedCallback();
+            
+            assert.ok(testContext.stubs.showWarningMessage.calledWith(
+                'Gemini CLI is not running. Please start it first.'
+            ));
+        });
+    });
+
+    suite('Send Open Files', () => {
+        test('should send all open file paths to terminal', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);
+            
+            const mockTabs = [
+                new MockTab(new MockTabInputText(createMockUri('/workspace/file1.ts'))),
+                new MockTab(new MockTabInputText(createMockUri('/workspace/file2.ts'))),
+                new MockTab(new MockTabInputText(createMockUri('/workspace/file3.ts')))
+            ];
+            const mockTabGroup = new MockTabGroup(mockTabs as any);
+            
+            testContext.sandbox.stub(vscode.window.tabGroups, 'all').value([mockTabGroup as any]);
+            testContext.stubs.asRelativePath.callsFake((uri: vscode.Uri) => {
+                return uri.fsPath.replace('/workspace/', '');
+            });
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            await startInNewPaneCallback();
+            
+            const sendOpenFilesCallback = registerCommandStub.getCall(2).args[1];
+            await sendOpenFilesCallback();
+            
+            await new Promise(resolve => setTimeout(resolve, 150));
+            
+            assert.ok(mockTerminal.sendText.calledWith('@file1.ts @file2.ts @file3.ts ', false));
+            assert.ok(testContext.stubs.showInformationMessage.calledWith('Sent 3 file(s) to Gemini CLI'));
+        });
+
+        test('should handle no open files', async () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);
+            
+            testContext.sandbox.stub(vscode.window.tabGroups, 'all').value([]);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            await startInNewPaneCallback();
+            
+            const sendOpenFilesCallback = registerCommandStub.getCall(2).args[1];
+            await sendOpenFilesCallback();
+            
+            assert.ok(testContext.stubs.showInformationMessage.calledWith('No files are currently open.'));
+        });
+    });
+
+    suite('Deactivation', () => {
+        test('should clear terminals map on deactivation', () => {
+            const mockTerminal = createMockTerminal();
+            testContext.stubs.createTerminal.returns(mockTerminal);
+            
+            const registerCommandStub = testContext.sandbox.stub(vscode.commands, 'registerCommand');
+            activate(extensionContext);
+            
+            const startInNewPaneCallback = registerCommandStub.getCall(0).args[1];
+            startInNewPaneCallback();
+            
+            deactivate();
+            
+            testContext.sandbox.stub(vscode.window, 'terminals').value([]);
+            startInNewPaneCallback();
+            
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 2);
+        });
+    });
+});

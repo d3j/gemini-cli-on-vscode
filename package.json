@@ -12,7 +12,13 @@
   "bugs": {
     "url": "https://github.com/d3j/gemini-cli-on-vscode/issues"
   },
-  "keywords": ["gemini", "google", "ai", "cli", "terminal"],
+  "keywords": [
+    "gemini",
+    "google",
+    "ai",
+    "cli",
+    "terminal"
+  ],
   "version": "0.0.5",
   "engines": {
     "vscode": "^1.85.0"
@@ -93,17 +99,25 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "test:unit": "npm run compile && vscode-test --config .vscode-test-unit.mjs",
+    "test:integration": "npm run compile && vscode-test --run out/test/integration/**/*.test.js",
+    "test:coverage": "npm run compile && nyc vscode-test",
+    "test:watch": "npm run compile && vscode-test --watch"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
+    "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
+    "@types/sinon": "^17.0.4",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "nyc": "^17.1.0",
+    "sinon": "^21.0.0",
+    "typescript": "^5.3.3"
   }
 }

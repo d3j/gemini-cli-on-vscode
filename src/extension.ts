@@ -9,6 +9,9 @@ const geminiTerminals = new Map<string, vscode.Terminal>();
 // Status bar items
 let saveHistoryStatusBarItem: vscode.StatusBarItem;
 
+// Track if extension is already activated
+let isActivated = false;
+
 function getHistoryFilePath(): string | undefined {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
@@ -51,7 +54,7 @@ async function saveClipboardToHistory() {
             if (terminalText && terminalText !== originalClipboard) {
                 textToSave = terminalText;
             }
-        } catch (error) {
+        } catch {
             // If copy selection fails, fall back to clipboard
             console.log('Terminal copy selection failed, using clipboard content');
         }
@@ -282,6 +285,12 @@ function updateStatusBarVisibility() {
 
 export function activate(context: vscode.ExtensionContext) {
     
+    // Prevent duplicate activation
+    if (isActivated) {
+        return;
+    }
+    isActivated = true;
+    
     // Create status bar items
     createStatusBarItems(context);
     
@@ -371,4 +380,5 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
     // Clear terminals map on deactivation
     geminiTerminals.clear();
+    isActivated = false;
 }

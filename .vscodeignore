@@ -14,3 +14,24 @@ tsconfig.json
 .claude
 
 /dev-workspace
+
+# Gemini CLI history
+.gemini-history/
+
+# GitHub files
+.github/
+
+# Documentation images (if not needed)
+# images/
+
+# Test files
+**/*.test.ts
+**/*.test.js
+**/test/
+
+# Source maps
+**/*.map
+
+# Markdown files (except README)
+CHANGELOG.md
+LICENSE
