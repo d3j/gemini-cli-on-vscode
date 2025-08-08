@@ -17,7 +17,7 @@ suite('FileHandler Unit Test Suite', () => {
     setup(() => {
         testContext = createTestContext();
         mockTerminals = new Map<string, vscode.Terminal>();
-        fileHandler = new FileHandler(mockTerminals);
+        fileHandler = new FileHandler(mockTerminals, new Map());
     });
 
     teardown(() => {
@@ -80,46 +80,46 @@ suite('FileHandler Unit Test Suite', () => {
         });
     });
 
-    suite('findGeminiTerminal', () => {
+    suite('findCLITerminal', () => {
         test('should return undefined when no terminals exist', () => {
             const terminals: vscode.Terminal[] = [];
-            const terminal = fileHandler.findGeminiTerminal(terminals);
+            const terminal = fileHandler.findCLITerminal(terminals);
             assert.strictEqual(terminal, undefined);
         });
 
-        test('should return undefined when no Gemini terminals in map', () => {
+        test('should return undefined when no CLI terminals in map', () => {
             const terminal1 = createMockTerminal('Other Terminal');
             const terminal2 = createMockTerminal('Another Terminal');
             const terminals = [terminal1, terminal2] as unknown as vscode.Terminal[];
             
-            const terminal = fileHandler.findGeminiTerminal(terminals);
+            const terminal = fileHandler.findCLITerminal(terminals);
             
             assert.strictEqual(terminal, undefined);
         });
 
-        test('should find Gemini terminal when it exists', () => {
-            const geminiTerminal = createMockTerminal('Gemini CLI');
+        test('should find CLI terminal when it exists', () => {
+            const cliTerminal = createMockTerminal('Gemini CLI');
             const otherTerminal = createMockTerminal('Other Terminal');
             
-            mockTerminals.set('newPane', geminiTerminal as unknown as vscode.Terminal);
-            const terminals = [otherTerminal, geminiTerminal] as unknown as vscode.Terminal[];
+            mockTerminals.set('newPane', cliTerminal as unknown as vscode.Terminal);
+            const terminals = [otherTerminal, cliTerminal] as unknown as vscode.Terminal[];
             
-            const terminal = fileHandler.findGeminiTerminal(terminals);
+            const terminal = fileHandler.findCLITerminal(terminals);
             
-            assert.strictEqual(terminal, geminiTerminal);
+            assert.strictEqual(terminal, cliTerminal);
         });
 
-        test('should return first matching Gemini terminal', () => {
-            const geminiTerminal1 = createMockTerminal('Gemini CLI');
-            const geminiTerminal2 = createMockTerminal('Gemini CLI 2');
+        test('should return first matching CLI terminal', () => {
+            const cliTerminal1 = createMockTerminal('Gemini CLI');
+            const cliTerminal2 = createMockTerminal('Codex CLI');
             
-            mockTerminals.set('newPane', geminiTerminal1 as unknown as vscode.Terminal);
-            mockTerminals.set('activePane', geminiTerminal2 as unknown as vscode.Terminal);
-            const terminals = [geminiTerminal1, geminiTerminal2] as unknown as vscode.Terminal[];
+            mockTerminals.set('newPane', cliTerminal1 as unknown as vscode.Terminal);
+            mockTerminals.set('activePane', cliTerminal2 as unknown as vscode.Terminal);
+            const terminals = [cliTerminal1, cliTerminal2] as unknown as vscode.Terminal[];
             
-            const terminal = fileHandler.findGeminiTerminal(terminals);
+            const terminal = fileHandler.findCLITerminal(terminals);
             
-            assert.strictEqual(terminal, geminiTerminal1);
+            assert.strictEqual(terminal, cliTerminal1);
         });
     });
 
@@ -150,7 +150,7 @@ suite('FileHandler Unit Test Suite', () => {
             await fileHandler.sendFilesToTerminal(uri);
             
             assert.ok(testContext.stubs.showWarningMessage.calledWith(
-                'Gemini CLI is not running. Please start it first.'
+                'No AI CLI is running. Please start Gemini or Codex CLI first.'
             ));
         });
     });

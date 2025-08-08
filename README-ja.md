@@ -2,9 +2,9 @@
 
 **🇯🇵 日本語版** | [🇺🇸 English](README.md)
 
-## 🎨 エディタウィンドウで動くGemini CLI
+## 🎨 エディタウィンドウで動くGemini & Codex CLI
 
-### ついに実現：Claude Codeと同じ体験をGemini CLIで
+### ついに実現：Claude Codeと同じ体験をGemini CLI & Codex CLI (GPT-5) で
 
 ![エディタ統合デモ](images/onVScode-ja.png)
 
@@ -15,17 +15,18 @@
 
 ### 🔄 従来の制約
 
-- **Gemini CLI**: 強力だが**ターミナルパネルでしか動作しない**
+- **Gemini CLI / Codex CLI**: 強力だが**ターミナルパネルでしか動作しない**
 - **Gemini Code Assist**: エディタ統合されているが**まったく別のツール**
-- **Claude Code**: 完璧なエディタ統合だが**Geminiが使えない**
+- **Claude Code**: 完璧なエディタ統合だが**GeminiもGPT-5も使えない**
 
 ### ✨ この拡張の革新
 
-#### Claude Codeのエディタ統合体験をGemini CLIで実現
+#### Claude Codeのエディタ統合体験をGemini CLI & Codex CLIで実現
 
-- Gemini CLIがエディタウィンドウで直接動作
+- Gemini CLI & Codex CLI (GPT-5) がエディタウィンドウで直接動作
 - ターミナルとエディタの切り替えが不要に
-- Claude Codeユーザーが愛するワークフローをGeminiで
+- Claude Codeユーザーが愛するワークフローをGeminiとGPT-5で
+- **業界初**: 複数のAI CLIを同時にエディタペインで管理
 
 ## ⚡ 主要機能
 
@@ -48,7 +49,22 @@
 
 ### 🆕 スマート機能
 
-**v0.0.5** 🎯 NEW
+#### v0.0.6 🚀 NEW - GPT-5リリース記念！
+
+- **Codex CLI サポート**: OpenAIのCodex CLI (GPT-5対応) をエディタペインで実行
+- **ユニバーサル履歴保存**: 複数のAI CLI（Gemini CLI、Codex CLI、Claude Code）で動作
+  - 統一履歴フォルダ `.history-memo/` で日々の作業記録を管理
+- **個別CLIコマンド**: Gemini/Codex それぞれに専用コマンド
+  - Gemini CLI: Send Selected Text / File Path / Open File Path
+  - Codex CLI: Send Selected Text / File Path / Open File Path
+- **詳細な設定オプション**:
+  - `gemini.enabled` / `codex.enabled` - 各CLIの有効/無効
+  - `gemini.showInContextMenu` / `codex.showInContextMenu` - コンテキストメニュー表示
+  - `saveToHistory.showStatusBar` - ステータスバー表示制御
+  - `saveToHistory.includeTerminalName` - 履歴にターミナル名を含める
+
+#### v0.0.5
+
 - **ファイル/フォルダパス送信**: あらゆるファイル・フォルダをGemini CLIに送信
   - エクスプローラーで右クリック → "Send File Path"（複数選択対応）
   - エディタタブで右クリック → "Send File Path"
@@ -58,16 +74,19 @@
   - "Send Open File Path" - 開いているファイルすべて
   - "Send Selected Text" - 選択したテキスト
 
-**v0.0.4**
-- **Gemini CLIの履歴モドキ**: Gemini CLIの出力を手動保存
-  - ステータスバーボタンで簡単に、日付別ファイル `.gemini-history/YYYY-MM-DD.md` に保存
+#### v0.0.4
+
+- **履歴保存機能**: ターミナル出力を手動保存
+  - ステータスバーボタンで簡単に、日付別ファイルに保存
 - **エディタからGeminiへ**: エディタテキストをGemini CLIに送信
   - エディタで文字列選択して右クリックメニュー → "Send Selected Text"
 
-**v0.0.3**
+#### v0.0.3
+
 - **開いているファイル名を一括送信**: 開いているタブすべてをGemini CLIに送信
 
-**v0.0.2**
+#### v0.0.2
+
 - **自動ナビゲーション**: ワークスペースフォルダーへ自動移動
 - **ターミナル再利用**: 重複作成せず既存のGemini CLIにフォーカス
 - **カスタムキーバインド**: 独自のキーボードショートカットを設定可能
@@ -77,110 +96,114 @@
 ### 前提条件
 
 ```bash
-# Gemini CLIのインストール（必須）
+# Gemini CLIのインストール （Gemini使用時）
 npm install -g @google/gemini-cli
+gemini  # Googleアカウント認証
 
-# 認証（初回のみ）
-gemini
-# ブラウザでGoogleアカウント認証を完了
+# Codex CLIのインストール（GPT-5使用時）
+npm install -g codex
+codex   # OpenAIアカウント認証
 ```
 
 ### 使用方法
 
 1. **VS Codeで任意のプロジェクトを開く**
-2. **エディタタイトルバーの ✨（sparkle）アイコンをクリック**
-3. **Gemini CLIが新しいエディタペインで起動！**
+2. **エディタタイトルバーのアイコンをクリック**
+   - ✨ Gemini CLI起動
+   - ❄️ Codex CLI起動
+3. **AI CLIが新しいエディタペインで起動！**
 
-### 📁 ファイル/フォルダをGemini CLIに送信
+### 📁 ファイル/フォルダをAI CLIに送信
 
 **エクスプローラーから送信**
+
 - ファイルまたはフォルダを右クリック
-- "Gemini CLI: Send File Path" を選択
+- "Gemini CLI: Send File Path" または "Codex CLI: Send File Path" を選択
 - 複数選択対応（Ctrl/Cmd+クリック）
 
 **エディタタブから送信**
+
 - エディタタブで右クリック
-- "Gemini CLI: Send File Path" を選択
+- 使用したいCLIのコマンドを選択
 
 **開いているファイルをすべて送信**
+
 - エディタ内で右クリック
-- "Gemini CLI: Send Open File Path" を選択
+- "Gemini CLI: Send Open File Path" または "Codex CLI: Send Open File Path" を選択
 
-すべてのパスが`@`付きでGemini CLIに送信されます。複数送信時は自動的にスペースで区切られます。
+すべてのパスが`@`付きで選択したCLIに送信されます。
 
-### 💾 会話履歴の保存
+### 💾 ユニバーサル履歴保存
 
-重要なGemini CLI会話を `.gemini-history/YYYY-MM-DD.md` に保存：
+すべてのターミナル出力を `.history-memo/YYYY-MM-DD.md` に保存：
 
-**Gemini CLIターミナルから:**
+**任意のターミナルから:**
+
 - テキストを選択 → ステータスバーの「Save to History」ボタンをクリック
+- Gemini CLI、Codex CLI、bash、zsh、Claude Code等すべてで動作
 
 **カスタムキーボードショートカット:**
+
 - VSCodeキーボードショートカット設定で独自に設定
 
-### 📤 Geminiへ送信
+### 📤 AI CLIへ送信
 
 **選択テキストの送信:**
-- エディタでテキストを選択 → 右クリック → "Gemini CLI: Send Selected Text"
-- または設定でカスタムキーボードショートカットを設定
+
+- エディタでテキストを選択 → 右クリック
+- "Gemini CLI: Send Selected Text" または "Codex CLI: Send Selected Text"
 
 **ファイル/フォルダパスの送信:**
-- エクスプローラーで右クリック → "Gemini CLI: Send File Path"
+
+- エクスプローラーで右クリック
+- 使用したいCLI用のコマンドを選択
 - 複数選択可能、フォルダも送信可能
 
 **開いているすべてのファイルを送信:**
-- エディタで右クリック → "Gemini CLI: Send Open File Path"
-- すべての開いているファイルパスが@プレフィックス付きで送信される
+
+- エディタで右クリック
+- 使用したいCLI用の "Send Open File Path" を選択
 
 ### ⌨️ コマンドパレット
 
 全ての機能はコマンドパレットからも実行可能
 
 - コマンドパレットを開く（`Cmd+Shift+P` / `Ctrl+Shift+P`）
+
+**Gemini CLI コマンド:**
+
+- "Gemini CLI: Start in New Pane" - 新しいペインで起動
+- "Gemini CLI: Start in Active Pane" - アクティブペインで起動
 - "Gemini CLI: Send File Path" - ファイル/フォルダパスを送信
 - "Gemini CLI: Send Open File Path" - 開いているファイルをすべて送信
 - "Gemini CLI: Send Selected Text" - 選択テキストを送信
-- "Gemini CLI: Save to History" - 履歴を保存
+
+**Codex CLI コマンド:**
+
+- "Codex CLI: Start in New Pane" - 新しいペインで起動
+- "Codex CLI: Start in Active Pane" - アクティブペインで起動
+- "Codex CLI: Send File Path" - ファイル/フォルダパスを送信
+- "Codex CLI: Send Open File Path" - 開いているファイルをすべて送信
+- "Codex CLI: Send Selected Text" - 選択テキストを送信
+
+**共通コマンド:**
+
+- "Save to History" - 履歴を保存（すべてのターミナルで動作）
 
 ### ⌨️ カスタムキーボードショートカット
 
 独自のキーバインディングを設定可能：
 
 1. キーボードショートカットを開く: `Cmd+K Cmd+S`（Mac）または `Ctrl+K Ctrl+S`（Windows/Linux）
-2. "Gemini CLI" で検索
+2. "Gemini CLI" または "Codex CLI" で検索
 3. 鉛筆アイコンをクリックしてお好みのキーを割り当て
-
-## 💡 実際の使用例
-
-普通のGemini CLIの使い方
-
-### コードレビューリクエスト
-
-```bash
-# Gemini CLIがエディタペインで起動後
-@src/components/Button.tsx このコンポーネントをレビューして改善提案をください
-```
-
-### プロジェクトアーキテクチャ分析
-
-```bash
-@. プロジェクトのアーキテクチャを分析して、主要な設計パターンを説明してください
-```
-
-### エラー解決
-
-```bash
-@package.json @src/main.ts ビルドエラーが発生しています。修正方法を教えてください
-```
 
 ## 🆚 他の選択肢との比較
 
 ### 🎯 最適なユースケース
 
-- **Claude CodeのUXが好きだがGeminiを使いたい**開発者
-- ターミナルベースのAIツールを好む**パワーユーザー**
+- **Claude CodeのUXが好きだがGeminiやGPT-5を使いたい**開発者
 - ターミナルとエディタの切り替えに**うんざりしている**人
-- すでにGemini CLIを使用している**チーム**
 
 ### 📊 比較表
 
@@ -193,9 +216,37 @@ gemini
 | **ファイルコンテキスト（@）** | ✅ | ✅ | ✅ | ✅ |
 | **エディタテキストを送信** | ❌ | ✅ | ✅ | ❌ (別ターミナル) |
 | **複数ファイル選択送信** | ❌ | ✅ | ✅ | ❌ |
-| **会話履歴** | ❌ | ✅ (手動) | ✅ | ✅ (JSON) |
-| **Geminiモデルを使用** | ✅ | ✅ | ✅ | ❌ |
+| **ユニバーサル履歴** | ❌ | ✅ | ❌ | ❌ |
+| **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ |
+| **GPT-5モデル対応** | ❌ | ✅ | ❌ | ❌ |
+| **複数CLI同時管理** | ❌ | ✅ | ❌ | ❌ |
 
+## ⚙️ 設定オプション
+
+### 利用可能な設定
+
+```json
+{
+  // CLI機能の有効/無効
+  "gemini-cli-vscode.gemini.enabled": true,
+  "gemini-cli-vscode.codex.enabled": true,
+  
+  // コンテキストメニュー表示
+  "gemini-cli-vscode.gemini.showInContextMenu": true,
+  "gemini-cli-vscode.codex.showInContextMenu": false,
+  
+  // 履歴保存設定
+  "gemini-cli-vscode.saveToHistory.showStatusBar": true,
+  "gemini-cli-vscode.saveToHistory.includeTerminalName": true
+}
+```
+
+設定の説明:
+
+- `enabled`: CLIの機能とエディタタイトルバーアイコンの表示を制御
+- `showInContextMenu`: 右クリックメニューでのコマンド表示を制御
+- `saveToHistory.showStatusBar`: ステータスバーの「Save to History」ボタン表示
+- `saveToHistory.includeTerminalName`: 履歴エントリにターミナル名を含める
 
 ## 🛠️ 開発
 
@@ -245,7 +296,6 @@ gemini
 - **バグ報告**: [Issues](https://github.com/d3j/gemini-cli-on-vscode/issues)
 - **機能リクエスト**: [Issues](https://github.com/d3j/gemini-cli-on-vscode/issues)
 - **プルリクエスト**: [Pull Requests](https://github.com/d3j/gemini-cli-on-vscode/pulls)
-
 
 ## 🙏 謝辞
 

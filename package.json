@@ -2,7 +2,7 @@
   "name": "gemini-cli-on-vscode",
   "displayName": "Gemini CLI on VSCode",
   "icon": "images/icon.png",
-  "description": "Run Gemini CLI in editor panes like Claude Code - no more terminal switching",
+  "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
   "author": "Joji Jorge Senda",
   "repository": {
@@ -14,12 +14,15 @@
   },
   "keywords": [
     "gemini",
+    "codex",
+    "gpt-5",
+    "openai",
     "google",
     "ai",
     "cli",
     "terminal"
   ],
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -42,20 +45,41 @@
         "title": "Gemini CLI: Start in Active Pane"
       },
       {
-        "command": "gemini-cli-vscode.sendOpenFilePath",
-        "title": "Gemini CLI: Send Open File Path"
+        "command": "gemini-cli-vscode.codexStartInNewPane",
+        "title": "Codex CLI: Start in New Pane",
+        "icon": "images/codex-icon.png"
+      },
+      {
+        "command": "gemini-cli-vscode.codexStartInActivePane",
+        "title": "Codex CLI: Start in Active Pane"
       },
       {
         "command": "gemini-cli-vscode.saveClipboardToHistory",
-        "title": "Gemini CLI: Save to History"
+        "title": "Save to History"
       },
       {
-        "command": "gemini-cli-vscode.sendSelectedText",
+        "command": "gemini-cli-vscode.sendSelectedTextToGemini",
         "title": "Gemini CLI: Send Selected Text"
       },
       {
-        "command": "gemini-cli-vscode.sendFilePath",
+        "command": "gemini-cli-vscode.sendSelectedTextToCodex",
+        "title": "Codex CLI: Send Selected Text"
+      },
+      {
+        "command": "gemini-cli-vscode.sendFilePathToGemini",
         "title": "Gemini CLI: Send File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.sendFilePathToCodex",
+        "title": "Codex CLI: Send File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.sendOpenFilePathToGemini",
+        "title": "Gemini CLI: Send Open File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.sendOpenFilePathToCodex",
+        "title": "Codex CLI: Send Open File Path"
       }
     ],
     "menus": {
@@ -63,35 +87,97 @@
         {
           "command": "gemini-cli-vscode.startInNewPane",
           "group": "navigation",
-          "when": "true"
+          "when": "config.gemini-cli-vscode.gemini.enabled"
+        },
+        {
+          "command": "gemini-cli-vscode.codexStartInNewPane",
+          "group": "navigation",
+          "when": "config.gemini-cli-vscode.codex.enabled"
         }
       ],
       "editor/context": [
         {
-          "command": "gemini-cli-vscode.sendOpenFilePath",
+          "command": "gemini-cli-vscode.sendOpenFilePathToGemini",
           "group": "5_cutcopypaste@99",
-          "when": "editorTextFocus"
+          "when": "editorTextFocus && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendSelectedText",
+          "command": "gemini-cli-vscode.sendOpenFilePathToCodex",
           "group": "5_cutcopypaste@100",
-          "when": "editorHasSelection"
+          "when": "editorTextFocus && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendSelectedTextToGemini",
+          "group": "5_cutcopypaste@101",
+          "when": "editorHasSelection && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendSelectedTextToCodex",
+          "group": "5_cutcopypaste@102",
+          "when": "editorHasSelection && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         }
       ],
       "explorer/context": [
         {
-          "command": "gemini-cli-vscode.sendFilePath",
-          "group": "5_cutcopypaste@101"
+          "command": "gemini-cli-vscode.sendFilePathToGemini",
+          "group": "5_cutcopypaste@103",
+          "when": "config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToCodex",
+          "group": "5_cutcopypaste@104",
+          "when": "config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         }
       ],
       "editor/title/context": [
         {
-          "command": "gemini-cli-vscode.sendFilePath",
-          "group": "5_cutcopypaste@102"
+          "command": "gemini-cli-vscode.sendFilePathToGemini",
+          "group": "5_cutcopypaste@105",
+          "when": "config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToCodex",
+          "group": "5_cutcopypaste@106",
+          "when": "config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         }
       ]
     },
-    "keybindings": []
+    "keybindings": [],
+    "configuration": {
+      "title": "Gemini CLI on VSCode",
+      "properties": {
+        "gemini-cli-vscode.gemini.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Gemini CLI features"
+        },
+        "gemini-cli-vscode.codex.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Codex CLI features"
+        },
+        "gemini-cli-vscode.gemini.showInContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Gemini CLI commands in context menus"
+        },
+        "gemini-cli-vscode.codex.showInContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Codex CLI commands in context menus"
+        },
+        "gemini-cli-vscode.saveToHistory.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show 'Save to History' button in status bar when terminal is active"
+        },
+        "gemini-cli-vscode.saveToHistory.includeTerminalName": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include terminal name in history entries"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

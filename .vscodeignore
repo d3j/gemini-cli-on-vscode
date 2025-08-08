@@ -15,8 +15,10 @@ tsconfig.json
 
 /dev-workspace
 
-# Gemini CLI history
+# User data - history folders
+.history-memo/
 .gemini-history/
+.codex-history/
 
 # GitHub files
 .github/

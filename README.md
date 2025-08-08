@@ -2,9 +2,9 @@
 
 [🇯🇵 日本語版](README-ja.md) | **🇺🇸 English**
 
-## 🎨 Gemini CLI Running in Editor Windows
+## 🎨 Gemini & Codex CLI Running in Editor Windows
 
-### Finally: The Same Claude Code Experience with Gemini CLI
+### Finally: The Same Claude Code Experience with Gemini CLI & Codex CLI (GPT-5)
 
 ![Editor Integration Demo](images/onVScode-ja.png)
 
@@ -15,17 +15,18 @@
 
 ### 🔄 Traditional Limitations
 
-- **Gemini CLI**: Powerful but **only runs in terminal panels**
+- **Gemini CLI / Codex CLI**: Powerful but **only runs in terminal panels**
 - **Gemini Code Assist**: Editor integrated but **a different tool entirely**
-- **Claude Code**: Perfect editor integration but **can't use Gemini**
+- **Claude Code**: Perfect editor integration but **can't use Gemini or GPT-5**
 
 ### ✨ This Extension's Innovation
 
-#### Brings Claude Code's editor integration experience to Gemini CLI
+#### Brings Claude Code's editor integration experience to Gemini CLI & Codex CLI
 
-- Gemini CLI runs directly in editor windows
+- Gemini CLI & Codex CLI (GPT-5) run directly in editor windows
 - No more switching between terminal and editor
-- The exact workflow Claude Code users love, now with Gemini
+- The exact workflow Claude Code users love, now with Gemini and GPT-5
+- **Industry first**: Multiple AI CLIs managed simultaneously in editor panes
 
 ## ⚡ Key Features
 
@@ -49,7 +50,22 @@
 
 ### 🆕 Smart Features
 
-**v0.0.5** 🎯 NEW
+#### v0.0.6 🚀 NEW - GPT-5 Launch Support!
+
+- **Codex CLI Support**: Run OpenAI's Codex CLI (GPT-5 powered) in editor panes
+- **Universal History**: Works with all terminals (Gemini CLI, Codex CLI, Claude Code, bash, zsh)
+  - Unified history folder `.history-memo/` for daily work logs
+  - Optional terminal name in history entries
+- **Individual CLI Commands**: Dedicated commands for each CLI
+  - Gemini CLI: Send Selected Text / File Path / Open File Path
+  - Codex CLI: Send Selected Text / File Path / Open File Path
+- **Advanced Settings**:
+  - `gemini.enabled` / `codex.enabled` - Enable/disable each CLI
+  - `gemini.showInContextMenu` / `codex.showInContextMenu` - Context menu visibility
+  - `saveToHistory.showStatusBar` - Status bar visibility control
+  - `saveToHistory.includeTerminalName` - Include terminal name in history
+
+#### v0.0.5
 - **Send File/Folder Paths**: Send any file or folder to Gemini CLI
   - Right-click in Explorer → "Send File Path" (supports multiple selection)
   - Right-click on editor tab → "Send File Path"
@@ -59,16 +75,18 @@
   - "Send Open File Path" - for all open files
   - "Send Selected Text" - for selected text
 
-**v0.0.4**
-- **Conversation History (Mock)**: Manually save Gemini CLI output
-  - Status bar button for easy saving to date-based files `.gemini-history/YYYY-MM-DD.md`
+#### v0.0.4
+
+- **History Save Feature**: Manually save terminal output
+  - Status bar button for easy saving to date-based files
 - **Editor to Gemini**: Send editor text to Gemini CLI
   - Select text in editor → Right-click menu → "Send Selected Text"
 
-**v0.0.3**
+#### v0.0.3
+
 - **Send Open Files**: Send all open editor tabs to Gemini CLI at once
 
-**v0.0.2**
+#### v0.0.2
 - **Auto-navigation**: Automatically navigates to your workspace folder
 - **Terminal reuse**: Focuses existing Gemini CLI instead of creating duplicates
 - **Custom keybindings**: Set your own keyboard shortcuts
@@ -78,118 +96,153 @@
 ### Prerequisites
 
 ```bash
-# Install Gemini CLI (required)
+# Install Gemini CLI (for Gemini)
 npm install -g @google/gemini-cli
+gemini  # Google account authentication
 
-# Authenticate (first time only)
-gemini
-# Complete Google account authentication in browser
+# Install Codex CLI (for GPT-5)
+npm install -g codex
+codex   # OpenAI account authentication
 ```
 
 ### Usage
 
 1. **Open any project in VS Code**
-2. **Click the ✨ (sparkle) icon** in the editor title bar
-3. **Gemini CLI launches in a new editor pane!**
+2. **Click the icon in the editor title bar**
+   - ✨ Launch Gemini CLI
+   - ❄️ Launch Codex CLI
+3. **AI CLI launches in a new editor pane!**
 
 Or use Command Palette:
 
 1. **Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)**
-2. **Search for "Gemini CLI"**
+2. **Search for "Gemini CLI" or "Codex CLI"**
 3. **Choose your preferred launch mode**
 
-### ⌨️ Custom Keyboard Shortcuts (Optional)
+### 📁 Send Files/Folders to AI CLI
+
+**Send from Explorer**
+
+- Right-click file or folder
+- Select "Gemini CLI: Send File Path" or "Codex CLI: Send File Path"
+- Supports multiple selection (Ctrl/Cmd+click)
+
+**Send from Editor Tab**
+
+- Right-click on editor tab
+- Choose your preferred CLI command
+
+**Send All Open Files**
+
+- Right-click in editor
+- Select "Gemini CLI: Send Open File Path" or "Codex CLI: Send Open File Path"
+
+All paths are sent with `@` prefix to your selected CLI.
+
+### 💾 Universal History Save
+
+Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
+
+**From Any Terminal:**
+
+- Select text → Click "Save to History" button in status bar
+- Works with Gemini CLI, Codex CLI, bash, zsh, Claude Code, and more
+
+**Custom Keyboard Shortcut:**
+
+- Set your own in VSCode Keyboard Shortcuts settings
+
+### 📤 Send to AI CLI
+
+**Send Selected Text:**
+
+- Select text in editor → Right-click
+- "Gemini CLI: Send Selected Text" or "Codex CLI: Send Selected Text"
+
+**Send File/Folder Paths:**
+
+- Right-click in Explorer
+- Choose your preferred CLI command
+- Supports multiple selection and folders
+
+**Send All Open Files:**
+
+- Right-click in editor
+- Choose "Send Open File Path" for your preferred CLI
+
+### ⌨️ Command Palette
+
+All features are available from the Command Palette:
+
+- Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
+
+**Gemini CLI Commands:**
+
+- "Gemini CLI: Start in New Pane" - Launch in new pane
+- "Gemini CLI: Start in Active Pane" - Launch in active pane
+- "Gemini CLI: Send File Path" - Send files/folders
+- "Gemini CLI: Send Open File Path" - Send all open files
+- "Gemini CLI: Send Selected Text" - Send selected text
+
+**Codex CLI Commands:**
+
+- "Codex CLI: Start in New Pane" - Launch in new pane
+- "Codex CLI: Start in Active Pane" - Launch in active pane
+- "Codex CLI: Send File Path" - Send files/folders
+- "Codex CLI: Send Open File Path" - Send all open files
+- "Codex CLI: Send Selected Text" - Send selected text
+
+**Common Commands:**
+
+- "Save to History" - Save conversation (works with all terminals)
+
+### ⌨️ Custom Keyboard Shortcuts
 
 Set your own keybindings:
 
 1. Open Keyboard Shortcuts: `Cmd+K Cmd+S` (Mac) or `Ctrl+K Ctrl+S` (Windows/Linux)
-2. Search for "Gemini CLI"
+2. Search for "Gemini CLI" or "Codex CLI"
 3. Click the pencil icon to assign your preferred keys
-
-Recommended shortcuts that won't conflict:
-- `Cmd+Shift+Alt+G` (Mac) / `Ctrl+Shift+Alt+G` (Windows/Linux)
-- `Cmd+K G` (Mac) / `Ctrl+K G` (Windows/Linux)
-
-### 📁 Send Files/Folders to Gemini CLI
-
-**Send from Explorer**
-- Right-click file or folder
-- Select "Gemini CLI: Send File Path"
-- Supports multiple selection (Ctrl/Cmd+click)
-
-**Send from Editor Tab**
-- Right-click on editor tab
-- Select "Gemini CLI: Send File Path"
-
-**Send All Open Files**
-- Right-click in editor
-- Select "Gemini CLI: Send Open File Path"
-
-All paths are sent with `@` prefix to Gemini CLI. Multiple selections are automatically space-separated.
-
-### 💾 Save Conversation History
-
-Save important Gemini CLI conversations to `.gemini-history/YYYY-MM-DD.md`:
-
-**From Gemini CLI Terminal:**
-- Select text → Click "Save to History" button in status bar
-
-**Custom Keyboard Shortcut:**
-- Set your own in VSCode Keyboard Shortcuts settings
-
-### 📤 Send to Gemini
-
-**Send Selected Text:**
-- Select text in editor → Right-click → "Gemini CLI: Send Selected Text"
-- Or set a custom keyboard shortcut in settings
-
-**Send File/Folder Paths:**
-- Right-click in Explorer → "Gemini CLI: Send File Path"
-- Supports multiple selection and folders
-
-**Send All Open Files:**
-- Right-click in editor → "Gemini CLI: Send Open File Path"
-- All open file paths are sent with @ prefix
-
-### ⌨️ Command Palette
-
-All features are also available from the Command Palette:
-
-- Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
-- "Gemini CLI: Send File Path" - Send files/folders
-- "Gemini CLI: Send Open File Path" - Send all open files
-- "Gemini CLI: Send Selected Text" - Send selected text
-- "Gemini CLI: Save to History" - Save conversation
 
 ## 💡 Real-World Usage Examples
 
-### Code Review Request
+### Gemini CLI Examples
+
+#### Code Review Request
 
 ```bash
 # After Gemini CLI launches in editor pane
 @src/components/Button.tsx Review this component and suggest improvements
 ```
 
-### Project Architecture Analysis
+#### Project Architecture Analysis
 
 ```bash
 @. Analyze the project architecture and explain the main design patterns
 ```
 
-### Error Resolution
+#### Error Resolution
 
 ```bash
 @package.json @src/main.ts I'm getting build errors. Help me fix them
+```
+
+### Codex CLI (GPT-5) Examples
+
+```bash
+# Advanced code generation
+@src/api.ts Implement rate limiting and caching for this API
+
+# AI agent development
+@agent.py Create an AI agent that can perform multi-step reasoning
 ```
 
 ## 🆚 Why Choose This Over Alternatives?
 
 ### 🎯 Perfect For
 
-- **Developers who love Claude Code's UX** but want to use Gemini
-- **Power users** who prefer terminal-based AI tools
+- **Developers who love Claude Code's UX** but want to use Gemini or GPT-5
 - **Anyone tired** of switching between terminal and editor
-- **Teams** already using Gemini CLI
 
 ### 📊 Comparison
 
@@ -202,8 +255,37 @@ All features are also available from the Command Palette:
 | **File context (@)** | ✅ | ✅ | ✅ | ✅ |
 | **Send editor text** | ❌ | ✅ | ✅ | ❌ (Separate terminal) |
 | **Send multiple files** | ❌ | ✅ | ✅ | ❌ |
-| **Conversation history** | ❌ | ✅ (Manual) | ✅ | ✅ (JSON) |
-| **Uses Gemini models** | ✅ | ✅ | ✅ | ❌ |
+| **Universal history** | ❌ | ✅ | ❌ | ❌ |
+| **Gemini models** | ✅ | ✅ | ✅ | ❌ |
+| **GPT-5 models** | ❌ | ✅ | ❌ | ❌ |
+| **Multiple CLI management** | ❌ | ✅ | ❌ | ❌ |
+
+## ⚙️ Configuration Options
+
+### Available Settings
+
+```json
+{
+  // Enable/disable CLI features
+  "gemini-cli-vscode.gemini.enabled": true,
+  "gemini-cli-vscode.codex.enabled": true,
+  
+  // Context menu visibility
+  "gemini-cli-vscode.gemini.showInContextMenu": true,
+  "gemini-cli-vscode.codex.showInContextMenu": false,
+  
+  // History save settings
+  "gemini-cli-vscode.saveToHistory.showStatusBar": true,
+  "gemini-cli-vscode.saveToHistory.includeTerminalName": true
+}
+```
+
+Settings explained:
+
+- `enabled`: Controls CLI features and editor title bar icon visibility
+- `showInContextMenu`: Controls command visibility in right-click menus
+- `saveToHistory.showStatusBar`: Shows/hides "Save to History" status bar button
+- `saveToHistory.includeTerminalName`: Includes terminal name in history entries
 
 ## 🛠️ Development
 

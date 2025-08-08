@@ -83,22 +83,32 @@ suite('Extension Unit Test Suite', () => {
             activate(extensionContext);
             
             // Verify all commands are registered
-            assert.strictEqual(registerCommandStub.callCount, 6);
+            assert.strictEqual(registerCommandStub.callCount, 11);
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInNewPane'));
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInActivePane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePath'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codexStartInNewPane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codexStartInActivePane'));
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.saveClipboardToHistory'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedText'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePath'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedTextToGemini'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedTextToCodex'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePathToGemini'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePathToCodex'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToGemini'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToCodex'));
             
             // Verify handlers are stored
-            assert.strictEqual(commandHandlers.size, 6);
+            assert.strictEqual(commandHandlers.size, 11);
             assert.ok(commandHandlers.has('gemini-cli-vscode.startInNewPane'));
             assert.ok(commandHandlers.has('gemini-cli-vscode.startInActivePane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePath'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codexStartInNewPane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codexStartInActivePane'));
             assert.ok(commandHandlers.has('gemini-cli-vscode.saveClipboardToHistory'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedText'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePath'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedTextToGemini'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedTextToCodex'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePathToGemini'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePathToCodex'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePathToGemini'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePathToCodex'));
         });
 
         test('should create status bar item on activation', () => {
@@ -237,7 +247,7 @@ suite('Extension Unit Test Suite', () => {
             await vscode.commands.executeCommand('gemini-cli-vscode.saveClipboardToHistory');
             
             // Verify history directory creation
-            const historyDir = path.join('/workspace', '.gemini-history');
+            const historyDir = path.join('/workspace', '.history-memo');
             assert.ok(fsStubs.mkdirSync.calledWith(historyDir, { recursive: true }));
             
             // Verify file append
@@ -278,12 +288,16 @@ suite('Extension Unit Test Suite', () => {
             activate(extensionContext);
             
             sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
+            sandbox.stub(vscode.window, 'activeTerminal').value(undefined);
+            sandbox.stub(vscode.window, 'activeTextEditor').value(undefined);
             
-            testContext.stubs.clipboardRead.resolves('Some text');
+            testContext.stubs.clipboardRead.resolves('');
+            testContext.stubs.clipboardWrite.resolves();
             
             await vscode.commands.executeCommand('gemini-cli-vscode.saveClipboardToHistory');
             
-            assert.ok(testContext.stubs.showErrorMessage.calledWith('No workspace folder open'));
+            // Since we have empty clipboard and no selection, should show info message
+            assert.ok(testContext.stubs.showInformationMessage.calledWith('No text selected. Select text in terminal or editor first.'));
         });
     });
 
@@ -314,7 +328,7 @@ suite('Extension Unit Test Suite', () => {
             mockTerminal.sendText.resetHistory();
             
             // Send selected text
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedText');
+            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedTextToGemini');
             
             // Wait for async operation
             await waitForAsync();
@@ -332,7 +346,7 @@ suite('Extension Unit Test Suite', () => {
             const mockEditor = createMockEditor('Some code', createMockSelection(0, 0, 0, 9));
             sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedText');
+            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedTextToGemini');
             
             assert.ok(testContext.stubs.showWarningMessage.calledWith(
                 'Gemini CLI is not running. Please start it first.'
@@ -355,7 +369,7 @@ suite('Extension Unit Test Suite', () => {
             // Create terminal first
             await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedText');
+            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedTextToGemini');
             
             assert.ok(testContext.stubs.showInformationMessage.calledWith(
                 'No text selected in editor. Select text in editor first.'
@@ -400,7 +414,7 @@ suite('Extension Unit Test Suite', () => {
             await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
             
             // Send open files
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePath');
+            await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePathToGemini');
             
             // Wait for async operation (sendOpenFilesToGemini uses 100ms setTimeout)
             // Need extra time for setTimeout to execute
@@ -450,7 +464,7 @@ suite('Extension Unit Test Suite', () => {
             // Create terminal first
             await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePath');
+            await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePathToGemini');
             
             assert.ok(testContext.stubs.showInformationMessage.calledWith('No files are currently open.'));
         });
@@ -471,7 +485,7 @@ suite('Extension Unit Test Suite', () => {
             });
         });
 
-        test('should show status bar when Gemini terminal is active', async () => {
+        test('should show status bar when any terminal is active', async () => {
             activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
@@ -496,11 +510,10 @@ suite('Extension Unit Test Suite', () => {
             assert.ok(mockStatusBarItem.show.called);
         });
 
-        test('should hide status bar when non-Gemini terminal is active', async () => {
+        test('should hide status bar when editor is active', async () => {
             activate(extensionContext);
             
             const geminiTerminal = createMockTerminal('Gemini CLI');
-            const otherTerminal = createMockTerminal('Other Terminal');
             testContext.stubs.createTerminal.returns(geminiTerminal as any);
             
             const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace');
@@ -509,9 +522,13 @@ suite('Extension Unit Test Suite', () => {
             // Create Gemini terminal
             await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
             
-            // Simulate other terminal becoming active
+            // Set active editor (not terminal)
+            sandbox.stub(vscode.window, 'activeTerminal').value(undefined);
+            sandbox.stub(vscode.window, 'activeTextEditor').value(createMockEditor('', createMockSelection(0, 0, 0, 0)));
+            
+            // Simulate terminal change
             if (onDidChangeActiveTerminalCallback) {
-                onDidChangeActiveTerminalCallback(otherTerminal as any);
+                onDidChangeActiveTerminalCallback(undefined);
             }
             
             assert.ok(mockStatusBarItem.hide.called);

@@ -1,3 +1,8 @@
+# User data - history folders
+.history-memo/
+.gemini-history/
+.codex-history/
+
 # Dependencies
 /node_modules
 
@@ -19,9 +24,6 @@
 
 # VSIX packages
 *.vsix
-
-# Gemini CLI history (user data)
-.gemini-history/
 
 # npm/yarn logs
 *.log

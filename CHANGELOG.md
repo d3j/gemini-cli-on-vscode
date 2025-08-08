@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2025-08-08
+
+### Added
+
+*   **Codex CLI Support** - Launch OpenAI's Codex CLI (with GPT-5 support) in editor panes
+    *   "Codex CLI: Start in New Pane"
+    *   "Codex CLI: Start in Active Pane"
+*   **Universal Save to History** - Works with all terminals, not just AI CLIs
+    *   Unified history location: `.history-memo/`
+    *   Terminal name included in history entries (configurable)
+    *   History files use "History Memo" format for daily work logs
+*   **Separate Commands for Each CLI** - Direct control over which AI receives content
+    *   Gemini-specific: Send Selected Text, Send File Path, Send Open File Path
+    *   Codex-specific: Send Selected Text, Send File Path, Send Open File Path
+*   **Configuration Settings** - Comprehensive control over features
+    *   `gemini-cli-vscode.gemini.enabled` - Enable/disable Gemini CLI
+    *   `gemini-cli-vscode.codex.enabled` - Enable/disable Codex CLI
+    *   `gemini-cli-vscode.gemini.showInContextMenu` - Show/hide Gemini commands in context menus
+    *   `gemini-cli-vscode.codex.showInContextMenu` - Show/hide Codex commands in context menus
+    *   `gemini-cli-vscode.saveToHistory.showStatusBar` - Control status bar visibility
+    *   `gemini-cli-vscode.saveToHistory.includeTerminalName` - Include terminal name in history entries
+
+### Changed
+
+*   Editor title bar icons now controlled by `enabled` settings for cleaner interface
+*   FileHandler now accepts target CLI parameter for directed sending
+*   Context menu items only show when enabled in settings
+*   Status bar "Save to History" appears for any active terminal
+*   Improved terminal selection detection to prevent duplicate history entries
+
+
+### Technical
+
+*   First VS Code extension to support both Gemini and Codex CLI in editor panes
+*   Released one day after GPT-5 announcement for immediate support
+*   Multiple CLI management with smart terminal identification
+*   Better separation of concerns between different AI CLIs
+
 ## [0.0.5] - 2025-08-08
 
 ### Added
