@@ -13,7 +13,7 @@
     "url": "https://github.com/d3j/gemini-cli-on-vscode/issues"
   },
   "keywords": ["gemini", "google", "ai", "cli", "terminal"],
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -36,16 +36,20 @@
         "title": "Gemini CLI: Start in Active Pane"
       },
       {
-        "command": "gemini-cli-vscode.sendOpenFiles",
-        "title": "Gemini CLI: Send Open Files"
+        "command": "gemini-cli-vscode.sendOpenFilePath",
+        "title": "Gemini CLI: Send Open File Path"
       },
       {
         "command": "gemini-cli-vscode.saveClipboardToHistory",
         "title": "Gemini CLI: Save to History"
       },
       {
-        "command": "gemini-cli-vscode.sendSelectedToGemini",
-        "title": "Gemini CLI: Send to Gemini"
+        "command": "gemini-cli-vscode.sendSelectedText",
+        "title": "Gemini CLI: Send Selected Text"
+      },
+      {
+        "command": "gemini-cli-vscode.sendFilePath",
+        "title": "Gemini CLI: Send File Path"
       }
     ],
     "menus": {
@@ -58,14 +62,26 @@
       ],
       "editor/context": [
         {
-          "command": "gemini-cli-vscode.sendOpenFiles",
+          "command": "gemini-cli-vscode.sendOpenFilePath",
           "group": "5_cutcopypaste@99",
           "when": "editorTextFocus"
         },
         {
-          "command": "gemini-cli-vscode.sendSelectedToGemini",
+          "command": "gemini-cli-vscode.sendSelectedText",
           "group": "5_cutcopypaste@100",
           "when": "editorHasSelection"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "gemini-cli-vscode.sendFilePath",
+          "group": "5_cutcopypaste@101"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "gemini-cli-vscode.sendFilePath",
+          "group": "5_cutcopypaste@102"
         }
       ]
     },

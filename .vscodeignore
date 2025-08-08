@@ -12,4 +12,5 @@ tsconfig.json
 *.vsix
 
 .claude
-prompt.md
+
+/dev-workspace

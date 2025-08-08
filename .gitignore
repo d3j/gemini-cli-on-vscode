@@ -13,4 +13,6 @@
 
 # Claude Code
 .claude
-prompt.md
+
+# Development workspace
+/dev-workspace

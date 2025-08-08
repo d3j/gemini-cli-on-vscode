@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { FileHandler } from './fileHandler';
 
 // Store active Gemini CLI terminals
 const geminiTerminals = new Map<string, vscode.Terminal>();
@@ -150,7 +151,7 @@ async function sendSelectedToGemini() {
     
     // Add a small delay to ensure terminal is focused
     setTimeout(() => {
-        geminiTerminal!.sendText(selectedText!, false);
+        geminiTerminal!.sendText(selectedText! + ' ', false); // Add trailing space
     }, 100);
     
     vscode.window.showInformationMessage('Sent selected text to Gemini CLI');
@@ -227,7 +228,7 @@ function sendOpenFilesToGemini() {
         return;
     }
     
-    const filesText = ` @${openFiles.join(' @')} `;
+    const filesText = `@${openFiles.join(' @')} `; // Add trailing space
     
     // Send to terminal
     activeTerminal.show();
@@ -284,6 +285,9 @@ export function activate(context: vscode.ExtensionContext) {
     // Create status bar items
     createStatusBarItems(context);
     
+    // Create FileHandler instance
+    const fileHandler = new FileHandler(geminiTerminals);
+    
     const startInNewPane = vscode.commands.registerCommand('gemini-cli-vscode.startInNewPane', () => {
         createOrFocusTerminal(context, { viewColumn: vscode.ViewColumn.Beside });
         updateStatusBarVisibility();
@@ -294,7 +298,7 @@ export function activate(context: vscode.ExtensionContext) {
         updateStatusBarVisibility();
     });
     
-    const sendOpenFiles = vscode.commands.registerCommand('gemini-cli-vscode.sendOpenFiles', () => {
+    const sendOpenFilePath = vscode.commands.registerCommand('gemini-cli-vscode.sendOpenFilePath', () => {
         sendOpenFilesToGemini();
     });
     
@@ -302,8 +306,30 @@ export function activate(context: vscode.ExtensionContext) {
         await saveClipboardToHistory();
     });
     
-    const sendSelected = vscode.commands.registerCommand('gemini-cli-vscode.sendSelectedToGemini', async () => {
+    const sendSelectedText = vscode.commands.registerCommand('gemini-cli-vscode.sendSelectedText', async () => {
         await sendSelectedToGemini();
+    });
+    
+    const sendFilePath = vscode.commands.registerCommand('gemini-cli-vscode.sendFilePath', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
+        console.log('sendFilePath called with uri:', uri?.fsPath, 'uris:', uris ? uris.map(u => u.fsPath) : 'none');
+        
+        // Handle multiple selection from explorer
+        if (uris && uris.length > 0) {
+            await fileHandler.sendFilesToTerminal(uris);
+        } 
+        // Handle single selection or editor tab context
+        else if (uri) {
+            await fileHandler.sendFilesToTerminal(uri);
+        }
+        // Handle command palette or other invocations
+        else {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor) {
+                await fileHandler.sendFilesToTerminal(activeEditor.document.uri);
+            } else {
+                vscode.window.showWarningMessage('No file selected');
+            }
+        }
     });
     
     // Update status bar visibility when terminal or editor changes
@@ -335,9 +361,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         startInNewPane, 
         startInActivePane, 
-        sendOpenFiles,
+        sendOpenFilePath,
         saveClipboard,
-        sendSelected
+        sendSelectedText,
+        sendFilePath
     );
 }
 
