@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.7] - 2025-08-09
+
+### Fixed
+
+- Fixed multiline text sending in "Send Selected Text" command - now pastes without auto-execution, allowing users to edit before running
+
 ## [0.0.6] - 2025-08-08
 
 ### Added

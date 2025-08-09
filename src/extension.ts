@@ -207,8 +207,13 @@ async function sendSelectedToCLI(targetCLI?: CLIType) {
     activeTerminal.show();
     
     // Add a small delay to ensure terminal is focused
-    setTimeout(() => {
-        activeTerminal!.sendText(selectedText! + ' ', false); // Add trailing space
+    setTimeout(async () => {
+        // Copy text to clipboard
+        await vscode.env.clipboard.writeText(selectedText!);
+        
+        // Use VS Code's paste command for terminal
+        // This pastes without executing, even with newlines
+        await vscode.commands.executeCommand('workbench.action.terminal.paste');
     }, 100);
     
     vscode.window.showInformationMessage(`Sent selected text to ${cliName}`);

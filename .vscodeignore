@@ -1,19 +1,20 @@
+# Development and IDE files
 .vscode/**
 .vscode-test/**
 .gitignore
 
+# Source files (TypeScript)
 src/**
 
+# Dependencies (already in package)
 node_modules/**
 
+# Development config files
 .eslintrc.json
 tsconfig.json
 
+# Package files
 *.vsix
-
-.claude
-
-/dev-workspace
 
 # User data - history folders
 .history-memo/
@@ -23,8 +24,8 @@ tsconfig.json
 # GitHub files
 .github/
 
-# Documentation images (if not needed)
-# images/
+# Documentation files (alternative language versions)
+README-ja.md
 
 # Test files
 **/*.test.ts
@@ -33,3 +34,10 @@ tsconfig.json
 
 # Source maps
 **/*.map
+
+# AI agent related files
+/dev-workspace
+.claude
+CLAUDE.md
+GEMINI.md
+AGENTS.md

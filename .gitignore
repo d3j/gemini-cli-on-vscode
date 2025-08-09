@@ -16,9 +16,6 @@
 # macOS
 .DS_Store
 
-# Claude Code
-.claude
-
 # Development workspace
 /dev-workspace
 
@@ -40,3 +37,10 @@ yarn-error.log*
 # Test coverage
 coverage/
 .nyc_output/
+
+# AI agent related files
+/dev-workspace
+.claude
+CLAUDE.md
+GEMINI.md
+AGENTS.md
