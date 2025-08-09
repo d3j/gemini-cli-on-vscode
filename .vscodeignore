@@ -33,7 +33,3 @@ tsconfig.json
 
 # Source maps
 **/*.map
-
-# Markdown files (except README)
-CHANGELOG.md
-LICENSE

@@ -6,7 +6,7 @@
 
 ### Finally: The Same Claude Code Experience with Gemini CLI & Codex CLI (GPT-5)
 
-![Editor Integration Demo](images/onVScode-ja.png)
+![Extension Features](images/ExtensionFeatures.png)
 
 ## 💡 Why This Extension is Revolutionary
 
@@ -64,32 +64,6 @@
   - `gemini.showInContextMenu` / `codex.showInContextMenu` - Context menu visibility
   - `saveToHistory.showStatusBar` - Status bar visibility control
   - `saveToHistory.includeTerminalName` - Include terminal name in history
-
-#### v0.0.5
-- **Send File/Folder Paths**: Send any file or folder to Gemini CLI
-  - Right-click in Explorer → "Send File Path" (supports multiple selection)
-  - Right-click on editor tab → "Send File Path"
-  - Folders can also be sent
-- **Improved Command Names**: Clearer, more intuitive names
-  - "Send File Path" - for selected files/folders
-  - "Send Open File Path" - for all open files
-  - "Send Selected Text" - for selected text
-
-#### v0.0.4
-
-- **History Save Feature**: Manually save terminal output
-  - Status bar button for easy saving to date-based files
-- **Editor to Gemini**: Send editor text to Gemini CLI
-  - Select text in editor → Right-click menu → "Send Selected Text"
-
-#### v0.0.3
-
-- **Send Open Files**: Send all open editor tabs to Gemini CLI at once
-
-#### v0.0.2
-- **Auto-navigation**: Automatically navigates to your workspace folder
-- **Terminal reuse**: Focuses existing Gemini CLI instead of creating duplicates
-- **Custom keybindings**: Set your own keyboard shortcuts
 
 ## 🚀 Quick Start
 

@@ -6,7 +6,7 @@
 
 ### ついに実現：Claude Codeと同じ体験をGemini CLI & Codex CLI (GPT-5) で
 
-![エディタ統合デモ](images/onVScode-ja.png)
+![Extension Features](images/ExtensionFeatures.png)
 
 ## 💡 なぜこの拡張が革新的なのか？
 
@@ -62,34 +62,6 @@
   - `gemini.showInContextMenu` / `codex.showInContextMenu` - コンテキストメニュー表示
   - `saveToHistory.showStatusBar` - ステータスバー表示制御
   - `saveToHistory.includeTerminalName` - 履歴にターミナル名を含める
-
-#### v0.0.5
-
-- **ファイル/フォルダパス送信**: あらゆるファイル・フォルダをGemini CLIに送信
-  - エクスプローラーで右クリック → "Send File Path"（複数選択対応）
-  - エディタタブで右クリック → "Send File Path"
-  - フォルダも送信可能
-- **改善されたコマンド名**: より分かりやすい名前に変更
-  - "Send File Path" - 選択したファイル/フォルダのパス
-  - "Send Open File Path" - 開いているファイルすべて
-  - "Send Selected Text" - 選択したテキスト
-
-#### v0.0.4
-
-- **履歴保存機能**: ターミナル出力を手動保存
-  - ステータスバーボタンで簡単に、日付別ファイルに保存
-- **エディタからGeminiへ**: エディタテキストをGemini CLIに送信
-  - エディタで文字列選択して右クリックメニュー → "Send Selected Text"
-
-#### v0.0.3
-
-- **開いているファイル名を一括送信**: 開いているタブすべてをGemini CLIに送信
-
-#### v0.0.2
-
-- **自動ナビゲーション**: ワークスペースフォルダーへ自動移動
-- **ターミナル再利用**: 重複作成せず既存のGemini CLIにフォーカス
-- **カスタムキーバインド**: 独自のキーボードショートカットを設定可能
 
 ## 🚀 クイックスタート
 
