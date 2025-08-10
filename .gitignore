@@ -16,9 +16,6 @@
 # macOS
 .DS_Store
 
-# Development workspace
-/dev-workspace
-
 # VSIX packages
 *.vsix
 

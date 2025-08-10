@@ -193,7 +193,7 @@ suite('FileHandler Test Suite', () => {
             await fileHandler.sendFilesToTerminal(uri);
             
             assert.ok(testContext.stubs.showWarningMessage.calledWith(
-                'Gemini CLI is not running. Please start it first.'
+                'No AI CLI is running. Please start Gemini or Codex CLI first.'
             ));
         });
 

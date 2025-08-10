@@ -175,6 +175,11 @@
           "type": "boolean",
           "default": true,
           "description": "Include terminal name in history entries"
+        },
+        "gemini-cli-vscode.terminal.disableFlowControl": {
+          "type": "boolean",
+          "default": true,
+          "description": "Disable XON/XOFF flow control (stty -ixon) to prevent Ctrl+S from freezing output"
         }
       }
     }

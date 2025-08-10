@@ -36,8 +36,13 @@ README-ja.md
 **/*.map
 
 # AI agent related files
-/dev-workspace
+dev-workspace/**
 .claude
 CLAUDE.md
 GEMINI.md
 AGENTS.md
+
+# Test configuration files
+.nycrc.json
+.vscode-test.mjs
+.vscode-test-unit.mjs

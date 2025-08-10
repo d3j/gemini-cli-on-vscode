@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.8] - 2025-08-10
+
+### Added
+
+- **Automatic Flow Control Prevention** - Prevents terminal output freezing when launching Gemini or Codex CLI
+  - Automatically applies `stty -ixon` to disable XON/XOFF flow control
+  - Prevents Ctrl+S from accidentally freezing output
+  - Configurable via `terminal.disableFlowControl` setting (enabled by default)
+- **Terminal Workaround Settings** - New configuration option for terminal behavior
+  - `gemini-cli-vscode.terminal.disableFlowControl` - Disable flow control (default: true)
+
+### Fixed
+
+- Resolved Codex CLI output freezing issue during long generations
+- Fixed VS Code integrated terminal flow control problems
+
+### Changed
+
+- Improved test coverage for clipboard operations
+- Simplified troubleshooting documentation
+- Removed unnecessary manual workarounds from documentation
+
+### Technical
+
+- Addresses known VS Code integrated terminal behavior with long, rapid outputs
+- Applies terminal settings only to CLIs launched through this extension
+- Improved test reliability by handling clipboard API limitations
+
 ## [0.0.7] - 2025-08-09
 
 ### Fixed

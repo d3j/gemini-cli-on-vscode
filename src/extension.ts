@@ -254,6 +254,16 @@ function createOrFocusTerminal(context: vscode.ExtensionContext, location: vscod
     // Store the new terminal
     terminals.set(key, terminal);
     
+    // Get configuration for terminal workarounds
+    const config = vscode.workspace.getConfiguration('gemini-cli-vscode');
+    const disableFlowControl = config.get<boolean>('terminal.disableFlowControl', true);
+    
+    // Apply terminal workarounds if enabled
+    if (disableFlowControl) {
+        // Disable XON/XOFF flow control to prevent Ctrl+S from freezing output
+        terminal.sendText('stty -ixon 2>/dev/null');
+    }
+    
     // Navigate to workspace folder if available
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (workspaceFolder) {
@@ -346,6 +356,7 @@ function sendOpenFilesToCLI(targetCLI?: CLIType) {
     
     vscode.window.showInformationMessage(`Sent ${openFiles.length} file(s) to ${cliName}`);
 }
+
 
 
 function createStatusBarItems(context: vscode.ExtensionContext) {

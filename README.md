@@ -302,6 +302,12 @@ gemini
 - Ensure you have an active editor open
 - Try reloading VS Code window (`Cmd+R` / `Ctrl+R`)
 
+### 🔧 Output Freezing Prevention
+
+This extension automatically prevents flow control issues when launching Gemini or Codex CLI by applying `stty -ixon`.
+
+**Note:** This addresses a known VS Code integrated terminal issue with long, rapid outputs.
+
 ## 🤝 Contributing
 
 Bug reports, feature requests, and pull requests are welcome!
