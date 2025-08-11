@@ -1,8 +1,3 @@
-# User data - history folders
-.history-memo/
-.gemini-history/
-.codex-history/
-
 # Dependencies
 /node_modules
 
@@ -35,9 +30,14 @@ yarn-error.log*
 coverage/
 .nyc_output/
 
+# User data - history folders
+.history-memo
+.private
+
 # AI agent related files
 /dev-workspace
 .claude
 CLAUDE.md
 GEMINI.md
 AGENTS.md
+

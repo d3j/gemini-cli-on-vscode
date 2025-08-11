@@ -1,0 +1,3 @@
+[submodule ".private"]
+	path = .private
+	url = https://github.com/d3j/gemini-cli-on-vscode-private.git

@@ -2,6 +2,7 @@
 .vscode/**
 .vscode-test/**
 .gitignore
+.gitmodules
 
 # Source files (TypeScript)
 src/**
@@ -16,11 +17,6 @@ tsconfig.json
 # Package files
 *.vsix
 
-# User data - history folders
-.history-memo/
-.gemini-history/
-.codex-history/
-
 # GitHub files
 .github/
 
@@ -32,17 +28,25 @@ README-ja.md
 **/*.test.js
 **/test/
 
-# Source maps
-**/*.map
-
-# AI agent related files
-dev-workspace/**
-.claude
-CLAUDE.md
-GEMINI.md
-AGENTS.md
-
 # Test configuration files
 .nycrc.json
 .vscode-test.mjs
 .vscode-test-unit.mjs
+
+# Test coverage files
+.nyc_output/**
+coverage/**
+
+# Source maps
+**/*.map
+
+# User data - history folders
+.history-memo
+.private/**
+
+# AI agent related files
+dev-workspace
+.claude
+CLAUDE.md
+GEMINI.md
+AGENTS.md
