@@ -2,11 +2,11 @@
 
 [🇯🇵 日本語版](README-ja.md) | **🇺🇸 English**
 
-## 🎨 Gemini & Codex CLI Running in Editor Windows
-
-### Finally: The Same Claude Code Experience with Gemini CLI & Codex CLI (GPT-5)
+## 🎤 Three AI CLIs and One Extension - "We be getting down with no delay"
 
 ![Extension Features](images/ExtensionFeatures.png)
+
+### Finally: The Same Claude Code Experience with Gemini CLI & Codex CLI (GPT-5)
 
 ## 💡 Why This Extension is Revolutionary
 
@@ -50,7 +50,12 @@
 
 ### 🆕 Smart Features
 
-#### v0.0.6 🚀 NEW - GPT-5 Launch Support!
+#### v0.0.8 ✴️ NEW - Three CLIs on Stage!
+
+- **Claude Code Joins the Party**: Claude Code was originally usable, but...
+- **"Getting down with no delay"**: Push the "AI Brain" button for three CLIs on stage at once
+
+#### v0.0.6 🚀 GPT-5 Launch Support!
 
 - **Codex CLI Support**: Run OpenAI's Codex CLI (GPT-5 powered) in editor panes
 - **Universal History**: Works with all terminals (Gemini CLI, Codex CLI, Claude Code, bash, zsh)
@@ -77,15 +82,33 @@ gemini  # Google account authentication
 # Install Codex CLI (for GPT-5)
 npm install -g codex
 codex   # OpenAI account authentication
+
+# Install Claude CLI (for Claude)
+npm install -g @anthropic-ai/claude-cli
+claude  # Anthropic account authentication
 ```
 
 ### Usage
 
 1. **Open any project in VS Code**
 2. **Click the icon in the editor title bar**
+   - 🚀 **Launch All CLIs** - Launch three CLIs at once
    - ✨ Launch Gemini CLI
    - ❄️ Launch Codex CLI
+   - ✴️ Launch Claude Code
 3. **AI CLI launches in a new editor pane!**
+
+### 🎨 Customizing Editor Title Bar Buttons
+
+**To hide buttons:**
+- **Right-click** on any button in the editor title bar
+- **Uncheck** the command from the menu
+
+**To show buttons again:**
+- **Right-click** on empty space in the editor title bar  
+- **Check** the hidden commands in the menu
+
+💡 **Tip**: Even with buttons hidden, all features remain accessible via Command Palette (`Cmd/Ctrl+Shift+P`).
 
 Or use Command Palette:
 
@@ -321,6 +344,17 @@ Bug reports, feature requests, and pull requests are welcome!
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
 - [Claude Code](https://claude.ai/claude-code) by Anthropic
 - VS Code Extension developer community
+
+### 🎨 Icon Credits
+
+Icons used in this extension are property of their respective owners:
+
+- **AllCLIs-icon.png** - [Irasutoya](https://www.irasutoya.com/)
+- **claude-logo.png** - Anthropic
+- **codex-icon.png** - OpenAI
+- **icon.png** (Gemini) - Google
+
+※ Company logos are used for identification purposes only. This extension has no official affiliation with these companies.
 
 ---
 

@@ -2,15 +2,13 @@
 
 **🇯🇵 日本語版** | [🇺🇸 English](README.md)
 
-## 🎨 エディタウィンドウで動くGemini & Codex CLI
-
-### ついに実現：Claude Codeと同じ体験をGemini CLI & Codex CLI (GPT-5) で
+## 🎨 3つのAI CLI（Gemini、Codex、Claude Code）を統一管理
 
 ![Extension Features](images/ExtensionFeatures.png)
 
 ## 💡 なぜこの拡張が革新的なのか？
 
-- ❌ 従来：ターミナルでのみ動作するGemini CLI
+- ❌ 従来：ターミナルでのみ動作するGemini CLIやCodex CLI
 - ✅ 革新：エディタ統合によるClaude Code風体験
 
 ### 🔄 従来の制約
@@ -32,8 +30,8 @@
 
 ### 🖱️ ワンクリック起動
 
+- **3種のAIを一括起動**と個別起動
 - **エディタタイトルバーのアイコン**で即座にアクセス
-- **コマンドパレット**統合
 
 ### 🔧 真のエディタ統合
 
@@ -49,19 +47,29 @@
 
 ### 🆕 スマート機能
 
-#### v0.0.6 🚀 NEW - GPT-5リリース記念！
+#### v0.0.8 ✴️ NEW - マルチCLI対応！
+
+- **Claude Code 統合**: Claude Codeも扱えます
+- **一括起動機能**: 「Launch All CLIs」ボタンで3つのCLIを同時起動
+  - すべてのAI CLIを並べて配置
+
+#### v0.0.6 GPT-5リリース記念！
 
 - **Codex CLI サポート**: OpenAIのCodex CLI (GPT-5対応) をエディタペインで実行
 - **ユニバーサル履歴保存**: 複数のAI CLI（Gemini CLI、Codex CLI、Claude Code）で動作
   - 統一履歴フォルダ `.history-memo/` で日々の作業記録を管理
-- **個別CLIコマンド**: Gemini/Codex それぞれに専用コマンド
+- **個別CLIコマンド**: 各CLIに専用コマンド
   - Gemini CLI: Send Selected Text / File Path / Open File Path
   - Codex CLI: Send Selected Text / File Path / Open File Path
+  - Claude Code: Send Selected Text / File Path / Open File Path
 - **詳細な設定オプション**:
-  - `gemini.enabled` / `codex.enabled` - 各CLIの有効/無効
-  - `gemini.showInContextMenu` / `codex.showInContextMenu` - コンテキストメニュー表示
+  - `gemini.enabled` / `codex.enabled` / `claude.enabled` - 各CLIの有効/無効
+  - `gemini.showInContextMenu` / `codex.showInContextMenu` / `claude.showInContextMenu` - コンテキストメニュー表示
+  - `multiCLI.enabled` - マルチCLI機能の有効/無効
+  - `multiCLI.launch.clis` - 一括起動するCLIと順序のカスタマイズ
   - `saveToHistory.showStatusBar` - ステータスバー表示制御
   - `saveToHistory.includeTerminalName` - 履歴にターミナル名を含める
+  - `terminal.disableFlowControl` - XON/XOFFフロー制御の無効化（Ctrl+Sフリーズ防止）
 
 ## 🚀 クイックスタート
 
@@ -75,22 +83,40 @@ gemini  # Googleアカウント認証
 # Codex CLIのインストール（GPT-5使用時）
 npm install -g codex
 codex   # OpenAIアカウント認証
+
+# Claude CLIのインストール（Claude使用時）
+npm install -g @anthropic-ai/claude-cli
+claude  # Anthropicアカウント認証
 ```
 
 ### 使用方法
 
 1. **VS Codeで任意のプロジェクトを開く**
 2. **エディタタイトルバーのアイコンをクリック**
+   - 🚀 **Launch All CLIs** - 3つのCLIを一括起動
    - ✨ Gemini CLI起動
    - ❄️ Codex CLI起動
-3. **AI CLIが新しいエディタペインで起動！**
+   - ✴️  Claude Code起動
+3. **AI CLIがエディタペインで起動！**
+
+### 🎨 エディタタイトルバーのボタンカスタマイズ
+
+**ボタンを非表示にする：**
+- エディタタイトルバーのボタンを**右クリック**
+- メニューから該当コマンドの**チェックを外す**
+
+**ボタンを再表示する：**
+- エディタタイトルバーの**空いている場所を右クリック**
+- メニューから非表示にしたコマンドに**チェックを入れる**
+
+💡 **ヒント**: ボタンを非表示にしても、コマンドパレット（`Cmd/Ctrl+Shift+P`）からすべての機能にアクセス可能です。
 
 ### 📁 ファイル/フォルダをAI CLIに送信
 
 **エクスプローラーから送信**
 
 - ファイルまたはフォルダを右クリック
-- "Gemini CLI: Send File Path" または "Codex CLI: Send File Path" を選択
+- "Gemini CLI: Send File Path"、"Codex CLI: Send File Path"、または "Claude Code: Send File Path" を選択
 - 複数選択対応（Ctrl/Cmd+クリック）
 
 **エディタタブから送信**
@@ -101,7 +127,7 @@ codex   # OpenAIアカウント認証
 **開いているファイルをすべて送信**
 
 - エディタ内で右クリック
-- "Gemini CLI: Send Open File Path" または "Codex CLI: Send Open File Path" を選択
+- 使用したいCLI用の "Send Open File Path" を選択
 
 すべてのパスが`@`付きで選択したCLIに送信されます。
 
@@ -123,7 +149,7 @@ codex   # OpenAIアカウント認証
 **選択テキストの送信:**
 
 - エディタでテキストを選択 → 右クリック
-- "Gemini CLI: Send Selected Text" または "Codex CLI: Send Selected Text"
+- "Gemini CLI: Send Selected Text"、"Codex CLI: Send Selected Text"、または "Claude Code: Send Selected Text"
 
 **ファイル/フォルダパスの送信:**
 
@@ -142,6 +168,10 @@ codex   # OpenAIアカウント認証
 
 - コマンドパレットを開く（`Cmd+Shift+P` / `Ctrl+Shift+P`）
 
+**マルチCLI コマンド:**
+
+- **"Launch All CLIs"** - 3つのCLIを一括起動（同じグループにタブとして配置）
+
 **Gemini CLI コマンド:**
 
 - "Gemini CLI: Start in New Pane" - 新しいペインで起動
@@ -158,6 +188,14 @@ codex   # OpenAIアカウント認証
 - "Codex CLI: Send Open File Path" - 開いているファイルをすべて送信
 - "Codex CLI: Send Selected Text" - 選択テキストを送信
 
+**Claude Code コマンド:**
+
+- "Claude Code: Start in New Pane" - 新しいペインで起動
+- "Claude Code: Start in Active Pane" - アクティブペインで起動
+- "Claude Code: Send File Path" - ファイル/フォルダパスを送信
+- "Claude Code: Send Open File Path" - 開いているファイルをすべて送信
+- "Claude Code: Send Selected Text" - 選択テキストを送信
+
 **共通コマンド:**
 
 - "Save to History" - 履歴を保存（すべてのターミナルで動作）
@@ -167,7 +205,7 @@ codex   # OpenAIアカウント認証
 独自のキーバインディングを設定可能：
 
 1. キーボードショートカットを開く: `Cmd+K Cmd+S`（Mac）または `Ctrl+K Ctrl+S`（Windows/Linux）
-2. "Gemini CLI" または "Codex CLI" で検索
+2. "CLI" で検索
 3. 鉛筆アイコンをクリックしてお好みのキーを割り当て
 
 ## 🆚 他の選択肢との比較
@@ -179,19 +217,20 @@ codex   # OpenAIアカウント認証
 
 ### 📊 比較表
 
-| 機能 | Gemini CLI | この拡張 | Gemini Code Assist | Claude Code |
-|------|-------------------|----------|--------------------------|----------------|
-| **コード生成** | ✅ | ✅ | ✅ | ✅ |
-| **エディタペインで動作** | ❌（ターミナル） | ✅ | ❌（サイドバー） | ✅ |
-| **ワンクリック起動** | ❌ | ✅ | ✅ | ✅ |
-| **ターミナルベースインターフェース** | ✅ | ✅ | ❌ | ✅ |
-| **ファイルコンテキスト（@）** | ✅ | ✅ | ✅ | ✅ |
-| **エディタテキストを送信** | ❌ | ✅ | ✅ | ❌ (別ターミナル) |
-| **複数ファイル選択送信** | ❌ | ✅ | ✅ | ❌ |
-| **ユニバーサル履歴** | ❌ | ✅ | ❌ | ❌ |
-| **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ |
-| **GPT-5モデル対応** | ❌ | ✅ | ❌ | ❌ |
-| **複数CLI同時管理** | ❌ | ✅ | ❌ | ❌ |
+| 機能 | この拡張 | Gemini Code Assist | Gemini CLI | Codex CLI | Claude Code |
+|------|----------|--------------------------|-------------------|-------------------|----------------|
+| **コード生成** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **ワンクリック起動** | ✅ | ✅ | ❌ | ❌ | ✅ |
+| **エディタペインで動作** | ✅ | ❌（サイドバー） | ❌（ターミナル） | ❌（ターミナル） | ✅ |
+| **ターミナルベースインターフェース** | ✅ | ❌ | ✅ | ✅ | ✅ |
+| **ファイルコンテキスト** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **エディタテキストを送信** | ✅ | ✅ | ❌ | ❌ | ❌ (別ターミナル) |
+| **ユニバーサル履歴** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **OpenAIモデル対応** | ✅ | ❌ | ❌ | ✅ | ❌ |
+| **Claudeモデル対応** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **複数AI CLI管理** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **一括起動機能** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ## ⚙️ 設定オプション
 
@@ -202,23 +241,35 @@ codex   # OpenAIアカウント認証
   // CLI機能の有効/無効
   "gemini-cli-vscode.gemini.enabled": true,
   "gemini-cli-vscode.codex.enabled": true,
+  "gemini-cli-vscode.claude.enabled": true,
   
   // コンテキストメニュー表示
   "gemini-cli-vscode.gemini.showInContextMenu": true,
-  "gemini-cli-vscode.codex.showInContextMenu": false,
+  "gemini-cli-vscode.codex.showInContextMenu": true,
+  "gemini-cli-vscode.claude.showInContextMenu": true,
+  
+  // マルチCLI機能
+  "gemini-cli-vscode.multiCLI.enabled": true,
+  "gemini-cli-vscode.multiCLI.launch.clis": ["claude", "gemini", "codex"],
   
   // 履歴保存設定
   "gemini-cli-vscode.saveToHistory.showStatusBar": true,
-  "gemini-cli-vscode.saveToHistory.includeTerminalName": true
+  "gemini-cli-vscode.saveToHistory.includeTerminalName": true,
+  
+  // ターミナル設定
+  "gemini-cli-vscode.terminal.disableFlowControl": true
 }
 ```
 
 設定の説明:
 
-- `enabled`: CLIの機能とエディタタイトルバーアイコンの表示を制御
+- `enabled`: 各CLIの機能とエディタタイトルバーアイコンの表示を制御
 - `showInContextMenu`: 右クリックメニューでのコマンド表示を制御
+- `multiCLI.enabled`: マルチCLI機能（一括起動）の有効/無効
+- `multiCLI.launch.clis`: 一括起動するCLIと起動順序（配列の順番で起動）
 - `saveToHistory.showStatusBar`: ステータスバーの「Save to History」ボタン表示
 - `saveToHistory.includeTerminalName`: 履歴エントリにターミナル名を含める
+- `terminal.disableFlowControl`: XON/XOFFフロー制御を無効化（Ctrl+Sフリーズ防止）
 
 ## 🛠️ 開発
 
@@ -263,7 +314,7 @@ gemini
 
 ### 🔧 出力フリーズ防止
 
-この拡張機能によって起動した Gemini または Codex CLI フロー制御の問題を自動的に `stty -ixon` を適用して防止します。
+この拡張機能によって起動した Gemini または Codex CLI のフロー制御の問題を `stty -ixon` を自動的に適用して防止します。
 
 **注意:** これは長く高速な出力に伴うVS Code統合ターミナルの既知の問題への対処です。
 
@@ -280,6 +331,17 @@ gemini
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
 - [Claude Code](https://claude.ai/claude-code) by Anthropic
 - VS Code Extension開発者コミュニティ
+
+### 🎨 アイコン素材
+
+この拡張機能で使用しているアイコンの著作権は各権利者に帰属します：
+
+- **AllCLIs-icon.png** - [いらすとや](https://www.irasutoya.com/)
+- **claude-logo.png** - Anthropic
+- **codex-icon.png** - OpenAI
+- **icon.png** (Gemini) - Google
+
+※ 各企業のロゴは識別目的でのみ使用しており、この拡張機能は各社と公式な提携関係にはありません。
 
 ---
 

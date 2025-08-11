@@ -9,23 +9,23 @@ import {
     waitForAsync
 } from '../helpers/testUtils';
 
-suite('FileHandler Unit Test Suite', () => {
+describe('FileHandler Unit Test Suite', () => {
     let fileHandler: FileHandler;
     let mockTerminals: Map<string, vscode.Terminal>;
     let testContext: ReturnType<typeof createTestContext>;
 
-    setup(() => {
+    beforeEach(() => {
         testContext = createTestContext();
         mockTerminals = new Map<string, vscode.Terminal>();
-        fileHandler = new FileHandler(mockTerminals, new Map());
+        fileHandler = new FileHandler(mockTerminals, new Map(), new Map());
     });
 
-    teardown(() => {
+    afterEach(() => {
         cleanupTestContext(testContext);
     });
 
-    suite('formatFilePath', () => {
-        test('should format path with @ prefix', () => {
+    describe('formatFilePath', () => {
+        it('should format path with @ prefix', () => {
             const uri = vscode.Uri.file('/workspace/test/file.txt');
             testContext.stubs.asRelativePath.returns('test/file.txt');
             
@@ -34,7 +34,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(formatted, '@test/file.txt');
         });
 
-        test('should handle paths with spaces', () => {
+        it('should handle paths with spaces', () => {
             const uri = vscode.Uri.file('/workspace/test folder/my file.txt');
             testContext.stubs.asRelativePath.returns('test folder/my file.txt');
             
@@ -43,7 +43,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(formatted, '@"test folder/my file.txt"');
         });
 
-        test('should handle Japanese characters in path', () => {
+        it('should handle Japanese characters in path', () => {
             const uri = vscode.Uri.file('/workspace/テスト/ファイル.txt');
             testContext.stubs.asRelativePath.returns('テスト/ファイル.txt');
             
@@ -52,7 +52,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(formatted, '@"テスト/ファイル.txt"');
         });
 
-        test('should handle paths with mixed special characters', () => {
+        it('should handle paths with mixed special characters', () => {
             const uri = vscode.Uri.file('/workspace/src/components/Button (legacy).tsx');
             testContext.stubs.asRelativePath.returns('src/components/Button (legacy).tsx');
             
@@ -61,7 +61,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(formatted, '@"src/components/Button (legacy).tsx"');
         });
 
-        test('should not quote simple paths', () => {
+        it('should not quote simple paths', () => {
             const uri = vscode.Uri.file('/workspace/src/index.ts');
             testContext.stubs.asRelativePath.returns('src/index.ts');
             
@@ -70,7 +70,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(formatted, '@src/index.ts');
         });
 
-        test('should handle emoji in file paths', () => {
+        it('should handle emoji in file paths', () => {
             const uri = vscode.Uri.file('/workspace/docs/📝notes.md');
             testContext.stubs.asRelativePath.returns('docs/📝notes.md');
             
@@ -80,14 +80,14 @@ suite('FileHandler Unit Test Suite', () => {
         });
     });
 
-    suite('findCLITerminal', () => {
-        test('should return undefined when no terminals exist', () => {
+    describe('findCLITerminal', () => {
+        it('should return undefined when no terminals exist', () => {
             const terminals: vscode.Terminal[] = [];
             const terminal = fileHandler.findCLITerminal(terminals);
             assert.strictEqual(terminal, undefined);
         });
 
-        test('should return undefined when no CLI terminals in map', () => {
+        it('should return undefined when no CLI terminals in map', () => {
             const terminal1 = createMockTerminal('Other Terminal');
             const terminal2 = createMockTerminal('Another Terminal');
             const terminals = [terminal1, terminal2] as unknown as vscode.Terminal[];
@@ -97,7 +97,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(terminal, undefined);
         });
 
-        test('should find CLI terminal when it exists', () => {
+        it('should find CLI terminal when it exists', () => {
             const cliTerminal = createMockTerminal('Gemini CLI');
             const otherTerminal = createMockTerminal('Other Terminal');
             
@@ -109,7 +109,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.strictEqual(terminal, cliTerminal);
         });
 
-        test('should return first matching CLI terminal', () => {
+        it('should return first matching CLI terminal', () => {
             const cliTerminal1 = createMockTerminal('Gemini CLI');
             const cliTerminal2 = createMockTerminal('Codex CLI');
             
@@ -123,8 +123,8 @@ suite('FileHandler Unit Test Suite', () => {
         });
     });
 
-    suite('sendFilesToTerminal', () => {
-        test('should send single file to terminal', async () => {
+    describe('sendFilesToTerminal', () => {
+        it('should send single file to terminal', async () => {
             const geminiTerminal = createMockTerminal();
             mockTerminals.set('newPane', geminiTerminal as unknown as vscode.Terminal);
             testContext.sandbox.stub(vscode.window, 'terminals').value([geminiTerminal]);
@@ -142,7 +142,7 @@ suite('FileHandler Unit Test Suite', () => {
             assert.ok(testContext.stubs.showInformationMessage.calledWith('Sent 1 item to Gemini CLI'));
         });
 
-        test('should show warning when no terminal exists', async () => {
+        it('should show warning when no terminal exists', async () => {
             testContext.sandbox.stub(vscode.window, 'terminals').value([]);
             
             const uri = createMockUri('/workspace/src/index.ts');
@@ -150,7 +150,7 @@ suite('FileHandler Unit Test Suite', () => {
             await fileHandler.sendFilesToTerminal(uri);
             
             assert.ok(testContext.stubs.showWarningMessage.calledWith(
-                'No AI CLI is running. Please start Gemini or Codex CLI first.'
+                'No CLI is running. Please start Gemini, Codex, or Claude CLI first.'
             ));
         });
     });

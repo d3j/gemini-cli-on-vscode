@@ -22,7 +22,7 @@
     "cli",
     "terminal"
   ],
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -38,7 +38,10 @@
       {
         "command": "gemini-cli-vscode.startInNewPane",
         "title": "Gemini CLI: Start in New Pane",
-        "icon": "images/icon.png"
+        "icon": {
+          "light": "images/icon.png",
+          "dark": "images/icon.png"
+        }
       },
       {
         "command": "gemini-cli-vscode.startInActivePane",
@@ -47,7 +50,10 @@
       {
         "command": "gemini-cli-vscode.codexStartInNewPane",
         "title": "Codex CLI: Start in New Pane",
-        "icon": "images/codex-icon.png"
+        "icon": {
+          "light": "images/codex-icon.png",
+          "dark": "images/codex-icon.png"
+        }
       },
       {
         "command": "gemini-cli-vscode.codexStartInActivePane",
@@ -80,19 +86,62 @@
       {
         "command": "gemini-cli-vscode.sendOpenFilePathToCodex",
         "title": "Codex CLI: Send Open File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.claudeStartInNewPane",
+        "title": "Claude Code: Start in New Pane",
+        "icon": {
+          "light": "images/claude-logo.png",
+          "dark": "images/claude-logo.png"
+        }
+      },
+      {
+        "command": "gemini-cli-vscode.claudeStartInActivePane",
+        "title": "Claude Code: Start in Active Pane"
+      },
+      {
+        "command": "gemini-cli-vscode.sendSelectedTextToClaude",
+        "title": "Claude Code: Send Selected Text"
+      },
+      {
+        "command": "gemini-cli-vscode.sendFilePathToClaude",
+        "title": "Claude Code: Send File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.sendOpenFilePathToClaude",
+        "title": "Claude Code: Send Open File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.launchAllCLIs",
+        "title": "Launch All CLIs",
+        "category": "Gemini CLI",
+        "icon": {
+          "light": "images/AllCLIs-icon.png",
+          "dark": "images/AllCLIs-icon.png"
+        }
       }
     ],
     "menus": {
       "editor/title": [
+        {
+          "command": "gemini-cli-vscode.claudeStartInNewPane",
+          "group": "navigation",
+          "when": "config.gemini-cli-vscode.claude.enabled"
+        },
+        {
+          "command": "gemini-cli-vscode.codexStartInNewPane",
+          "group": "navigation",
+          "when": "config.gemini-cli-vscode.codex.enabled"
+        },
         {
           "command": "gemini-cli-vscode.startInNewPane",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.gemini.enabled"
         },
         {
-          "command": "gemini-cli-vscode.codexStartInNewPane",
+          "command": "gemini-cli-vscode.launchAllCLIs",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.codex.enabled"
+          "when": "config.gemini-cli-vscode.multiCLI.enabled"
         }
       ],
       "editor/context": [
@@ -115,6 +164,16 @@
           "command": "gemini-cli-vscode.sendSelectedTextToCodex",
           "group": "5_cutcopypaste@102",
           "when": "editorHasSelection && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendOpenFilePathToClaude",
+          "group": "5_cutcopypaste@103",
+          "when": "editorTextFocus && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendSelectedTextToClaude",
+          "group": "5_cutcopypaste@104",
+          "when": "editorHasSelection && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         }
       ],
       "explorer/context": [
@@ -127,6 +186,11 @@
           "command": "gemini-cli-vscode.sendFilePathToCodex",
           "group": "5_cutcopypaste@104",
           "when": "config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToClaude",
+          "group": "5_cutcopypaste@105",
+          "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         }
       ],
       "editor/title/context": [
@@ -139,6 +203,11 @@
           "command": "gemini-cli-vscode.sendFilePathToCodex",
           "group": "5_cutcopypaste@106",
           "when": "config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToClaude",
+          "group": "5_cutcopypaste@107",
+          "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         }
       ]
     },
@@ -180,6 +249,32 @@
           "type": "boolean",
           "default": true,
           "description": "Disable XON/XOFF flow control (stty -ixon) to prevent Ctrl+S from freezing output"
+        },
+        "gemini-cli-vscode.claude.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Claude Code CLI features"
+        },
+        "gemini-cli-vscode.claude.showInContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Claude Code commands in context menus"
+        },
+        "gemini-cli-vscode.multiCLI.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable multi-CLI features"
+        },
+        "gemini-cli-vscode.multiCLI.launch.clis": {
+          "type": "array",
+          "default": ["claude", "gemini", "codex"],
+          "items": {
+            "type": "string",
+            "enum": ["gemini", "codex", "claude"]
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "CLIs to launch with 'Launch All CLIs' command (order matters)"
         }
       }
     }

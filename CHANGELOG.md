@@ -2,33 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.8] - 2025-08-10
+## [0.0.8] - 2025-08-11
 
 ### Added
 
-- **Automatic Flow Control Prevention** - Prevents terminal output freezing when launching Gemini or Codex CLI
-  - Automatically applies `stty -ixon` to disable XON/XOFF flow control
-  - Prevents Ctrl+S from accidentally freezing output
-  - Configurable via `terminal.disableFlowControl` setting (enabled by default)
-- **Terminal Workaround Settings** - New configuration option for terminal behavior
-  - `gemini-cli-vscode.terminal.disableFlowControl` - Disable flow control (default: true)
+- **Claude Code Joins the Party** - The trio is complete!
+  - 🎤 Three AI CLIs on One Extension
+  - Consistent command structure across all three performers (Send File Path, Send Selected Text, etc.)
+- **Launch All CLIs Button** - three CLIs on stage at once
+  - Hit the "AI Brain" and watch the show begin - "Getting down with no delay"
+  - Configurable setlist via `multiCLI.launch.clis` setting
 
 ### Fixed
 
-- Resolved Codex CLI output freezing issue during long generations
-- Fixed VS Code integrated terminal flow control problems
-
-### Changed
-
-- Improved test coverage for clipboard operations
-- Simplified troubleshooting documentation
-- Removed unnecessary manual workarounds from documentation
-
-### Technical
-
-- Addresses known VS Code integrated terminal behavior with long, rapid outputs
-- Applies terminal settings only to CLIs launched through this extension
-- Improved test reliability by handling clipboard API limitations
+- Resolved Codex CLI output freezing issue during long CLI generations (VS Code flow control problem)
+- Test framework unified to BDD format
+- Test suite errors resolved (suite/test → describe/it migration)
 
 ## [0.0.7] - 2025-08-09
 
