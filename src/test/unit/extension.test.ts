@@ -406,18 +406,36 @@ describe('Extension Unit Test Suite', () => {
     });
 
     describe('Send Open Files', () => {
-        it.skip('should format and send all open file paths', async () => {
+        it('should format and send all open file paths', async () => {
             activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
-            sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);
             
-            // Create mock tab groups
+            // Mock the terminals array to include our mock terminal after it's created
+            const terminalsArray: vscode.Terminal[] = [];
+            sandbox.stub(vscode.window, 'terminals').get(() => terminalsArray);
+            
+            // Override createTerminal to also add to the array
+            testContext.stubs.createTerminal.callsFake(() => {
+                terminalsArray.push(mockTerminal as any);
+                return mockTerminal;
+            });
+            
+            // Create mock tab groups - need to use actual vscode.TabInputText constructor
+            const mockTab1Input = new MockTabInputText(createMockUri('/workspace/file1.ts'));
+            const mockTab2Input = new MockTabInputText(createMockUri('/workspace/dir/file2.ts'));
+            const mockTab3Input = new MockTabInputText(createMockUri('/workspace/file3.ts'));
+            
+            // Make instanceof check work
+            Object.setPrototypeOf(mockTab1Input, vscode.TabInputText.prototype);
+            Object.setPrototypeOf(mockTab2Input, vscode.TabInputText.prototype);
+            Object.setPrototypeOf(mockTab3Input, vscode.TabInputText.prototype);
+            
             const mockTabs = [
-                new MockTab(new MockTabInputText(createMockUri('/workspace/file1.ts'))),
-                new MockTab(new MockTabInputText(createMockUri('/workspace/dir/file2.ts'))),
-                new MockTab(new MockTabInputText(createMockUri('/workspace/file3.ts')))
+                new MockTab(mockTab1Input),
+                new MockTab(mockTab2Input),
+                new MockTab(mockTab3Input)
             ];
             const mockTabGroup = new MockTabGroup(mockTabs as any);
             
@@ -441,18 +459,14 @@ describe('Extension Unit Test Suite', () => {
             // Create terminal first
             await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
             
-            // Send open files
+            // Send open files (now returns a Promise)
             await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePathToGemini');
             
-            // Wait for async operation (sendOpenFilesToGemini uses 100ms setTimeout)
-            // Need extra time for setTimeout to execute
-            await waitForAsync(500);
+            // Wait a moment for the setTimeout inside sendOpenFilesToCLI
+            await waitForAsync(150);
             
-            // Debug: log actual calls
+            // Get actual calls for assertions
             const sendTextCalls = mockTerminal.sendText.getCalls();
-            if (sendTextCalls.length > 0) {
-                console.log('Actual sendText:', sendTextCalls.map(c => c.args));
-            }
             
             // Check if terminal was shown at least once
             assert.ok(mockTerminal.show.callCount >= 1, `Terminal should be shown at least once`);

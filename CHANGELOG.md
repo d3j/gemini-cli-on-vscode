@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.9] - TBD
+
+### Improved
+
+- **Test Suite Enhancement** - Improved test reliability and maintainability
+  - Complete migration to BDD format
+  - Enhanced test helpers for better stability
+  - Added comprehensive assertions
+
+### Fixed
+
+- Improved error logging (changed `console.log` to `console.error`)
+- Refactored `sendOpenFilesToCLI` function with Promise support
+
+### Technical
+
+- Updated ESLint configuration
+- Enhanced CI/CD workflow
+- Improved code quality and test coverage
+
 ## [0.0.8] - 2025-08-11
 
 ### Added

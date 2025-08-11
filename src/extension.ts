@@ -76,7 +76,7 @@ async function saveClipboardToHistory() {
             }
         } catch {
             // If copy selection fails, restore clipboard
-            console.log('Terminal copy selection failed');
+            console.error('Terminal copy selection failed');
         }
         
         // Restore original clipboard if no selection was found
@@ -344,41 +344,23 @@ async function launchAllCLIs(context: vscode.ExtensionContext) {
     );
 }
 
-function sendOpenFilesToCLI(targetCLI?: CLIType) {
-    // Find active CLI terminal (Gemini or Codex)
-    let activeTerminal: vscode.Terminal | undefined;
-    let cliName = 'AI CLI';
-    
-    if (targetCLI === 'codex') {
-        // Look for Codex terminal only
-        for (const terminal of codexTerminals.values()) {
-            if (vscode.window.terminals.includes(terminal)) {
-                activeTerminal = terminal;
-                cliName = 'Codex CLI';
-                break;
-            }
-        }
-    } else if (targetCLI === 'gemini') {
-        // Look for Gemini terminal only
-        for (const terminal of geminiTerminals.values()) {
-            if (vscode.window.terminals.includes(terminal)) {
-                activeTerminal = terminal;
-                cliName = 'Gemini CLI';
-                break;
-            }
-        }
-    } else {
-        // Check Codex terminals first
-        for (const terminal of codexTerminals.values()) {
-            if (vscode.window.terminals.includes(terminal)) {
-                activeTerminal = terminal;
-                cliName = 'Codex CLI';
-                break;
-            }
-        }
+function sendOpenFilesToCLI(targetCLI?: CLIType): Promise<void> {
+    return new Promise((resolve) => {
+        // Find active CLI terminal (Gemini or Codex)
+        let activeTerminal: vscode.Terminal | undefined;
+        let cliName = 'AI CLI';
         
-        // Then check Gemini terminals
-        if (!activeTerminal) {
+        if (targetCLI === 'codex') {
+            // Look for Codex terminal only
+            for (const terminal of codexTerminals.values()) {
+                if (vscode.window.terminals.includes(terminal)) {
+                    activeTerminal = terminal;
+                    cliName = 'Codex CLI';
+                    break;
+                }
+            }
+        } else if (targetCLI === 'gemini') {
+            // Look for Gemini terminal only
             for (const terminal of geminiTerminals.values()) {
                 if (vscode.window.terminals.includes(terminal)) {
                     activeTerminal = terminal;
@@ -386,42 +368,65 @@ function sendOpenFilesToCLI(targetCLI?: CLIType) {
                     break;
                 }
             }
+        } else {
+            // Check Codex terminals first
+            for (const terminal of codexTerminals.values()) {
+                if (vscode.window.terminals.includes(terminal)) {
+                    activeTerminal = terminal;
+                    cliName = 'Codex CLI';
+                    break;
+                }
+            }
+            
+            // Then check Gemini terminals
+            if (!activeTerminal) {
+                for (const terminal of geminiTerminals.values()) {
+                    if (vscode.window.terminals.includes(terminal)) {
+                        activeTerminal = terminal;
+                        cliName = 'Gemini CLI';
+                        break;
+                    }
+                }
+            }
         }
-    }
-    
-    if (!activeTerminal) {
-        const message = targetCLI 
-            ? `${targetCLI === 'codex' ? 'Codex' : 'Gemini'} CLI is not running. Please start it first.`
-            : 'No AI CLI is running. Please start Gemini or Codex CLI first.';
-        vscode.window.showWarningMessage(message);
-        return;
-    }
-    
-    // Get all open files
-    const openFiles = vscode.window.tabGroups.all
-        .flatMap(group => group.tabs)
-        .filter(tab => tab.input instanceof vscode.TabInputText)
-        .map(tab => {
-            const uri = (tab.input as vscode.TabInputText).uri;
-            return vscode.workspace.asRelativePath(uri);
-        });
-    
-    if (openFiles.length === 0) {
-        vscode.window.showInformationMessage('No files are currently open.');
-        return;
-    }
-    
-    const filesText = `@${openFiles.join(' @')} `; // Add trailing space
-    
-    // Send to terminal
-    activeTerminal.show();
-    
-    // Small delay to ensure terminal is focused and ready
-    setTimeout(() => {
-        activeTerminal!.sendText(filesText, false);
-    }, 100);
-    
-    vscode.window.showInformationMessage(`Sent ${openFiles.length} file(s) to ${cliName}`);
+        
+        if (!activeTerminal) {
+            const message = targetCLI 
+                ? `${targetCLI === 'codex' ? 'Codex' : 'Gemini'} CLI is not running. Please start it first.`
+                : 'No AI CLI is running. Please start Gemini or Codex CLI first.';
+            vscode.window.showWarningMessage(message);
+            resolve();
+            return;
+        }
+        
+        // Get all open files
+        const openFiles = vscode.window.tabGroups.all
+            .flatMap(group => group.tabs)
+            .filter(tab => tab.input instanceof vscode.TabInputText)
+            .map(tab => {
+                const uri = (tab.input as vscode.TabInputText).uri;
+                return vscode.workspace.asRelativePath(uri);
+            });
+        
+        if (openFiles.length === 0) {
+            vscode.window.showInformationMessage('No files are currently open.');
+            resolve();
+            return;
+        }
+        
+        const filesText = `@${openFiles.join(' @')} `; // Add trailing space
+        
+        // Send to terminal
+        activeTerminal.show();
+        
+        // Small delay to ensure terminal is focused and ready
+        setTimeout(() => {
+            activeTerminal!.sendText(filesText, false);
+            resolve();
+        }, 100);
+        
+        vscode.window.showInformationMessage(`Sent ${openFiles.length} file(s) to ${cliName}`);
+    });
 }
 
 
@@ -526,7 +531,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
     
     const sendOpenFilePathToGemini = vscode.commands.registerCommand('gemini-cli-vscode.sendOpenFilePathToGemini', () => {
-        sendOpenFilesToCLI('gemini');
+        return sendOpenFilesToCLI('gemini');
     });
     
     const sendFilePathToGemini = vscode.commands.registerCommand('gemini-cli-vscode.sendFilePathToGemini', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
@@ -550,7 +555,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
     
     const sendOpenFilePathToCodex = vscode.commands.registerCommand('gemini-cli-vscode.sendOpenFilePathToCodex', () => {
-        sendOpenFilesToCLI('codex');
+        return sendOpenFilesToCLI('codex');
     });
     
     const sendFilePathToCodex = vscode.commands.registerCommand('gemini-cli-vscode.sendFilePathToCodex', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
@@ -593,7 +598,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
     
     const sendOpenFilePathToClaude = vscode.commands.registerCommand('gemini-cli-vscode.sendOpenFilePathToClaude', () => {
-        sendOpenFilesToCLI('claude');
+        return sendOpenFilesToCLI('claude');
     });
     
     const sendFilePathToClaude = vscode.commands.registerCommand('gemini-cli-vscode.sendFilePathToClaude', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {

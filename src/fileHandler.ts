@@ -57,8 +57,8 @@ export class FileHandler {
         // Handle single URI or array
         const uriArray = Array.isArray(uris) ? uris : [uris];
         
-        // Debug log
-        console.log('sendFilesToTerminal called with:', uriArray.map(u => u.fsPath), 'target:', targetCLI);
+        // Debug log - commented out for production
+        // console.log('sendFilesToTerminal called with:', uriArray.map(u => u.fsPath), 'target:', targetCLI);
         
         if (!uriArray || uriArray.length === 0) {
             vscode.window.showWarningMessage('No item selected');
@@ -83,7 +83,8 @@ export class FileHandler {
         const paths = uriArray.map(uri => this.formatFilePath(uri));
         const message = paths.join(' ') + ' '; // Add trailing space
         
-        console.log('Sending to terminal:', message);
+        // Debug log - commented out for production
+        // console.log('Sending to terminal:', message);
         
         terminal.show();
         

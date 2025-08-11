@@ -7,7 +7,10 @@ export function run(): Promise<void> {
     const mocha = new Mocha({
         ui: 'bdd',
         color: true,
-        timeout: 20000
+        timeout: 20000,
+        // CI環境でのみ厳格化 - スキップされたテストや.onlyを検出
+        forbidOnly: process.env.CI === 'true',
+        forbidPending: process.env.CI === 'true'
     });
 
     const testsRoot = path.resolve(__dirname, '..');
