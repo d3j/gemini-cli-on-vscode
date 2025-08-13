@@ -4,23 +4,47 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.9] - TBD
 
+### Added
+
+- **Multi-AI Composer (Phase 1)** - Send prompts to multiple AIs simultaneously! 🚀
+  - New command: `multiAI.openComposer` - Opens an interactive prompt input dialog
+  - New command: `multiAI.askAll` - Broadcasts your prompt to selected AI agents
+  - Automatic execution: Each CLI receives and executes the prompt automatically
+  - Smart CLI-specific handling: Optimized for Gemini CLI, Codex CLI, and Claude Code
+  - Configurable delays: Fine-tune timing for your environment via settings
+    - `multiAI.composer.delays.initial` - Initial delay before sending (default: 100ms)
+    - `multiAI.composer.delays.claude.enter` - Claude Code Enter delay (default: 150ms)
+    - `multiAI.composer.delays.gemini.showWait` - Gemini CLI terminal activation delay (default: 250ms)
+    - `multiAI.composer.delays.gemini.enter` - Gemini CLI Enter delay (default: 600ms)
+
 ### Improved
 
-- **Test Suite Enhancement** - Improved test reliability and maintainability
-  - Complete migration to BDD format
+- **Test Suite Enhancement** - Complete test framework overhaul
+  - Full migration from TDD (suite/test) to BDD (describe/it) format
+  - All 42 tests passing with 100% reliability
   - Enhanced test helpers for better stability
-  - Added comprehensive assertions
+  - Added comprehensive assertions for new multi-AI features
+
+### Changed
+
+- **Configuration Naming** - Improved consistency and clarity
+  - Renamed `multiCLI` to `multiAI` throughout the codebase
+  - Organized delay settings under `composer.delays` hierarchy
+  - Better alignment with user-facing terminology
 
 ### Fixed
 
 - Improved error logging (changed `console.log` to `console.error`)
 - Refactored `sendOpenFilesToCLI` function with Promise support
+- Fixed test suite compatibility issues with VS Code test runner
+- Resolved CLI-specific execution quirks for reliable multi-AI broadcasting
 
 ### Technical
 
 - Updated ESLint configuration
 - Enhanced CI/CD workflow
 - Improved code quality and test coverage
+- Implemented CLI-specific execution strategies for optimal performance
 
 ## [0.0.8] - 2025-08-11
 

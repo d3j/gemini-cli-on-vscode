@@ -11,27 +11,27 @@ import {
     waitForCondition
 } from '../helpers/testUtils';
 
-describe('E2E Integration Test Suite', () => {
+suite('E2E Integration Test Suite', () => {
     let testContext: ReturnType<typeof createTestContext>;
     let extensionContext: vscode.ExtensionContext;
     let originalEnv: NodeJS.ProcessEnv;
 
-    before(() => {
+    suiteSetup(() => {
         originalEnv = { ...process.env };
     });
 
-    beforeEach(() => {
+    setup(() => {
         testContext = createTestContext();
         extensionContext = createMockContext();
     });
 
-    afterEach(() => {
+    teardown(() => {
         cleanupTestContext(testContext);
         process.env = originalEnv;
     });
 
-    describe('Full Workflow Tests', () => {
-        it('Complete workflow: Start terminal, send files, save history', async function() {
+    suite('Full Workflow Tests', () => {
+        test('Complete workflow: Start terminal, send files, save history', async function() {
             this.timeout(5000);
 
             const fsStubs = {
@@ -120,7 +120,7 @@ describe('E2E Integration Test Suite', () => {
             assert.ok(sentSelectedText);
         });
 
-        it('Multiple terminals management', async function() {
+        test('Multiple terminals management', async function() {
             this.timeout(3000);
 
             const mockTerminals: vscode.Terminal[] = [];
@@ -162,7 +162,7 @@ describe('E2E Integration Test Suite', () => {
             assert.strictEqual(firstTerminal.show.callCount, 2);
         });
 
-        it('Terminal cleanup on close', async function() {
+        test('Terminal cleanup on close', async function() {
             this.timeout(3000);
 
             let terminalCloseCallback: ((terminal: vscode.Terminal) => void) | undefined;
@@ -209,8 +209,8 @@ describe('E2E Integration Test Suite', () => {
         });
     });
 
-    describe('Error Handling', () => {
-        it('Handles missing workspace gracefully', async () => {
+    suite('Error Handling', () => {
+        test('Handles missing workspace gracefully', async () => {
             testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
 
             activate(extensionContext);
@@ -220,7 +220,7 @@ describe('E2E Integration Test Suite', () => {
             assert.ok(testContext.stubs.showErrorMessage.calledWith('No workspace folder open'));
         });
 
-        it('Handles file system errors gracefully', async () => {
+        test('Handles file system errors gracefully', async () => {
             const fsStubs = {
                 existsSync: testContext.sandbox.stub(fs, 'existsSync'),
                 mkdirSync: testContext.sandbox.stub(fs, 'mkdirSync')
@@ -251,8 +251,8 @@ describe('E2E Integration Test Suite', () => {
         });
     });
 
-    describe('Command Palette Integration', () => {
-        it('All commands are available in command palette', async () => {
+    suite('Command Palette Integration', () => {
+        test('All commands are available in command palette', async () => {
             const getCommandsStub = testContext.sandbox.stub(vscode.commands, 'getCommands');
             getCommandsStub.resolves([
                 'gemini-cli-vscode.startInNewPane',

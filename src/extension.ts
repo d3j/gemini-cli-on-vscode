@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileHandler } from './fileHandler';
+import { SimpleComposer } from './multiAI/simpleComposer';
 
 // CLI type definition
 export type CLIType = 'gemini' | 'codex' | 'claude';
@@ -297,7 +298,7 @@ async function launchAllCLIs(context: vscode.ExtensionContext) {
     const config = vscode.workspace.getConfiguration('gemini-cli-vscode');
     
     // Pre-validation
-    const clis = config.get<string[]>('multiCLI.launch.clis', ['claude', 'gemini', 'codex']);
+    const clis = config.get<string[]>('multiAI.launch.clis', ['claude', 'gemini', 'codex']);
     const enabledCLIs = clis.filter(cli => 
         config.get<boolean>(`${cli}.enabled`, true)
     ) as CLIType[];
@@ -621,6 +622,19 @@ export function activate(context: vscode.ExtensionContext) {
         launchAllCLIs(context);
     });
     
+    // Multi AI commands - reuse existing fileHandler instance
+    const simpleComposer = new SimpleComposer(fileHandler);
+    
+    const openComposerCmd = vscode.commands.registerCommand('gemini-cli-vscode.multiAI.openComposer', () => {
+        simpleComposer.openAndAsk();
+    });
+    
+    const askAllCmd = vscode.commands.registerCommand('gemini-cli-vscode.multiAI.askAll', async () => {
+        // For now, just open the composer
+        // In Phase 2+, this will support direct invocation with parameters
+        await simpleComposer.openAndAsk();
+    });
+    
     // Update status bar visibility when terminal or editor changes
     vscode.window.onDidChangeActiveTerminal(() => {
         updateStatusBarVisibility();
@@ -674,7 +688,9 @@ export function activate(context: vscode.ExtensionContext) {
         sendFilePathToGemini,
         sendFilePathToCodex,
         sendFilePathToClaude,
-        launchAllCLIsCmd
+        launchAllCLIsCmd,
+        openComposerCmd,
+        askAllCmd
     );
 }
 

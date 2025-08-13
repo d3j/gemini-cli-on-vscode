@@ -82,8 +82,8 @@ describe('Extension Unit Test Suite', () => {
         it('should register all commands on activation', () => {
             activate(extensionContext);
             
-            // Verify all commands are registered
-            assert.strictEqual(registerCommandStub.callCount, 17);
+            // Verify all commands are registered (including multiAI commands)
+            assert.strictEqual(registerCommandStub.callCount, 19);
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInNewPane'));
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInActivePane'));
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codexStartInNewPane'));
@@ -103,9 +103,12 @@ describe('Extension Unit Test Suite', () => {
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToClaude'));
             // Launch all CLIs command
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.launchAllCLIs'));
+            // MultiAI commands
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.multiAI.openComposer'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.multiAI.askAll'));
             
-            // Verify handlers are stored
-            assert.strictEqual(commandHandlers.size, 17);
+            // Verify handlers are stored (including multiAI commands)
+            assert.strictEqual(commandHandlers.size, 19);
             assert.ok(commandHandlers.has('gemini-cli-vscode.startInNewPane'));
             assert.ok(commandHandlers.has('gemini-cli-vscode.startInActivePane'));
             assert.ok(commandHandlers.has('gemini-cli-vscode.codexStartInNewPane'));
