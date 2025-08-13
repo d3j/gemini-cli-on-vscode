@@ -320,29 +320,43 @@ function createOrFocusTerminal(
   // }
 
   // vscode.window.onDidChangeTerminalShellIntegration((e) => {
-  //   terminal.sendText(`echo "${e.terminal.state}"`, true);
+  //   terminal.sendText(
+  //     `echo onDidChangeTerminalShellIntegration "${e.terminal.state.isInteractedWith}"`,
+  //     true
+  //   );
   //   // if (e === terminal) {
   //   //   sendStartCliCommand(terminal, cfg.command);
   // });
   // vscode.window.onDidChangeTerminalState((e) => {
-  //   terminal.sendText(`echo "${e.state}"`, true);
+  //   terminal.sendText(
+  //     `echo onDidChangeTerminalState "${e.state.isInteractedWith}"`,
+  //     true
+  //   );
   //   // if (e === terminal && e.state === vscode. TerminalState.Open) {
   //   //   sendStartCliCommand(terminal, cfg.command);
   //   // }
   // });
   const openDisposable = vscode.window.onDidOpenTerminal((t) => {
     if (t === terminal) {
+      // terminal.sendText(
+      //   `echo onDidOpenTerminal "${t.state.isInteractedWith}"`,
+      //   true
+      // );
+      openDisposable.dispose();
       const activeDisposable = vscode.window.onDidChangeActiveTerminal(
         (active) => {
           if (active === terminal) {
+            // terminal.sendText(
+            //   `echo onDidChangeActiveTerminal "${active.state.isInteractedWith}"`,
+            //   true
+            // );
             activeDisposable.dispose();
             setTimeout(() => {
-              sendStartCliCommand(terminal, cfg.command);
+              sendStartCliCommand(terminal, cfg.command, true);
             }, 1000);
           }
         }
       );
-      openDisposable.dispose();
     }
   });
 
@@ -355,50 +369,56 @@ function createOrFocusTerminal(
   return terminal;
 }
 
-function sendStartCliCommand(terminal: vscode.Terminal, cliCommand: string) {
+function sendStartCliCommand(
+  terminal: vscode.Terminal,
+  cliCommand: string,
+  clear = true
+) {
   let prefixCommand = null;
-  switch (terminal.state.shell?.toLowerCase()) {
-    case "bash":
-    case "zsh":
-    case "sh":
-    case "fish":
-    case "gitbash":
-    case "ksh":
-    case "wsl":
-      prefixCommand = `clear && `;
-      break;
-    case "pwsh":
-      prefixCommand = `Clear-Host; `;
-      break;
-    case "cmd":
-      prefixCommand = `cls && `;
-      break;
-    default:
-      {
-        const os = process.platform;
-        if (os === "linux" || os === "darwin") {
-          prefixCommand = `clear && `;
-        } else {
-          const shellPath = process.env.SHELL || process.env.COMSPEC || "";
-          const lower = shellPath.toLowerCase();
-          if (
-            lower.includes("bash") ||
-            lower.includes("zsh") ||
-            lower.includes("sh") ||
-            lower.includes("fish") ||
-            lower.includes("gitbash") ||
-            lower.includes("ksh") ||
-            lower.includes("wsl")
-          ) {
+  if (clear) {
+    switch (terminal.state.shell?.toLowerCase()) {
+      case "bash":
+      case "zsh":
+      case "sh":
+      case "fish":
+      case "gitbash":
+      case "ksh":
+      case "wsl":
+        prefixCommand = `clear && `;
+        break;
+      case "pwsh":
+        prefixCommand = `Clear-Host; `;
+        break;
+      case "cmd":
+        prefixCommand = `cls && `;
+        break;
+      default:
+        {
+          const os = process.platform;
+          if (os === "linux" || os === "darwin") {
             prefixCommand = `clear && `;
-          } else if (lower.includes("powershell")) {
-            prefixCommand = `Clear-Host; `;
-          } else if (lower.includes("cmd")) {
-            prefixCommand = `cls && `;
+          } else {
+            const shellPath = process.env.SHELL || process.env.COMSPEC || "";
+            const lower = shellPath.toLowerCase();
+            if (
+              lower.includes("bash") ||
+              lower.includes("zsh") ||
+              lower.includes("sh") ||
+              lower.includes("fish") ||
+              lower.includes("gitbash") ||
+              lower.includes("ksh") ||
+              lower.includes("wsl")
+            ) {
+              prefixCommand = `clear && `;
+            } else if (lower.includes("powershell")) {
+              prefixCommand = `Clear-Host; `;
+            } else if (lower.includes("cmd")) {
+              prefixCommand = `cls && `;
+            }
           }
         }
-      }
-      break;
+        break;
+    }
   }
 
   terminal.sendText(`${prefixCommand ? prefixCommand : ""}${cliCommand}`, true);
