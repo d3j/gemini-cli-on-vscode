@@ -319,7 +319,38 @@ function createOrFocusTerminal(
   //   terminal.sendText(`cd "${workspacePath}"`, true);
   // }
 
-  sendStartCliCommand(terminal, cfg.command);
+  vscode.window.onDidChangeTerminalShellIntegration((e) => {
+    terminal.sendText(`echo "${e.terminal.state}"`, true);
+    // if (e === terminal) {
+    //   sendStartCliCommand(terminal, cfg.command);
+  });
+  vscode.window.onDidChangeTerminalState((e) => {
+    terminal.sendText(`echo "${e.state}"`, true);
+    // if (e === terminal && e.state === vscode. TerminalState.Open) {
+    //   sendStartCliCommand(terminal, cfg.command);
+    // }
+  });
+  const openDisposable = vscode.window.onDidOpenTerminal((t) => {
+    if (t === terminal) {
+      terminal.sendText(`echo "${t.state}"`, true);
+      const activeDisposable = vscode.window.onDidChangeActiveTerminal(
+        (active) => {
+          if (active === terminal) {
+            terminal.sendText(`echo "${active.state}"`, true);
+            activeDisposable.dispose();
+            setTimeout(() => {
+              sendStartCliCommand(terminal, cfg.command);
+            }, 1000);
+          }
+        }
+      );
+      openDisposable.dispose();
+    }
+  });
+
+  sendClearCommand(terminal);
+
+  // sendStartCliCommand(terminal, cfg.command);
 
   terminal.show();
 
@@ -373,6 +404,55 @@ function sendStartCliCommand(terminal: vscode.Terminal, cliCommand: string) {
   }
 
   terminal.sendText(`${prefixCommand ? prefixCommand : ""}${cliCommand}`, true);
+}
+
+function sendClearCommand(terminal: vscode.Terminal) {
+  let prefixCommand = null;
+  switch (terminal.state.shell?.toLowerCase()) {
+    case "bash":
+    case "zsh":
+    case "sh":
+    case "fish":
+    case "gitbash":
+    case "ksh":
+    case "wsl":
+      prefixCommand = `clear`;
+      break;
+    case "pwsh":
+      prefixCommand = `Clear-Host`;
+      break;
+    case "cmd":
+      prefixCommand = `cls`;
+      break;
+    default:
+      {
+        const os = process.platform;
+        if (os === "linux" || os === "darwin") {
+          prefixCommand = `clear`;
+        } else {
+          const shellPath = process.env.SHELL || process.env.COMSPEC || "";
+          const lower = shellPath.toLowerCase();
+          if (
+            lower.includes("bash") ||
+            lower.includes("zsh") ||
+            lower.includes("sh") ||
+            lower.includes("fish") ||
+            lower.includes("gitbash") ||
+            lower.includes("ksh") ||
+            lower.includes("wsl")
+          ) {
+            prefixCommand = `clear`;
+          } else if (lower.includes("powershell")) {
+            prefixCommand = `Clear-Host`;
+          } else if (lower.includes("cmd")) {
+            prefixCommand = `cls`;
+          }
+        }
+      }
+      break;
+  }
+
+  if (prefixCommand) terminal.sendText(prefixCommand);
 }
 
 async function launchAllCLIs(context: vscode.ExtensionContext) {
