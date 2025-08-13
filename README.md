@@ -96,6 +96,7 @@ claude  # Anthropic account authentication
    - ✨ Launch Gemini CLI
    - ❄️ Launch Codex CLI
    - ✴️ Launch Claude Code
+   - ✨ Launch Qwen Code
 3. **AI CLI launches in a new editor pane!**
 
 ### 🎨 Customizing Editor Title Bar Buttons
@@ -352,6 +353,7 @@ Icons used in this extension are property of their respective owners:
 - **AllCLIs-icon.png** - [Irasutoya](https://www.irasutoya.com/)
 - **claude-logo.png** - Anthropic
 - **codex-icon.png** - OpenAI
+- **qwen-logo.png** - Alibaba
 - **icon.png** (Gemini) - Google
 
 ※ Company logos are used for identification purposes only. This extension has no official affiliation with these companies.
