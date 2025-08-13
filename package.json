@@ -1,8 +1,8 @@
 {
   "name": "gemini-cli-on-vscode",
-  "displayName": "Gemini CLI on VSCode",
+  "displayName": "AI CLI on VSCode",
   "icon": "images/icon.png",
-  "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
+  "description": "Run Gemini, Codex CLI (GPT-5), Claude and Qwen in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
   "author": "Joji Jorge Senda",
   "repository": {
@@ -15,6 +15,7 @@
   "keywords": [
     "gemini",
     "codex",
+    "qwen",
     "gpt-5",
     "openai",
     "google",
@@ -22,7 +23,7 @@
     "cli",
     "terminal"
   ],
-  "version": "0.0.8",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -60,6 +61,18 @@
         "title": "Codex CLI: Start in Active Pane"
       },
       {
+        "command": "gemini-cli-vscode.qwenStartInNewPane",
+        "title": "Qwen CLI: Start in New Pane",
+        "icon": {
+          "light": "images/qwen-logo.png",
+          "dark": "images/qwen-logo.png"
+        }
+      },
+      {
+        "command": "gemini-cli-vscode.qwenStartInActivePane",
+        "title": "Qwen CLI: Start in Active Pane"
+      },
+      {
         "command": "gemini-cli-vscode.saveClipboardToHistory",
         "title": "Save to History"
       },
@@ -72,6 +85,10 @@
         "title": "Codex CLI: Send Selected Text"
       },
       {
+        "command": "gemini-cli-vscode.sendSelectedTextToQwen",
+        "title": "Qwen CLI: Send Selected Text"
+      },
+      {
         "command": "gemini-cli-vscode.sendFilePathToGemini",
         "title": "Gemini CLI: Send File Path"
       },
@@ -80,12 +97,20 @@
         "title": "Codex CLI: Send File Path"
       },
       {
+        "command": "gemini-cli-vscode.sendFilePathToQwen",
+        "title": "Qwen CLI: Send File Path"
+      },
+      {
         "command": "gemini-cli-vscode.sendOpenFilePathToGemini",
         "title": "Gemini CLI: Send Open File Path"
       },
       {
         "command": "gemini-cli-vscode.sendOpenFilePathToCodex",
         "title": "Codex CLI: Send Open File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
+        "title": "Qwen CLI: Send Open File Path"
       },
       {
         "command": "gemini-cli-vscode.claudeStartInNewPane",
@@ -134,6 +159,11 @@
           "when": "config.gemini-cli-vscode.codex.enabled"
         },
         {
+          "command": "gemini-cli-vscode.qwenStartInNewPane",
+          "group": "navigation",
+          "when": "config.gemini-cli-vscode.qwen.enabled"
+        },
+        {
           "command": "gemini-cli-vscode.startInNewPane",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.gemini.enabled"
@@ -156,6 +186,11 @@
           "when": "editorTextFocus && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         },
         {
+          "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
+          "group": "5_cutcopypaste@100",
+          "when": "editorTextFocus && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
+        },
+        {
           "command": "gemini-cli-vscode.sendSelectedTextToGemini",
           "group": "5_cutcopypaste@101",
           "when": "editorHasSelection && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
@@ -164,6 +199,11 @@
           "command": "gemini-cli-vscode.sendSelectedTextToCodex",
           "group": "5_cutcopypaste@102",
           "when": "editorHasSelection && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendSelectedTextToQwen",
+          "group": "5_cutcopypaste@102",
+          "when": "editorHasSelection && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
           "command": "gemini-cli-vscode.sendOpenFilePathToClaude",
@@ -188,6 +228,11 @@
           "when": "config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         },
         {
+          "command": "gemini-cli-vscode.sendFilePathToQwen",
+          "group": "5_cutcopypaste@104",
+          "when": "config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
+        },
+        {
           "command": "gemini-cli-vscode.sendFilePathToClaude",
           "group": "5_cutcopypaste@105",
           "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
@@ -203,6 +248,11 @@
           "command": "gemini-cli-vscode.sendFilePathToCodex",
           "group": "5_cutcopypaste@106",
           "when": "config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToQwen",
+          "group": "5_cutcopypaste@106",
+          "when": "config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
           "command": "gemini-cli-vscode.sendFilePathToClaude",
@@ -225,6 +275,11 @@
           "default": true,
           "description": "Enable Codex CLI features"
         },
+        "gemini-cli-vscode.qwen.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Qwen CLI features"
+        },
         "gemini-cli-vscode.gemini.showInContextMenu": {
           "type": "boolean",
           "default": true,
@@ -234,6 +289,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show Codex CLI commands in context menus"
+        },
+        "gemini-cli-vscode.qwen.showInContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Qwen CLI commands in context menus"
         },
         "gemini-cli-vscode.saveToHistory.showStatusBar": {
           "type": "boolean",
@@ -267,13 +327,23 @@
         },
         "gemini-cli-vscode.multiCLI.launch.clis": {
           "type": "array",
-          "default": ["claude", "gemini", "codex"],
+          "default": [
+            "claude",
+            "gemini",
+            "codex",
+            "qwen"
+          ],
           "items": {
             "type": "string",
-            "enum": ["gemini", "codex", "claude"]
+            "enum": [
+              "gemini",
+              "codex",
+              "claude",
+              "qwen"
+            ]
           },
           "minItems": 1,
-          "maxItems": 3,
+          "maxItems": 4,
           "description": "CLIs to launch with 'Launch All CLIs' command (order matters)"
         }
       }
@@ -289,7 +359,9 @@
     "test:unit": "npm run compile && vscode-test --config .vscode-test-unit.mjs",
     "test:integration": "npm run compile && vscode-test --run out/test/integration/**/*.test.js",
     "test:coverage": "npm run compile && nyc vscode-test",
-    "test:watch": "npm run compile && vscode-test --watch"
+    "test:watch": "npm run compile && vscode-test --watch",
+    "vscode:package": "npm exec @vscode/vsce package -- --out ./dist/.",
+    "vscode:install": "mkdir -p dist && npm exec @vscode/vsce package -- --out ./dist/. && code --install-extension ./dist/$(node -p \"require('./package.json').name\")-$(node -p \"require('./package.json').version\").vsix"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
@@ -304,6 +376,7 @@
     "eslint": "^8.56.0",
     "nyc": "^17.1.0",
     "sinon": "^21.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@vscode/vsce": "^3.6.0"
   }
 }

@@ -8,6 +8,7 @@
 
 # Build output
 /out
+/dist
 
 # VSCode
 .vscode-test/
