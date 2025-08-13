@@ -187,7 +187,7 @@
         },
         {
           "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
-          "group": "5_cutcopypaste@100",
+          "group": "5_cutcopypaste@110",
           "when": "editorTextFocus && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
@@ -202,17 +202,17 @@
         },
         {
           "command": "gemini-cli-vscode.sendSelectedTextToQwen",
-          "group": "5_cutcopypaste@102",
+          "group": "5_cutcopypaste@112",
           "when": "editorHasSelection && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
           "command": "gemini-cli-vscode.sendOpenFilePathToClaude",
-          "group": "5_cutcopypaste@103",
+          "group": "5_cutcopypaste@123",
           "when": "editorTextFocus && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         },
         {
           "command": "gemini-cli-vscode.sendSelectedTextToClaude",
-          "group": "5_cutcopypaste@104",
+          "group": "5_cutcopypaste@124",
           "when": "editorHasSelection && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         }
       ],
@@ -229,12 +229,12 @@
         },
         {
           "command": "gemini-cli-vscode.sendFilePathToQwen",
-          "group": "5_cutcopypaste@104",
+          "group": "5_cutcopypaste@114",
           "when": "config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
           "command": "gemini-cli-vscode.sendFilePathToClaude",
-          "group": "5_cutcopypaste@105",
+          "group": "5_cutcopypaste@125",
           "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         }
       ],
@@ -251,12 +251,12 @@
         },
         {
           "command": "gemini-cli-vscode.sendFilePathToQwen",
-          "group": "5_cutcopypaste@106",
+          "group": "5_cutcopypaste@116",
           "when": "config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
           "command": "gemini-cli-vscode.sendFilePathToClaude",
-          "group": "5_cutcopypaste@107",
+          "group": "5_cutcopypaste@127",
           "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         }
       ]
