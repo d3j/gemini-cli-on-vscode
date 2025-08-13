@@ -22,16 +22,14 @@
     "cli",
     "terminal"
   ],
-  "version": "0.0.8",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:gemini-cli-vscode.start"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -119,6 +117,16 @@
           "light": "images/AllCLIs-icon.png",
           "dark": "images/AllCLIs-icon.png"
         }
+      },
+      {
+        "command": "gemini-cli-vscode.multiAI.openComposer",
+        "title": "AI: Open Prompt Composer",
+        "category": "Multi AI"
+      },
+      {
+        "command": "gemini-cli-vscode.multiAI.askAll",
+        "title": "AI: Ask All Agents",
+        "category": "Multi AI"
       }
     ],
     "menus": {
@@ -141,7 +149,7 @@
         {
           "command": "gemini-cli-vscode.launchAllCLIs",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.multiCLI.enabled"
+          "when": "config.gemini-cli-vscode.multiAI.enabled"
         }
       ],
       "editor/context": [
@@ -260,12 +268,12 @@
           "default": true,
           "description": "Show Claude Code commands in context menus"
         },
-        "gemini-cli-vscode.multiCLI.enabled": {
+        "gemini-cli-vscode.multiAI.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable multi-CLI features"
+          "description": "Enable multi-AI features"
         },
-        "gemini-cli-vscode.multiCLI.launch.clis": {
+        "gemini-cli-vscode.multiAI.launch.clis": {
           "type": "array",
           "default": ["claude", "gemini", "codex"],
           "items": {
@@ -275,6 +283,34 @@
           "minItems": 1,
           "maxItems": 3,
           "description": "CLIs to launch with 'Launch All CLIs' command (order matters)"
+        },
+        "gemini-cli-vscode.multiAI.composer.delays.initial": {
+          "type": "number",
+          "default": 100,
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Initial delay before sending prompt to each AI (milliseconds)"
+        },
+        "gemini-cli-vscode.multiAI.composer.delays.claude.enter": {
+          "type": "number",
+          "default": 150,
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Delay before sending Enter to Claude Code after prompt (milliseconds)"
+        },
+        "gemini-cli-vscode.multiAI.composer.delays.gemini.showWait": {
+          "type": "number",
+          "default": 250,
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Wait time after showing Gemini CLI terminal before sending prompt (milliseconds)"
+        },
+        "gemini-cli-vscode.multiAI.composer.delays.gemini.enter": {
+          "type": "number",
+          "default": 600,
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Delay before sending Enter to Gemini CLI after prompt (milliseconds)"
         }
       }
     }
