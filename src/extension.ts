@@ -319,24 +319,22 @@ function createOrFocusTerminal(
   //   terminal.sendText(`cd "${workspacePath}"`, true);
   // }
 
-  vscode.window.onDidChangeTerminalShellIntegration((e) => {
-    terminal.sendText(`echo "${e.terminal.state}"`, true);
-    // if (e === terminal) {
-    //   sendStartCliCommand(terminal, cfg.command);
-  });
-  vscode.window.onDidChangeTerminalState((e) => {
-    terminal.sendText(`echo "${e.state}"`, true);
-    // if (e === terminal && e.state === vscode. TerminalState.Open) {
-    //   sendStartCliCommand(terminal, cfg.command);
-    // }
-  });
+  // vscode.window.onDidChangeTerminalShellIntegration((e) => {
+  //   terminal.sendText(`echo "${e.terminal.state}"`, true);
+  //   // if (e === terminal) {
+  //   //   sendStartCliCommand(terminal, cfg.command);
+  // });
+  // vscode.window.onDidChangeTerminalState((e) => {
+  //   terminal.sendText(`echo "${e.state}"`, true);
+  //   // if (e === terminal && e.state === vscode. TerminalState.Open) {
+  //   //   sendStartCliCommand(terminal, cfg.command);
+  //   // }
+  // });
   const openDisposable = vscode.window.onDidOpenTerminal((t) => {
     if (t === terminal) {
-      terminal.sendText(`echo "${t.state}"`, true);
       const activeDisposable = vscode.window.onDidChangeActiveTerminal(
         (active) => {
           if (active === terminal) {
-            terminal.sendText(`echo "${active.state}"`, true);
             activeDisposable.dispose();
             setTimeout(() => {
               sendStartCliCommand(terminal, cfg.command);
