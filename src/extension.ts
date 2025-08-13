@@ -289,10 +289,13 @@ function createOrFocusTerminal(
     cfg.icon
   );
 
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+
   const terminal = vscode.window.createTerminal({
     name: cfg.name, // Simple name without sessionId
     location: location,
     iconPath: iconPath,
+    ...(workspaceFolder ? { cwd: workspaceFolder.uri.fsPath } : {}),
   });
 
   // Store the new terminal
@@ -300,24 +303,21 @@ function createOrFocusTerminal(
 
   // Get configuration for terminal workarounds
   const config = vscode.workspace.getConfiguration("gemini-cli-vscode");
-  const disableFlowControl = config.get<boolean>(
-    "terminal.disableFlowControl",
-    true
-  );
+  const disableFlowControl = config.get<boolean>("terminal.disableFlowControl");
 
   // Apply terminal workarounds if enabled
   if (disableFlowControl) {
     // Disable XON/XOFF flow control to prevent Ctrl+S from freezing output
-    terminal.sendText("stty -ixon 2>/dev/null", true);
+    terminal.sendText("stty -ixon 2>/dev/null");
   }
 
-  // Navigate to workspace folder if available
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-  if (workspaceFolder) {
-    const workspacePath = workspaceFolder.uri.fsPath;
-    // Use quotes to handle paths with spaces
-    terminal.sendText(`cd "${workspacePath}"`, true);
-  }
+  // // Navigate to workspace folder if available
+  // const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  // if (workspaceFolder) {
+  //   const workspacePath = workspaceFolder.uri.fsPath;
+  //   // Use quotes to handle paths with spaces
+  //   terminal.sendText(`cd "${workspacePath}"`, true);
+  // }
 
   sendStartCliCommand(terminal, cfg.command);
 
@@ -327,25 +327,52 @@ function createOrFocusTerminal(
 }
 
 function sendStartCliCommand(terminal: vscode.Terminal, cliCommand: string) {
-  const os = process.platform;
-  if (os === "linux" || os === "darwin") {
-    terminal.sendText(`clear && ${cliCommand}`, true);
-  } else {
-    const shellPath = process.env.SHELL || process.env.COMSPEC || "";
-    const lower = shellPath.toLowerCase();
-    if (
-      lower.includes("bash") ||
-      lower.includes("zsh") ||
-      lower.includes("sh") ||
-      lower.includes("fish")
-    ) {
-      terminal.sendText(`clear && ${cliCommand}`, true);
-    } else if (lower.includes("powershell")) {
-      terminal.sendText("Clear-Host");
-    } else if (lower.includes("cmd")) {
-      terminal.sendText("cls");
-    }
+  let prefixCommand = null;
+  switch (terminal.state.shell?.toLowerCase()) {
+    case "bash":
+    case "zsh":
+    case "sh":
+    case "fish":
+    case "gitbash":
+    case "ksh":
+    case "wsl":
+      prefixCommand = `clear && `;
+      break;
+    case "pwsh":
+      prefixCommand = `Clear-Host; `;
+      break;
+    case "cmd":
+      prefixCommand = `cls && `;
+      break;
+    default:
+      {
+        const os = process.platform;
+        if (os === "linux" || os === "darwin") {
+          prefixCommand = `clear && `;
+        } else {
+          const shellPath = process.env.SHELL || process.env.COMSPEC || "";
+          const lower = shellPath.toLowerCase();
+          if (
+            lower.includes("bash") ||
+            lower.includes("zsh") ||
+            lower.includes("sh") ||
+            lower.includes("fish") ||
+            lower.includes("gitbash") ||
+            lower.includes("ksh") ||
+            lower.includes("wsl")
+          ) {
+            prefixCommand = `clear && `;
+          } else if (lower.includes("powershell")) {
+            prefixCommand = `Clear-Host; `;
+          } else if (lower.includes("cmd")) {
+            prefixCommand = `cls && `;
+          }
+        }
+      }
+      break;
   }
+
+  terminal.sendText(`${prefixCommand ? prefixCommand : ""}${cliCommand}`, true);
 }
 
 async function launchAllCLIs(context: vscode.ExtensionContext) {
