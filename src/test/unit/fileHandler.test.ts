@@ -153,5 +153,76 @@ describe('FileHandler Unit Test Suite', () => {
                 'No CLI is running. Please start Gemini, Codex, or Claude CLI first.'
             ));
         });
+
+        it('should send multiple files to terminal', async () => {
+            const geminiTerminal = createMockTerminal();
+            mockTerminals.set('activePane', geminiTerminal as unknown as vscode.Terminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([geminiTerminal]);
+
+            const uris = [
+                createMockUri('/workspace/src/index.ts'),
+                createMockUri('/workspace/src/app.ts'),
+                createMockUri('/workspace/src/utils.ts')
+            ];
+
+            testContext.stubs.asRelativePath.onCall(0).returns('src/index.ts');
+            testContext.stubs.asRelativePath.onCall(1).returns('src/app.ts');
+            testContext.stubs.asRelativePath.onCall(2).returns('src/utils.ts');
+
+            await fileHandler.sendFilesToTerminal(uris);
+
+            await waitForAsync();
+
+            assert.ok(geminiTerminal.sendText.calledWith('@src/index.ts @src/app.ts @src/utils.ts ', false));
+            assert.ok(geminiTerminal.show.called);
+            assert.ok(testContext.stubs.showInformationMessage.calledWith('Sent 3 items to Gemini CLI'));
+        });
+
+        it('should handle files with spaces in names', async () => {
+            const geminiTerminal = createMockTerminal();
+            mockTerminals.set('newPane', geminiTerminal as unknown as vscode.Terminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([geminiTerminal]);
+
+            const uris = [
+                createMockUri('/workspace/my docs/readme.md'),
+                createMockUri('/workspace/test files/test.spec.ts')
+            ];
+
+            testContext.stubs.asRelativePath.onCall(0).returns('my docs/readme.md');
+            testContext.stubs.asRelativePath.onCall(1).returns('test files/test.spec.ts');
+
+            await fileHandler.sendFilesToTerminal(uris);
+
+            await waitForAsync();
+
+            assert.ok(geminiTerminal.sendText.calledWith('@"my docs/readme.md" @"test files/test.spec.ts" ', false));
+        });
+
+        it('should handle mixed file types', async () => {
+            const geminiTerminal = createMockTerminal();
+            mockTerminals.set('newPane', geminiTerminal as unknown as vscode.Terminal);
+            testContext.sandbox.stub(vscode.window, 'terminals').value([geminiTerminal]);
+
+            const uris = [
+                createMockUri('/workspace/README.md'),
+                createMockUri('/workspace/src/index.ts'),
+                createMockUri('/workspace/package.json'),
+                createMockUri('/workspace/.gitignore')
+            ];
+
+            testContext.stubs.asRelativePath.onCall(0).returns('README.md');
+            testContext.stubs.asRelativePath.onCall(1).returns('src/index.ts');
+            testContext.stubs.asRelativePath.onCall(2).returns('package.json');
+            testContext.stubs.asRelativePath.onCall(3).returns('.gitignore');
+
+            await fileHandler.sendFilesToTerminal(uris);
+
+            await waitForAsync();
+
+            assert.ok(geminiTerminal.sendText.calledWith(
+                '@README.md @src/index.ts @package.json @.gitignore ', 
+                false
+            ));
+        });
     });
 });

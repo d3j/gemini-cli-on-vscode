@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileHandler } from './fileHandler';
-import { SimpleComposer } from './multiAI/simpleComposer';
+import { PromptComposerViewProvider } from './multiAI/promptComposerView';
 
 // CLI type definition
 export type CLIType = 'gemini' | 'codex' | 'claude';
@@ -17,15 +17,12 @@ let saveHistoryStatusBarItem: vscode.StatusBarItem;
 
 // Track if extension is already activated
 let isActivated = false;
+let composerViewRegistration: vscode.Disposable | undefined;
 
 // Helper function to generate terminal key
-function getTerminalKey(location: any): string {
-    const viewColumn = location?.viewColumn;
-    const mode = viewColumn === -2 ? 'beside' : 'active'; // -2 is ViewColumn.Beside
-    const column = viewColumn?.toString() || 'default';
-    
-    // Simple key without sessionId
-    return `${mode}-${column}`;
+function getTerminalKey(_location: any): string {
+    // Use a single global key per CLI to prevent multiple terminals
+    return 'global';
 }
 
 function getHistoryFilePath(): string | undefined {
@@ -243,11 +240,17 @@ function createOrFocusTerminal(
     // Simple terminal key generation without sessionId
     const key = getTerminalKey(location);
     
-    // Always reuse existing terminal if available
+    // Check existing terminal and clean up if it's no longer active
     const existingTerminal = terminals.get(key);
-    if (existingTerminal && vscode.window.terminals.includes(existingTerminal)) {
-        existingTerminal.show();
-        return existingTerminal;
+    if (existingTerminal) {
+        // If terminal is disposed or has exit status, remove from map
+        if (!vscode.window.terminals.includes(existingTerminal) || existingTerminal.exitStatus) {
+            terminals.delete(key);
+        } else {
+            // Terminal is still active, reuse it
+            existingTerminal.show();
+            return existingTerminal;
+        }
     }
     
     // CLI configuration
@@ -263,7 +266,8 @@ function createOrFocusTerminal(
     const terminal = vscode.window.createTerminal({
         name: cfg.name,  // Simple name without sessionId
         location: location,
-        iconPath: iconPath
+        iconPath: iconPath,
+        isTransient: true  // Prevent terminal persistence on restart
     });
     
     // Store the new terminal
@@ -476,6 +480,11 @@ export function activate(context: vscode.ExtensionContext) {
     
     // Create FileHandler instance with all terminal maps
     const fileHandler = new FileHandler(geminiTerminals, codexTerminals, claudeTerminals);
+
+    // Register Sidebar Prompt Composer view provider
+    const composerViewProvider = new PromptComposerViewProvider(context, fileHandler);
+    composerViewRegistration = vscode.window.registerWebviewViewProvider(PromptComposerViewProvider.viewId, composerViewProvider);
+    context.subscriptions.push(composerViewRegistration);
     
     // Check configuration
     const config = vscode.workspace.getConfiguration('gemini-cli-vscode');
@@ -623,16 +632,24 @@ export function activate(context: vscode.ExtensionContext) {
     });
     
     // Multi AI commands - reuse existing fileHandler instance
-    const simpleComposer = new SimpleComposer(fileHandler);
-    
-    const openComposerCmd = vscode.commands.registerCommand('gemini-cli-vscode.multiAI.openComposer', () => {
-        simpleComposer.openAndAsk();
+    const openComposerCmd = vscode.commands.registerCommand('gemini-cli-vscode.multiAI.openComposer', async () => {
+        // Always focus the sidebar view (MAGUS Council)
+        try {
+            await vscode.commands.executeCommand('workbench.view.extension.gemini-cli-vscode');
+        } catch {
+            // ignore
+        }
+        try {
+            await vscode.commands.executeCommand('gemini-cli-vscode.promptComposerView.focus');
+        } catch {
+            // ignore
+        }
     });
+
     
     const askAllCmd = vscode.commands.registerCommand('gemini-cli-vscode.multiAI.askAll', async () => {
-        // For now, just open the composer
-        // In Phase 2+, this will support direct invocation with parameters
-        await simpleComposer.openAndAsk();
+        // Open the sidebar-based composer
+        await vscode.commands.executeCommand('gemini-cli-vscode.multiAI.openComposer');
     });
     
     // Update status bar visibility when terminal or editor changes
@@ -695,9 +712,42 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
+    // Dispose active terminals before clearing maps
+    geminiTerminals.forEach((terminal) => {
+        if (terminal && !terminal.exitStatus) {
+            terminal.dispose();
+        }
+    });
+    codexTerminals.forEach((terminal) => {
+        if (terminal && !terminal.exitStatus) {
+            terminal.dispose();
+        }
+    });
+    claudeTerminals.forEach((terminal) => {
+        if (terminal && !terminal.exitStatus) {
+            terminal.dispose();
+        }
+    });
+    
     // Clear terminals map on deactivation
     geminiTerminals.clear();
     codexTerminals.clear();
+    
+    // Dispose registered webview provider and status bar
+    try {
+        composerViewRegistration?.dispose();
+        composerViewRegistration = undefined;
+    } catch (error) {
+        console.error('Error disposing composer view registration:', error);
+    }
+    try {
+        saveHistoryStatusBarItem?.dispose();
+    } catch (error) {
+        console.error('Error disposing status bar item:', error);
+    }
+    
+    // Allow re-activation in tests
+    isActivated = false;
     claudeTerminals.clear();
     isActivated = false;
 }

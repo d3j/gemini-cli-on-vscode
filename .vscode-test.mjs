@@ -6,7 +6,7 @@ export default defineConfig({
     'out/test/*.test.js'
   ],
   mocha: {
-    ui: 'tdd',
+    ui: 'bdd',
     timeout: 20000,
     color: true
   },

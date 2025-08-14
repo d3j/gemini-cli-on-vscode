@@ -2,16 +2,16 @@
 
 [🇯🇵 日本語版](README-ja.md) | **🇺🇸 English**
 
-## 🎤 Three AI CLIs and One Extension - "We be getting down with no delay"
+## 🔮 MAGUS Council - Unified AI CLI Management
 
-![Extension Features](images/ExtensionFeatures.png)
+![Extension Features](images/Broadcast_your_pain_to_all_AI_CLIs_with_one_click.png)
 
 ### Finally: The Same Claude Code Experience with Gemini CLI & Codex CLI (GPT-5)
 
 ## 💡 Why This Extension is Revolutionary
 
-- ❌ Traditional: Gemini CLI only runs in terminal
-- ✅ Innovation: Editor integration with Claude Code-like experience
+- ❌ Traditional: Gemini CLI and Codex CLI only run in terminal
+- ✅ Innovation: Unified AI management system with editor integration
 
 ### 🔄 Traditional Limitations
 
@@ -21,12 +21,10 @@
 
 ### ✨ This Extension's Innovation
 
-#### Brings Claude Code's editor integration experience to Gemini CLI & Codex CLI
+#### Brings Claude Code's editor integration experience to three AI CLIs
 
-- Gemini CLI & Codex CLI (GPT-5) run directly in editor windows
-- No more switching between terminal and editor
-- The exact workflow Claude Code users love, now with Gemini and GPT-5
-- **Industry first**: Multiple AI CLIs managed simultaneously in editor panes
+- Gemini CLI & Codex CLI run directly in editor windows
+- **MAGUS Council** enables broadcasting single prompts to multiple AI CLIs
 
 ## ⚡ Key Features
 
@@ -48,27 +46,19 @@
 - No context switching between terminal and editor
 - Natural integration with your development flow
 
-### 🆕 Smart Features
+### 🔮 v0.1.0 Major Update - MAGUS Council
 
-#### v0.0.8 ✴️ NEW - Three CLIs on Stage!
+- **MAGUS Council** - Multiple Agent Guidance & Intelligence System 🔮
+  - **Unified prompt broadcasting**: Operate Gemini, Claude, and Codex in perfect synchronization
+  - **All according to the scenario**: Optimized execution timing for each AI type
 
-- **Claude Code Joins the Party**: Claude Code was originally usable, but...
-- **"Getting down with no delay"**: Push the "AI Brain" button for three CLIs on stage at once
+### 🎨 Other Key Features
 
-#### v0.0.6 🚀 GPT-5 Launch Support!
-
-- **Codex CLI Support**: Run OpenAI's Codex CLI (GPT-5 powered) in editor panes
-- **Universal History**: Works with all terminals (Gemini CLI, Codex CLI, Claude Code, bash, zsh)
-  - Unified history folder `.history-memo/` for daily work logs
-  - Optional terminal name in history entries
+- **Claude Code Integration**: Complete integration of three AI CLIs
+- **Batch Launch**: "Launch All CLIs" button starts all three CLIs simultaneously
+- **Universal History**: Unified history folder `.history-memo/` for work logs
 - **Individual CLI Commands**: Dedicated commands for each CLI
-  - Gemini CLI: Send Selected Text / File Path / Open File Path
-  - Codex CLI: Send Selected Text / File Path / Open File Path
-- **Advanced Settings**:
-  - `gemini.enabled` / `codex.enabled` - Enable/disable each CLI
-  - `gemini.showInContextMenu` / `codex.showInContextMenu` - Context menu visibility
-  - `saveToHistory.showStatusBar` - Status bar visibility control
-  - `saveToHistory.includeTerminalName` - Include terminal name in history
+- **Advanced Settings**: Enable/disable CLIs, menu visibility control, etc.
 
 ## 🚀 Quick Start
 
@@ -96,7 +86,11 @@ claude  # Anthropic account authentication
    - ✨ Launch Gemini CLI
    - ❄️ Launch Codex CLI
    - ✴️ Launch Claude Code
-3. **AI CLI launches in a new editor pane!**
+3. **Launch MAGUS Council**
+   - MAGUS Council panel appears in sidebar
+   - Command Palette: "MAGUS Council: Open"
+4. **Select desired AIs and send prompts**
+   - Multiple AI selection enables simultaneous execution
 
 ### 🎨 Customizing Editor Title Bar Buttons
 
@@ -167,11 +161,31 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 - Right-click in editor
 - Choose "Send Open File Path" for your preferred CLI
 
+### 🔮 Using MAGUS Council
+
+**From Unified Control Panel:**
+
+1. Open MAGUS Council panel in sidebar
+2. Check desired AIs (Gemini/Claude/Codex)
+3. Enter prompt
+4. Click "🔮 Ask n AIs" button for batch sending
+
+**Individual Control Also Available:**
+
+- Direct operation from each AI tab
+- Traditional file sending features
+- Context menu operations
+
 ### ⌨️ Command Palette
 
-All features are available from the Command Palette:
+**MAGUS Council Commands:**
 
-- Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
+- "MAGUS Council: Open" - Open unified control panel
+- "Multi-AI: Ask All" - Batch send to selected AIs
+
+**Existing Commands:**
+
+- "Launch All CLIs" - Launch three CLIs at once (tabs in same group)
 
 **Gemini CLI Commands:**
 
@@ -243,37 +257,34 @@ Set your own keybindings:
 
 ### 📊 Comparison
 
-| Feature | Gemini CLI | This Extension | Gemini Code Assist | Claude Code |
-|---------|-----------|----------------|-------------------|-------------|
-| **Code generation** | ✅ | ✅ | ✅ | ✅ |
-| **Runs in editor pane** | ❌ (terminal) | ✅ | ❌ (sidebar) | ✅ |
-| **One-click launch** | ❌ | ✅ | ✅ | ✅ |
-| **Terminal-based interface** | ✅ | ✅ | ❌ | ✅ |
-| **File context (@)** | ✅ | ✅ | ✅ | ✅ |
-| **Send editor text** | ❌ | ✅ | ✅ | ❌ (Separate terminal) |
-| **Send multiple files** | ❌ | ✅ | ✅ | ❌ |
-| **Universal history** | ❌ | ✅ | ❌ | ❌ |
-| **Gemini models** | ✅ | ✅ | ✅ | ❌ |
-| **GPT-5 models** | ❌ | ✅ | ❌ | ❌ |
-| **Multiple CLI management** | ❌ | ✅ | ❌ | ❌ |
+| Feature | This Extension | Gemini Code Assist | Gemini CLI | Codex CLI | Claude Code |
+|---------|----------------|-------------------|-----------|-----------|-------------|
+| **Unified AI Management** | ✅ MAGUS Council | ❌ | ❌ | ❌ | ❌ |
+| **Simultaneous Prompt Sending** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Code generation** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Runs in editor pane** | ✅ | ❌ (sidebar) | ❌ (terminal) | ❌ (terminal) | ✅ |
+| **Gemini models** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **OpenAI models** | ✅ | ❌ | ❌ | ✅ | ❌ |
+| **Claude models** | ✅ | ❌ | ❌ | ❌ | ✅ |
 
 ## ⚙️ Configuration Options
 
-### Available Settings
+### MAGUS Council Settings
 
 ```json
 {
-  // Enable/disable CLI features
+  // Enable/disable AI features
   "gemini-cli-vscode.gemini.enabled": true,
   "gemini-cli-vscode.codex.enabled": true,
+  "gemini-cli-vscode.claude.enabled": true,
   
-  // Context menu visibility
-  "gemini-cli-vscode.gemini.showInContextMenu": true,
-  "gemini-cli-vscode.codex.showInContextMenu": false,
+  // MAGUS Council execution timing
+  "gemini-cli-vscode.multiAI.composer.delays.initial": 100,
+  "gemini-cli-vscode.multiAI.composer.delays.claude.enter": 150,
+  "gemini-cli-vscode.multiAI.composer.delays.gemini.enter": 600,
   
-  // History save settings
-  "gemini-cli-vscode.saveToHistory.showStatusBar": true,
-  "gemini-cli-vscode.saveToHistory.includeTerminalName": true
+  // Batch launch settings
+  "gemini-cli-vscode.multiAI.launch.clis": ["claude", "gemini", "codex"]
 }
 ```
 
@@ -377,4 +388,4 @@ MIT License - See [LICENSE](LICENSE) file for details
 
 ---
 
-Born from the daily frustration of switching between terminal and editor while using AI coding assistants. This extension brings the best of both worlds - Claude Code's elegant editor integration with Gemini CLI's powerful capabilities. This documentation expects to make a mundane extension seem like a world-changing feature. But maybe that's okay. If a small tool solves someone's small problem, the world becomes a little better.
+The dream of unified AI coding assistant management becomes reality with MAGUS Council. Skillfully controlling multiple AIs and guiding the development process to the next level - that's the system we aim for. 🔮

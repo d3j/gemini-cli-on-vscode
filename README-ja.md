@@ -2,14 +2,14 @@
 
 **🇯🇵 日本語版** | [🇺🇸 English](README.md)
 
-## 🎨 3つのAI CLI（Gemini、Codex、Claude Code）を統一管理
+## 🔮 MAGUS Council - 3つのAI CLIを統一管理
 
-![Extension Features](images/ExtensionFeatures.png)
+![Extension Features](images/Broadcast_your_pain_to_all_AI_CLIs_with_one_click.png)
 
 ## 💡 なぜこの拡張が革新的なのか？
 
 - ❌ 従来：ターミナルでのみ動作するGemini CLIやCodex CLI
-- ✅ 革新：エディタ統合によるClaude Code風体験
+- ✅ 革新：エディタ統合による統一AI管理システム
 
 ### 🔄 従来の制約
 
@@ -19,12 +19,10 @@
 
 ### ✨ この拡張の革新
 
-#### Claude Codeのエディタ統合体験をGemini CLI & Codex CLIで実現
+#### Claude Codeのエディタ統合体験を3つのAI CLIで実現
 
-- Gemini CLI & Codex CLI (GPT-5) がエディタウィンドウで直接動作
-- ターミナルとエディタの切り替えが不要に
-- Claude Codeユーザーが愛するワークフローをGeminiとGPT-5で
-- **業界初**: 複数のAI CLIを同時にエディタペインで管理
+- Gemini CLI & Codex CLI がエディタウィンドウで直接動作
+- **MAGUS Council**で一つのプロンプトを複数のAI CLIへ一括送信
 
 ## ⚡ 主要機能
 
@@ -45,31 +43,19 @@
 - ターミナルとエディタ間のコンテキストスイッチが不要
 - 開発フローと自然に統合
 
-### 🆕 スマート機能
+### 🔮 v0.1.0 メジャーアップデート - MAGUS Council
 
-#### v0.0.8 ✴️ NEW - マルチCLI対応！
+- **MAGUS Council** - Multiple Agent Guidance & Intelligence System 🔮
+  - **プロンプトの一斉配信機能**: Gemini、Claude、Codexをシンクロ操作
+  - **全てはシナリオ通りに**: 各AI特化の実行タイミングを最適化
 
-- **Claude Code 統合**: Claude Codeも扱えます
+### 🎨 その他の主要機能
+
+- **Claude Code 統合**: 3つのAI CLIを完全統合
 - **一括起動機能**: 「Launch All CLIs」ボタンで3つのCLIを同時起動
-  - すべてのAI CLIを並べて配置
-
-#### v0.0.6 GPT-5リリース記念！
-
-- **Codex CLI サポート**: OpenAIのCodex CLI (GPT-5対応) をエディタペインで実行
-- **ユニバーサル履歴保存**: 複数のAI CLI（Gemini CLI、Codex CLI、Claude Code）で動作
-  - 統一履歴フォルダ `.history-memo/` で日々の作業記録を管理
-- **個別CLIコマンド**: 各CLIに専用コマンド
-  - Gemini CLI: Send Selected Text / File Path / Open File Path
-  - Codex CLI: Send Selected Text / File Path / Open File Path
-  - Claude Code: Send Selected Text / File Path / Open File Path
-- **詳細な設定オプション**:
-  - `gemini.enabled` / `codex.enabled` / `claude.enabled` - 各CLIの有効/無効
-  - `gemini.showInContextMenu` / `codex.showInContextMenu` / `claude.showInContextMenu` - コンテキストメニュー表示
-  - `multiCLI.enabled` - マルチCLI機能の有効/無効
-  - `multiCLI.launch.clis` - 一括起動するCLIと順序のカスタマイズ
-  - `saveToHistory.showStatusBar` - ステータスバー表示制御
-  - `saveToHistory.includeTerminalName` - 履歴にターミナル名を含める
-  - `terminal.disableFlowControl` - XON/XOFFフロー制御の無効化（Ctrl+Sフリーズ防止）
+- **ユニバーサル履歴保存**: 統一履歴フォルダ `.history-memo/` で作業記録を管理
+- **個別CLIコマンド**: 各CLIに専用の送信コマンド
+- **詳細な設定オプション**: 各CLIの有効/無効、メニュー表示制御など
 
 ## 🚀 クイックスタート
 
@@ -96,8 +82,12 @@ claude  # Anthropicアカウント認証
    - 🚀 **Launch All CLIs** - 3つのCLIを一括起動
    - ✨ Gemini CLI起動
    - ❄️ Codex CLI起動
-   - ✴️  Claude Code起動
-3. **AI CLIがエディタペインで起動！**
+   - ✴️ Claude Code起動
+3. **MAGUS Councilを起動**
+   - サイドバーにMAGUS Councilパネルが表示
+   - コマンドパレット: "MAGUS Council: Open"
+4. **使用したいAIを選択してプロンプト送信**
+   - 複数AI選択で同時実行可能
 
 ### 🎨 エディタタイトルバーのボタンカスタマイズ
 
@@ -162,13 +152,29 @@ claude  # Anthropicアカウント認証
 - エディタで右クリック
 - 使用したいCLI用の "Send Open File Path" を選択
 
+### 🔮 MAGUS Council の使い方
+
+**統一制御パネルから:**
+
+1. サイドバーのMAGUS Councilパネルを開く
+2. 使用したいAI（Gemini/Claude/Codex）をチェック
+3. プロンプトを入力
+4. 「🔮 Ask n AIs」ボタンで一斉送信
+
+**個別制御も可能:**
+
+- 各AIタブで直接操作
+- 従来通りのファイル送信機能
+- コンテキストメニューからの操作
+
 ### ⌨️ コマンドパレット
 
-全ての機能はコマンドパレットからも実行可能
+**MAGUS Council コマンド:**
 
-- コマンドパレットを開く（`Cmd+Shift+P` / `Ctrl+Shift+P`）
+- **"MAGUS Council: Open"** - 統一制御パネルを開く
+- **"Multi-AI: Ask All"** - 選択したAIに一斉送信
 
-**マルチCLI コマンド:**
+**既存のコマンド:**
 
 - **"Launch All CLIs"** - 3つのCLIを一括起動（同じグループにタブとして配置）
 
@@ -219,45 +225,32 @@ claude  # Anthropicアカウント認証
 
 | 機能 | この拡張 | Gemini Code Assist | Gemini CLI | Codex CLI | Claude Code |
 |------|----------|--------------------------|-------------------|-------------------|----------------|
+| **統一AI管理** | ✅ MAGUS Council | ❌ | ❌ | ❌ | ❌ |
+| **同時プロンプト送信** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **コード生成** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **ワンクリック起動** | ✅ | ✅ | ❌ | ❌ | ✅ |
 | **エディタペインで動作** | ✅ | ❌（サイドバー） | ❌（ターミナル） | ❌（ターミナル） | ✅ |
-| **ターミナルベースインターフェース** | ✅ | ❌ | ✅ | ✅ | ✅ |
-| **ファイルコンテキスト** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **エディタテキストを送信** | ✅ | ✅ | ❌ | ❌ | ❌ (別ターミナル) |
-| **ユニバーサル履歴** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ | ❌ |
 | **OpenAIモデル対応** | ✅ | ❌ | ❌ | ✅ | ❌ |
 | **Claudeモデル対応** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **複数AI CLI管理** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **一括起動機能** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ## ⚙️ 設定オプション
 
-### 利用可能な設定
+### MAGUS Council 設定
 
 ```json
 {
-  // CLI機能の有効/無効
+  // AI機能の有効/無効
   "gemini-cli-vscode.gemini.enabled": true,
   "gemini-cli-vscode.codex.enabled": true,
   "gemini-cli-vscode.claude.enabled": true,
   
-  // コンテキストメニュー表示
-  "gemini-cli-vscode.gemini.showInContextMenu": true,
-  "gemini-cli-vscode.codex.showInContextMenu": true,
-  "gemini-cli-vscode.claude.showInContextMenu": true,
+  // MAGUS Council実行タイミング
+  "gemini-cli-vscode.multiAI.composer.delays.initial": 100,
+  "gemini-cli-vscode.multiAI.composer.delays.claude.enter": 150,
+  "gemini-cli-vscode.multiAI.composer.delays.gemini.enter": 600,
   
-  // マルチCLI機能
-  "gemini-cli-vscode.multiCLI.enabled": true,
-  "gemini-cli-vscode.multiCLI.launch.clis": ["claude", "gemini", "codex"],
-  
-  // 履歴保存設定
-  "gemini-cli-vscode.saveToHistory.showStatusBar": true,
-  "gemini-cli-vscode.saveToHistory.includeTerminalName": true,
-  
-  // ターミナル設定
-  "gemini-cli-vscode.terminal.disableFlowControl": true
+  // 一括起動設定
+  "gemini-cli-vscode.multiAI.launch.clis": ["claude", "gemini", "codex"]
 }
 ```
 

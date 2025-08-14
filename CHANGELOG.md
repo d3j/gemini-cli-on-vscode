@@ -2,66 +2,63 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.9] - TBD
+## [0.1.0] - 2025-08-15
+
+### 🎉 Major Feature: MAGUS Council
+
+- **MAGUS Council** - Multiple Agent Guidance & Intelligence System 🔮
+  - Three Wise Men Protocol: Coordinate Gemini, Claude, and Codex in perfect synchronization
+  - Interactive sidebar for unified AI management
+  - Broadcast prompts to multiple AI CLIs simultaneously
+  - Smart CLI-specific execution with configurable delays
 
 ### Added
 
-- **Multi-AI Composer (Phase 1)** - Send prompts to multiple AIs simultaneously! 🚀
-  - New command: `multiAI.openComposer` - Opens an interactive prompt input dialog
-  - New command: `multiAI.askAll` - Broadcasts your prompt to selected AI agents
-  - Automatic execution: Each CLI receives and executes the prompt automatically
-  - Smart CLI-specific handling: Optimized for Gemini CLI, Codex CLI, and Claude Code
-  - Configurable delays: Fine-tune timing for your environment via settings
-    - `multiAI.composer.delays.initial` - Initial delay before sending (default: 100ms)
-    - `multiAI.composer.delays.claude.enter` - Claude Code Enter delay (default: 150ms)
-    - `multiAI.composer.delays.gemini.showWait` - Gemini CLI terminal activation delay (default: 250ms)
-    - `multiAI.composer.delays.gemini.enter` - Gemini CLI Enter delay (default: 600ms)
+- **Commands**
+  - `multiAI.openComposer` - Opens MAGUS Council sidebar
+  - `multiAI.askAll` - Broadcasts to selected AI agents
+- **Icon**: New Council icon for multi-AI features
+- **Settings**: Configurable execution delays
+  - `multiAI.composer.delays.initial` (default: 100ms)
+  - `multiAI.composer.delays.claude.enter` (default: 150ms)
+  - `multiAI.composer.delays.gemini.enter` (default: 600ms)
+
 
 ### Improved
 
-- **Test Suite Enhancement** - Complete test framework overhaul
-  - Full migration from TDD (suite/test) to BDD (describe/it) format
-  - All 42 tests passing with 100% reliability
-  - Enhanced test helpers for better stability
-  - Added comprehensive assertions for new multi-AI features
+- **Terminal Management**
+  - Single instance per AI type with automatic reuse
+  - Consistent behavior across all launch methods
+  - Clean shutdown with transient terminals (no ghost terminals)
+  
+- **Test Suite**
+  - Complete migration to BDD format (describe/it)
+  - Enhanced test helpers for stability
 
 ### Changed
 
-- **Configuration Naming** - Improved consistency and clarity
-  - Renamed `multiCLI` to `multiAI` throughout the codebase
-  - Organized delay settings under `composer.delays` hierarchy
-  - Better alignment with user-facing terminology
+- Organized settings under `composer.delays` hierarchy
 
 ### Fixed
 
-- Improved error logging (changed `console.log` to `console.error`)
-- Refactored `sendOpenFilesToCLI` function with Promise support
-- Fixed test suite compatibility issues with VS Code test runner
-- Resolved CLI-specific execution quirks for reliable multi-AI broadcasting
-
-### Technical
-
-- Updated ESLint configuration
-- Enhanced CI/CD workflow
-- Improved code quality and test coverage
-- Implemented CLI-specific execution strategies for optimal performance
+- Terminal persistence issue - no more ghost terminals after restart
+- Error logging improved (`console.log` → `console.error`)
+- Promise-based file operations for reliability
+- CLI-specific execution timing optimized
+- "All according to scenario" - comprehensive test coverage
 
 ## [0.0.8] - 2025-08-11
 
 ### Added
 
-- **Claude Code Joins the Party** - The trio is complete!
-  - 🎤 Three AI CLIs on One Extension
-  - Consistent command structure across all three performers (Send File Path, Send Selected Text, etc.)
-- **Launch All CLIs Button** - three CLIs on stage at once
-  - Hit the "AI Brain" and watch the show begin - "Getting down with no delay"
-  - Configurable setlist via `multiCLI.launch.clis` setting
+- **Claude Code Integration** - Complete the AI trio! 🎤
+- **Launch All CLIs** button - Start all three AIs simultaneously
+  - Configurable order via `multiCLI.launch.clis` setting
 
 ### Fixed
 
-- Resolved Codex CLI output freezing issue during long CLI generations (VS Code flow control problem)
-- Test framework unified to BDD format
-- Test suite errors resolved (suite/test → describe/it migration)
+- Codex CLI output freezing during long generations
+- Initial test framework migration started
 
 ## [0.0.7] - 2025-08-09
 

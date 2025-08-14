@@ -22,16 +22,38 @@
     "cli",
     "terminal"
   ],
-  "version": "0.0.8",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:gemini-cli-vscode.promptComposerView",
+    "onCommand:gemini-cli-vscode.multiAI.openComposer"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gemini-cli-vscode",
+          "title": "MAGUS Council",
+          "icon": "images/council-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "gemini-cli-vscode": [
+        {
+          "type": "webview",
+          "id": "gemini-cli-vscode.promptComposerView",
+          "name": "MAGUS Council",
+          "when": "config.gemini-cli-vscode.multiAI.enabled"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "gemini-cli-vscode.startInNewPane",
@@ -120,7 +142,7 @@
       },
       {
         "command": "gemini-cli-vscode.multiAI.openComposer",
-        "title": "AI: Open Prompt Composer",
+        "title": "AI: Open MAGUS Council",
         "category": "Multi AI"
       },
       {
@@ -185,6 +207,11 @@
         }
       ],
       "explorer/context": [
+        {
+          "command": "gemini-cli-vscode.multiAI.openComposer",
+          "group": "navigation@1",
+          "when": "config.gemini-cli-vscode.multiAI.enabled"
+        },
         {
           "command": "gemini-cli-vscode.sendFilePathToGemini",
           "group": "5_cutcopypaste@103",
@@ -298,19 +325,26 @@
           "maximum": 5000,
           "description": "Delay before sending Enter to Claude Code after prompt (milliseconds)"
         },
-        "gemini-cli-vscode.multiAI.composer.delays.gemini.showWait": {
-          "type": "number",
-          "default": 250,
-          "minimum": 0,
-          "maximum": 5000,
-          "description": "Wait time after showing Gemini CLI terminal before sending prompt (milliseconds)"
-        },
         "gemini-cli-vscode.multiAI.composer.delays.gemini.enter": {
           "type": "number",
           "default": 600,
           "minimum": 0,
           "maximum": 5000,
           "description": "Delay before sending Enter to Gemini CLI after prompt (milliseconds)"
+        },
+        "gemini-cli-vscode.multiAI.defaultAgents": {
+          "type": "array",
+          "default": ["gemini", "codex", "claude"],
+          "items": {
+            "type": "string",
+            "enum": ["gemini", "codex", "claude"]
+          },
+          "description": "Default agents to select in MAGUS Council"
+        },
+        "gemini-cli-vscode.multiAI.composer.autoSaveHistory": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically save sent prompts to .history-memo"
         }
       }
     }
@@ -323,7 +357,7 @@
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
     "test:unit": "npm run compile && vscode-test --config .vscode-test-unit.mjs",
-    "test:integration": "npm run compile && vscode-test --run out/test/integration/**/*.test.js",
+    "test:integration": "npm run compile && vscode-test --config .vscode-test-integration.mjs",
     "test:coverage": "npm run compile && nyc vscode-test",
     "test:watch": "npm run compile && vscode-test --watch"
   },

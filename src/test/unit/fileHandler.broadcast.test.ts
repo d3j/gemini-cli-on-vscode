@@ -19,6 +19,14 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
         claudeTerminals = new Map();
         
         fileHandler = new FileHandler(geminiTerminals, codexTerminals, claudeTerminals);
+
+        // Stub VS Code command execution and clipboard to avoid environment dependencies
+        sandbox.stub(vscode.commands, 'executeCommand').resolves();
+        try {
+            sandbox.stub(vscode.env.clipboard, 'writeText').resolves();
+        } catch {
+            // Some environments may not allow stubbing clipboard; ignore
+        }
     });
 
     afterEach(() => {
@@ -54,8 +62,8 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
         await fileHandler.broadcastToMultipleClis(prompt, agents);
         
         // Assert
-        assert.strictEqual(geminiShowStub.callCount, 2); // show is called twice for Gemini (initial show + show(false))
-        assert.strictEqual(geminiSendTextStub.callCount, 2); // Gemini now sends prompt then Enter separately
+        assert.ok(geminiShowStub.callCount >= 1); // Terminal should be shown at least once
+        assert.strictEqual(geminiSendTextStub.callCount, 1); // Only Enter is sent via sendText
         assert.strictEqual(warningStub.callCount, 1);
         assert.ok(warningStub.firstCall.args[0].includes('Codex, Claude'));
     });
@@ -141,21 +149,11 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
         
         sandbox.stub(vscode.window, 'terminals').value([geminiTerminal, codexTerminal]);
         
-        const clock = sandbox.useFakeTimers();
-        
         // Act
-        const promise = fileHandler.broadcastToMultipleClis(prompt, agents, delayMs);
-        
-        // Advance timers to complete all operations
-        // Initial delay (100) + Gemini show wait (250) + Gemini enter (600) + delay between (100) + Codex (100)
-        await clock.tickAsync(1200);
-        
+        await fileHandler.broadcastToMultipleClis(prompt, agents, delayMs);
+
         // Assert
-        assert.strictEqual(geminiSendTextStub.callCount, 2); // Gemini sends prompt then Enter
+        assert.strictEqual(geminiSendTextStub.callCount, 1); // Gemini sends only Enter via sendText
         assert.strictEqual(codexSendTextStub.callCount, 1); // Codex sends once
-        
-        await promise;
-        
-        clock.restore();
     });
 });

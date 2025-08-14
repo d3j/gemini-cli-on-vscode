@@ -77,7 +77,6 @@ export class FileHandler {
                 enter: config.get<number>('claude.enter', 150)
             },
             gemini: {
-                showWait: config.get<number>('gemini.showWait', 250),
                 enter: config.get<number>('gemini.enter', 600)
             }
         };
@@ -118,50 +117,55 @@ export class FileHandler {
 
             terminal.show();
             
-            // Send prompt with CLI-specific execution method
+            // Send prompt with clipboard paste method (reliable for multiline text)
             await new Promise<void>(resolve => {
                 setTimeout(async () => {
-                    // Each CLI has different behavior with sendText
+                    // Copy prompt to clipboard
+                    await vscode.env.clipboard.writeText(prompt);
+                    
+                    // Use VS Code's paste command for terminal
+                    // This preserves newlines and works consistently across all CLIs
+                    await vscode.commands.executeCommand('workbench.action.terminal.paste');
+                    
+                    // Send Enter to execute the command after paste
+                    // Each CLI may need different timing
                     switch (cli) {
-                        case 'codex':
-                            // Codex works correctly with sendText(prompt, true)
-                            terminal.sendText(prompt, true);
-                            resolve();
-                            break;
-                        
-                        case 'claude':
-                            // Claude Code: send prompt without Enter, then send Enter separately
-                            terminal.sendText(prompt, false);
-                            // Send Enter after configurable delay
+                        case 'claude': {
+                            // Claude Code: Send Enter after delay
+                            // 長文貼り付け時は[Pasted text]表示になるため、より長い待機が必要
+                            // プロンプトの長さに応じて動的に調整
+                            let claudeDelay = delays.claude.enter;
+                            if (prompt.length > 2000) {
+                                claudeDelay = 2500; // 2.5秒待機（5秒から半分に削減）
+                            } else if (prompt.length > 1000) {
+                                claudeDelay = 1500; // 1.5秒待機（3秒から半分に削減）
+                            }
+                            
                             setTimeout(() => {
                                 terminal.sendText('', true);
                                 resolve();
-                            }, delays.claude.enter);
+                            }, claudeDelay);
                             break;
+                        }
                         
-                        case 'gemini':
-                            // Gemini CLI: ensure terminal is active before sending
-                            // First, show the terminal without preserving focus
-                            terminal.show(false);
-                            
-                            // Wait for terminal to be fully active
+                        case 'gemini': {
+                            // Gemini CLI: Send Enter after delay
                             setTimeout(() => {
-                                // Send the prompt without Enter first
-                                terminal.sendText(prompt, false);
-                                
-                                // Wait a bit then send Enter
-                                setTimeout(() => {
-                                    terminal.sendText('', true);
-                                    resolve();
-                                }, delays.gemini.enter);
-                            }, delays.gemini.showWait);
+                                terminal.sendText('', true);
+                                resolve();
+                            }, delays.gemini.enter);
                             break;
+                        }
                         
-                        default:
-                            // Fallback to standard behavior
-                            terminal.sendText(prompt, true);
-                            resolve();
+                        case 'codex':
+                        default: {
+                            // Codex and others: Send Enter immediately
+                            setTimeout(() => {
+                                terminal.sendText('', true);
+                                resolve();
+                            }, 100);
                             break;
+                        }
                     }
                 }, delays.initial);
             });
