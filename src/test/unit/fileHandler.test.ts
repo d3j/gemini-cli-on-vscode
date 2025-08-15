@@ -17,7 +17,7 @@ describe('FileHandler Unit Test Suite', () => {
     beforeEach(() => {
         testContext = createTestContext();
         mockTerminals = new Map<string, vscode.Terminal>();
-        fileHandler = new FileHandler(mockTerminals, new Map(), new Map());
+        fileHandler = new FileHandler(mockTerminals, new Map(), new Map(), new Map());
     });
 
     afterEach(() => {

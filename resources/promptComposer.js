@@ -15,7 +15,7 @@
     let persisted = {
         prompt: '',
         includeContext: true,
-        agents: { gemini: true, codex: true, claude: true }
+        agents: { gemini: true, codex: true, claude: true, qwen: false }
     };
     
     // Auto-resize textarea function
@@ -57,10 +57,12 @@
             const geminiToggle = document.querySelector('.ai-toggle[data-agent="gemini"]');
             const codexToggle = document.querySelector('.ai-toggle[data-agent="codex"]');
             const claudeToggle = document.querySelector('.ai-toggle[data-agent="claude"]');
+            const qwenToggle = document.querySelector('.ai-toggle[data-agent="qwen"]');
             
             if (geminiToggle) geminiToggle.classList.toggle('active', !!persisted.agents.gemini);
             if (codexToggle) codexToggle.classList.toggle('active', !!persisted.agents.codex);
             if (claudeToggle) claudeToggle.classList.toggle('active', !!persisted.agents.claude);
+            if (qwenToggle) qwenToggle.classList.toggle('active', !!persisted.agents.qwen);
         } catch (e) {}
 
         vscode.postMessage({ type: 'composer/init' });
@@ -248,6 +250,7 @@
                 gemini: document.querySelector('.ai-toggle[data-agent="gemini"]')?.classList.contains('active') ?? true,
                 codex: document.querySelector('.ai-toggle[data-agent="codex"]')?.classList.contains('active') ?? true,
                 claude: document.querySelector('.ai-toggle[data-agent="claude"]')?.classList.contains('active') ?? true,
+                qwen: document.querySelector('.ai-toggle[data-agent="qwen"]')?.classList.contains('active') ?? false,
             }
         };
         try { vscode.setState && vscode.setState(state); } catch (e) {}

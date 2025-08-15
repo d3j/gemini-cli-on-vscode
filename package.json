@@ -22,17 +22,14 @@
     "cli",
     "terminal"
   ],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onView:gemini-cli-vscode.promptComposerView",
-    "onCommand:gemini-cli-vscode.multiAI.openComposer"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -132,6 +129,30 @@
         "title": "Claude Code: Send Open File Path"
       },
       {
+        "command": "gemini-cli-vscode.qwenStartInNewPane",
+        "title": "Qwen CLI: Start in New Pane",
+        "icon": {
+          "light": "images/qwen-color.svg",
+          "dark": "images/qwen-color.svg"
+        }
+      },
+      {
+        "command": "gemini-cli-vscode.qwenStartInActivePane",
+        "title": "Qwen CLI: Start in Active Pane"
+      },
+      {
+        "command": "gemini-cli-vscode.sendSelectedTextToQwen",
+        "title": "Qwen CLI: Send Selected Text"
+      },
+      {
+        "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
+        "title": "Qwen CLI: Send Open File Path"
+      },
+      {
+        "command": "gemini-cli-vscode.sendFilePathToQwen",
+        "title": "Qwen CLI: Send File Path"
+      },
+      {
         "command": "gemini-cli-vscode.launchAllCLIs",
         "title": "Launch All CLIs",
         "category": "Gemini CLI",
@@ -169,6 +190,11 @@
           "when": "config.gemini-cli-vscode.gemini.enabled"
         },
         {
+          "command": "gemini-cli-vscode.qwenStartInNewPane",
+          "group": "navigation",
+          "when": "config.gemini-cli-vscode.qwen.enabled"
+        },
+        {
           "command": "gemini-cli-vscode.launchAllCLIs",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.multiAI.enabled"
@@ -204,6 +230,16 @@
           "command": "gemini-cli-vscode.sendSelectedTextToClaude",
           "group": "5_cutcopypaste@104",
           "when": "editorHasSelection && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
+          "group": "5_cutcopypaste@105",
+          "when": "editorTextFocus && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendSelectedTextToQwen",
+          "group": "5_cutcopypaste@106",
+          "when": "editorHasSelection && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         }
       ],
       "explorer/context": [
@@ -226,6 +262,11 @@
           "command": "gemini-cli-vscode.sendFilePathToClaude",
           "group": "5_cutcopypaste@105",
           "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToQwen",
+          "group": "5_cutcopypaste@106",
+          "when": "config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         }
       ],
       "editor/title/context": [
@@ -243,6 +284,11 @@
           "command": "gemini-cli-vscode.sendFilePathToClaude",
           "group": "5_cutcopypaste@107",
           "when": "config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.sendFilePathToQwen",
+          "group": "5_cutcopypaste@108",
+          "when": "config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         }
       ]
     },
@@ -295,6 +341,29 @@
           "default": true,
           "description": "Show Claude Code commands in context menus"
         },
+        "gemini-cli-vscode.qwen.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Qwen CLI features"
+        },
+        "gemini-cli-vscode.qwen.command": {
+          "type": "string",
+          "default": "qwen",
+          "description": "Command to launch Qwen CLI (e.g., 'qwen' or custom command)"
+        },
+        "gemini-cli-vscode.qwen.args": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional arguments for Qwen CLI"
+        },
+        "gemini-cli-vscode.qwen.showInContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Qwen commands in context menus"
+        },
         "gemini-cli-vscode.multiAI.enabled": {
           "type": "boolean",
           "default": true,
@@ -305,10 +374,10 @@
           "default": ["claude", "gemini", "codex"],
           "items": {
             "type": "string",
-            "enum": ["gemini", "codex", "claude"]
+            "enum": ["gemini", "codex", "claude", "qwen"]
           },
           "minItems": 1,
-          "maxItems": 3,
+          "maxItems": 4,
           "description": "CLIs to launch with 'Launch All CLIs' command (order matters)"
         },
         "gemini-cli-vscode.multiAI.composer.delays.initial": {
@@ -337,7 +406,7 @@
           "default": ["gemini", "codex", "claude"],
           "items": {
             "type": "string",
-            "enum": ["gemini", "codex", "claude"]
+            "enum": ["gemini", "codex", "claude", "qwen"]
           },
           "description": "Default agents to select in MAGUS Council"
         },

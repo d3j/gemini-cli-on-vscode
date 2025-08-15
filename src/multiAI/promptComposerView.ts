@@ -98,7 +98,7 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
 
         await this.fileHandler.broadcastToMultipleClis(
             finalPrompt,
-            payload.agents as ('gemini' | 'codex' | 'claude')[]
+            payload.agents as ('gemini' | 'codex' | 'claude' | 'qwen')[]
         );
 
         // Notification is handled by fileHandler.broadcastToMultipleClis
@@ -170,6 +170,9 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
         const codexIconUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this.context.extensionUri, 'images', 'codex-icon.png')
         );
+        const qwenIconUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this.context.extensionUri, 'images', 'qwen-color.svg')
+        );
         const nonce = this.getNonce();
 
         return `<!DOCTYPE html>
@@ -201,6 +204,9 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
                         </button>
                         <button class="ai-toggle active" data-agent="claude" title="Claude AI">
                             <img src="${claudeIconUri}" class="ai-icon" alt="Claude">
+                        </button>
+                        <button class="ai-toggle" data-agent="qwen" title="Qwen AI">
+                            <img src="${qwenIconUri}" class="ai-icon" alt="Qwen">
                         </button>
                     </div>
                 </div>

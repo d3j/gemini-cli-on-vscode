@@ -9,6 +9,7 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
     let geminiTerminals: Map<string, vscode.Terminal>;
     let codexTerminals: Map<string, vscode.Terminal>;
     let claudeTerminals: Map<string, vscode.Terminal>;
+    let qwenTerminals: Map<string, vscode.Terminal>;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
@@ -17,8 +18,9 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
         geminiTerminals = new Map();
         codexTerminals = new Map();
         claudeTerminals = new Map();
+        qwenTerminals = new Map();
         
-        fileHandler = new FileHandler(geminiTerminals, codexTerminals, claudeTerminals);
+        fileHandler = new FileHandler(geminiTerminals, codexTerminals, claudeTerminals, qwenTerminals);
 
         // Stub VS Code command execution and clipboard to avoid environment dependencies
         sandbox.stub(vscode.commands, 'executeCommand').resolves();

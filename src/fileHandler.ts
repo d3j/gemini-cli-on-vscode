@@ -4,15 +4,18 @@ export class FileHandler {
     private geminiTerminals: Map<string, vscode.Terminal>;
     private codexTerminals: Map<string, vscode.Terminal>;
     private claudeTerminals: Map<string, vscode.Terminal>;
+    private qwenTerminals: Map<string, vscode.Terminal>;
 
     constructor(
         geminiTerminals: Map<string, vscode.Terminal>, 
         codexTerminals: Map<string, vscode.Terminal>,
-        claudeTerminals: Map<string, vscode.Terminal>
+        claudeTerminals: Map<string, vscode.Terminal>,
+        qwenTerminals: Map<string, vscode.Terminal>
     ) {
         this.geminiTerminals = geminiTerminals;
         this.codexTerminals = codexTerminals;
         this.claudeTerminals = claudeTerminals;
+        this.qwenTerminals = qwenTerminals;
     }
 
     formatFilePath(uri: vscode.Uri): string {
@@ -21,11 +24,12 @@ export class FileHandler {
         return needsQuotes ? `@"${path}"` : `@${path}`;
     }
 
-    findCLITerminal(terminals: readonly vscode.Terminal[], targetCLI?: 'gemini' | 'codex' | 'claude'): vscode.Terminal | undefined {
+    findCLITerminal(terminals: readonly vscode.Terminal[], targetCLI?: 'gemini' | 'codex' | 'claude' | 'qwen'): vscode.Terminal | undefined {
         const terminalMaps = {
             'claude': this.claudeTerminals,
             'codex': this.codexTerminals,
-            'gemini': this.geminiTerminals
+            'gemini': this.geminiTerminals,
+            'qwen': this.qwenTerminals
         };
         
         if (targetCLI) {
@@ -55,7 +59,7 @@ export class FileHandler {
 
     async broadcastToMultipleClis(
         prompt: string, 
-        agents: ('gemini' | 'codex' | 'claude')[], 
+        agents: ('gemini' | 'codex' | 'claude' | 'qwen')[], 
         delayMs: number = 0
     ): Promise<void> {
         // Validate input
@@ -82,7 +86,7 @@ export class FileHandler {
         };
 
         // Find available terminals for each agent
-        const availableAgents: { cli: 'gemini' | 'codex' | 'claude', terminal: vscode.Terminal }[] = [];
+        const availableAgents: { cli: 'gemini' | 'codex' | 'claude' | 'qwen', terminal: vscode.Terminal }[] = [];
         const missingAgents: string[] = [];
 
         for (const agent of agents) {
@@ -93,7 +97,8 @@ export class FileHandler {
                 const cliNames = {
                     'claude': 'Claude',
                     'codex': 'Codex', 
-                    'gemini': 'Gemini'
+                    'gemini': 'Gemini',
+                    'qwen': 'Qwen'
                 };
                 missingAgents.push(cliNames[agent]);
             }
@@ -179,7 +184,7 @@ export class FileHandler {
         }
     }
 
-    async sendFilesToTerminal(uris: vscode.Uri[] | vscode.Uri, targetCLI?: 'gemini' | 'codex' | 'claude'): Promise<void> {
+    async sendFilesToTerminal(uris: vscode.Uri[] | vscode.Uri, targetCLI?: 'gemini' | 'codex' | 'claude' | 'qwen'): Promise<void> {
         // Handle single URI or array
         const uriArray = Array.isArray(uris) ? uris : [uris];
         
@@ -193,7 +198,8 @@ export class FileHandler {
             const cliNames = {
                 'claude': 'Claude Code',
                 'codex': 'Codex',
-                'gemini': 'Gemini'
+                'gemini': 'Gemini',
+                'qwen': 'Qwen'
             };
             const message = targetCLI 
                 ? `${cliNames[targetCLI]} CLI is not running. Please start it first.`

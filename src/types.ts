@@ -1,0 +1,1 @@
+export type CLIType = 'gemini' | 'codex' | 'claude' | 'qwen';

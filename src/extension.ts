@@ -5,12 +5,13 @@ import { FileHandler } from './fileHandler';
 import { PromptComposerViewProvider } from './multiAI/promptComposerView';
 
 // CLI type definition
-export type CLIType = 'gemini' | 'codex' | 'claude';
+import { CLIType } from './types';
 
 // Store active terminals for each CLI type
 const geminiTerminals = new Map<string, vscode.Terminal>();
 const codexTerminals = new Map<string, vscode.Terminal>();
 const claudeTerminals = new Map<string, vscode.Terminal>();
+const qwenTerminals = new Map<string, vscode.Terminal>();
 
 // Status bar items
 let saveHistoryStatusBarItem: vscode.StatusBarItem;
@@ -18,6 +19,8 @@ let saveHistoryStatusBarItem: vscode.StatusBarItem;
 // Track if extension is already activated
 let isActivated = false;
 let composerViewRegistration: vscode.Disposable | undefined;
+
+ 
 
 // Helper function to generate terminal key
 function getTerminalKey(_location: any): string {
@@ -160,7 +163,7 @@ async function sendSelectedToCLI(targetCLI?: CLIType) {
         return;
     }
     
-    // Find active CLI terminal (Gemini or Codex)
+    // Find active CLI terminal
     let activeTerminal: vscode.Terminal | undefined;
     let cliName = 'AI CLI';
     
@@ -182,17 +185,44 @@ async function sendSelectedToCLI(targetCLI?: CLIType) {
                 break;
             }
         }
-    } else {
-        // Check Codex terminals first
-        for (const terminal of codexTerminals.values()) {
+    } else if (targetCLI === 'claude') {
+        // Look for Claude terminal only
+        for (const terminal of claudeTerminals.values()) {
             if (vscode.window.terminals.includes(terminal)) {
                 activeTerminal = terminal;
-                cliName = 'Codex CLI';
+                cliName = 'Claude Code';
+                break;
+            }
+        }
+    } else if (targetCLI === 'qwen') {
+        // Look for Qwen terminal only
+        for (const terminal of qwenTerminals.values()) {
+            if (vscode.window.terminals.includes(terminal)) {
+                activeTerminal = terminal;
+                cliName = 'Qwen CLI';
+                break;
+            }
+        }
+    } else {
+        // Check all terminals in priority order
+        for (const terminal of claudeTerminals.values()) {
+            if (vscode.window.terminals.includes(terminal)) {
+                activeTerminal = terminal;
+                cliName = 'Claude Code';
                 break;
             }
         }
         
-        // Then check Gemini terminals
+        if (!activeTerminal) {
+            for (const terminal of codexTerminals.values()) {
+                if (vscode.window.terminals.includes(terminal)) {
+                    activeTerminal = terminal;
+                    cliName = 'Codex CLI';
+                    break;
+                }
+            }
+        }
+        
         if (!activeTerminal) {
             for (const terminal of geminiTerminals.values()) {
                 if (vscode.window.terminals.includes(terminal)) {
@@ -205,9 +235,15 @@ async function sendSelectedToCLI(targetCLI?: CLIType) {
     }
     
     if (!activeTerminal) {
+        const cliNames: Record<string, string> = {
+            'codex': 'Codex',
+            'gemini': 'Gemini',
+            'claude': 'Claude Code',
+            'qwen': 'Qwen'
+        };
         const message = targetCLI 
-            ? `${targetCLI === 'codex' ? 'Codex' : 'Gemini'} CLI is not running. Please start it first.`
-            : 'No AI CLI is running. Please start Gemini or Codex CLI first.';
+            ? `${cliNames[targetCLI] || targetCLI} CLI is not running. Please start it first.`
+            : 'No AI CLI is running. Please start Gemini, Codex, Claude, or Qwen CLI first.';
         vscode.window.showWarningMessage(message);
         return;
     }
@@ -233,7 +269,8 @@ function createOrFocusTerminal(
     location: vscode.TerminalOptions['location'], 
     cliType: CLIType = 'gemini'
 ): vscode.Terminal {
-    const terminals = cliType === 'claude' ? claudeTerminals :
+    const terminals = cliType === 'qwen' ? qwenTerminals :
+                     cliType === 'claude' ? claudeTerminals :
                      cliType === 'codex' ? codexTerminals : 
                      geminiTerminals;
     
@@ -257,7 +294,8 @@ function createOrFocusTerminal(
     const cliConfig = {
         gemini: { name: 'Gemini CLI', command: 'gemini', icon: 'icon.png' },
         codex: { name: 'Codex CLI', command: 'codex', icon: 'codex-icon.png' },
-        claude: { name: 'Claude Code', command: 'claude', icon: 'claude-logo.png' }
+        claude: { name: 'Claude Code', command: 'claude', icon: 'claude-logo.png' },
+        qwen: { name: 'Qwen CLI', command: 'qwen', icon: 'qwen-color.svg' }
     };
     
     const cfg = cliConfig[cliType];
@@ -267,7 +305,9 @@ function createOrFocusTerminal(
         name: cfg.name,  // Simple name without sessionId
         location: location,
         iconPath: iconPath,
-        isTransient: true  // Prevent terminal persistence on restart
+        isTransient: true,  // Prevent terminal persistence on restart
+        hideFromUser: false,  // Show in terminal dropdown but don't persist
+        env: {}  // Clean environment to prevent restoration
     });
     
     // Store the new terminal
@@ -294,7 +334,7 @@ function createOrFocusTerminal(
     // Launch the CLI
     terminal.sendText(cfg.command);
     terminal.show();
-    
+
     return terminal;
 }
 
@@ -351,7 +391,7 @@ async function launchAllCLIs(context: vscode.ExtensionContext) {
 
 function sendOpenFilesToCLI(targetCLI?: CLIType): Promise<void> {
     return new Promise((resolve) => {
-        // Find active CLI terminal (Gemini or Codex)
+        // Find active CLI terminal
         let activeTerminal: vscode.Terminal | undefined;
         let cliName = 'AI CLI';
         
@@ -373,17 +413,44 @@ function sendOpenFilesToCLI(targetCLI?: CLIType): Promise<void> {
                     break;
                 }
             }
-        } else {
-            // Check Codex terminals first
-            for (const terminal of codexTerminals.values()) {
+        } else if (targetCLI === 'claude') {
+            // Look for Claude terminal only
+            for (const terminal of claudeTerminals.values()) {
                 if (vscode.window.terminals.includes(terminal)) {
                     activeTerminal = terminal;
-                    cliName = 'Codex CLI';
+                    cliName = 'Claude Code';
+                    break;
+                }
+            }
+        } else if (targetCLI === 'qwen') {
+            // Look for Qwen terminal only
+            for (const terminal of qwenTerminals.values()) {
+                if (vscode.window.terminals.includes(terminal)) {
+                    activeTerminal = terminal;
+                    cliName = 'Qwen CLI';
+                    break;
+                }
+            }
+        } else {
+            // Check all terminals in priority order
+            for (const terminal of claudeTerminals.values()) {
+                if (vscode.window.terminals.includes(terminal)) {
+                    activeTerminal = terminal;
+                    cliName = 'Claude Code';
                     break;
                 }
             }
             
-            // Then check Gemini terminals
+            if (!activeTerminal) {
+                for (const terminal of codexTerminals.values()) {
+                    if (vscode.window.terminals.includes(terminal)) {
+                        activeTerminal = terminal;
+                        cliName = 'Codex CLI';
+                        break;
+                    }
+                }
+            }
+            
             if (!activeTerminal) {
                 for (const terminal of geminiTerminals.values()) {
                     if (vscode.window.terminals.includes(terminal)) {
@@ -396,9 +463,15 @@ function sendOpenFilesToCLI(targetCLI?: CLIType): Promise<void> {
         }
         
         if (!activeTerminal) {
+            const cliNames: Record<string, string> = {
+                'codex': 'Codex',
+                'gemini': 'Gemini',
+                'claude': 'Claude Code',
+                'qwen': 'Qwen'
+            };
             const message = targetCLI 
-                ? `${targetCLI === 'codex' ? 'Codex' : 'Gemini'} CLI is not running. Please start it first.`
-                : 'No AI CLI is running. Please start Gemini or Codex CLI first.';
+                ? `${cliNames[targetCLI] || targetCLI} CLI is not running. Please start it first.`
+                : 'No AI CLI is running. Please start Gemini, Codex, Claude, or Qwen CLI first.';
             vscode.window.showWarningMessage(message);
             resolve();
             return;
@@ -475,11 +548,31 @@ export function activate(context: vscode.ExtensionContext) {
     }
     isActivated = true;
     
+    // Clean up any ghost terminals from previous sessions
+    const cliNames = ['Gemini CLI', 'Codex CLI', 'Claude Code', 'Qwen CLI'];
+    vscode.window.terminals.forEach(terminal => {
+        // Check if this is a ghost terminal from our extension
+        if (cliNames.includes(terminal.name) && !terminal.exitStatus) {
+            // If terminal has no process ID or is in a weird state, dispose it
+            const pidPromise = terminal.processId;
+            if (pidPromise && typeof pidPromise.then === 'function') {
+                (pidPromise as Promise<number | undefined>).then(pid => {
+                    if (!pid) {
+                        terminal.dispose();
+                    }
+                }).catch(() => {
+                    // If we can't get process ID, it's likely a ghost terminal
+                    terminal.dispose();
+                });
+            }
+        }
+    });
+    
     // Create status bar items
     createStatusBarItems(context);
     
     // Create FileHandler instance with all terminal maps
-    const fileHandler = new FileHandler(geminiTerminals, codexTerminals, claudeTerminals);
+    const fileHandler = new FileHandler(geminiTerminals, codexTerminals, claudeTerminals, qwenTerminals);
 
     // Register Sidebar Prompt Composer view provider
     const composerViewProvider = new PromptComposerViewProvider(context, fileHandler);
@@ -491,6 +584,7 @@ export function activate(context: vscode.ExtensionContext) {
     const geminiEnabled = config.get<boolean>('gemini.enabled', true);
     const codexEnabled = config.get<boolean>('codex.enabled', true);
     const claudeEnabled = config.get<boolean>('claude.enabled', true);
+    const qwenEnabled = config.get<boolean>('qwen.enabled', false);
     
     // Gemini CLI commands
     const startInNewPane = vscode.commands.registerCommand('gemini-cli-vscode.startInNewPane', () => {
@@ -626,6 +720,49 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
     
+    // Qwen CLI commands
+    const qwenStartInNewPane = vscode.commands.registerCommand('gemini-cli-vscode.qwenStartInNewPane', () => {
+        if (!qwenEnabled) {
+            vscode.window.showWarningMessage('Qwen CLI is disabled in settings.');
+            return;
+        }
+        createOrFocusTerminal(context, { viewColumn: vscode.ViewColumn.Beside }, 'qwen');
+        updateStatusBarVisibility();
+    });
+    
+    const qwenStartInActivePane = vscode.commands.registerCommand('gemini-cli-vscode.qwenStartInActivePane', () => {
+        if (!qwenEnabled) {
+            vscode.window.showWarningMessage('Qwen CLI is disabled in settings.');
+            return;
+        }
+        createOrFocusTerminal(context, { viewColumn: vscode.ViewColumn.Active }, 'qwen');
+        updateStatusBarVisibility();
+    });
+    
+    // Qwen-specific send commands
+    const sendSelectedTextToQwen = vscode.commands.registerCommand('gemini-cli-vscode.sendSelectedTextToQwen', async () => {
+        await sendSelectedToCLI('qwen');
+    });
+    
+    const sendOpenFilePathToQwen = vscode.commands.registerCommand('gemini-cli-vscode.sendOpenFilePathToQwen', () => {
+        return sendOpenFilesToCLI('qwen');
+    });
+    
+    const sendFilePathToQwen = vscode.commands.registerCommand('gemini-cli-vscode.sendFilePathToQwen', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
+        if (uris && uris.length > 0) {
+            await fileHandler.sendFilesToTerminal(uris, 'qwen');
+        } else if (uri) {
+            await fileHandler.sendFilesToTerminal(uri, 'qwen');
+        } else {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor) {
+                await fileHandler.sendFilesToTerminal(activeEditor.document.uri, 'qwen');
+            } else {
+                vscode.window.showWarningMessage('No file selected');
+            }
+        }
+    });
+    
     // Multi-CLI command
     const launchAllCLIsCmd = vscode.commands.registerCommand('gemini-cli-vscode.launchAllCLIs', () => {
         launchAllCLIs(context);
@@ -682,11 +819,18 @@ export function activate(context: vscode.ExtensionContext) {
                 claudeTerminals.delete(key);
             }
         });
+        qwenTerminals.forEach((value, key) => {
+            if (value === terminal) {
+                qwenTerminals.delete(key);
+            }
+        });
         updateStatusBarVisibility();
     });
     
     // Initial visibility update
     updateStatusBarVisibility();
+
+    // No startup editor-group cleanup
     
     context.subscriptions.push(
         startInNewPane, 
@@ -695,16 +839,21 @@ export function activate(context: vscode.ExtensionContext) {
         codexStartInActivePane,
         claudeStartInNewPane,
         claudeStartInActivePane,
+        qwenStartInNewPane,
+        qwenStartInActivePane,
         saveClipboard,
         sendSelectedTextToGemini,
         sendSelectedTextToCodex,
         sendSelectedTextToClaude,
+        sendSelectedTextToQwen,
         sendOpenFilePathToGemini,
         sendOpenFilePathToCodex,
         sendOpenFilePathToClaude,
+        sendOpenFilePathToQwen,
         sendFilePathToGemini,
         sendFilePathToCodex,
         sendFilePathToClaude,
+        sendFilePathToQwen,
         launchAllCLIsCmd,
         openComposerCmd,
         askAllCmd
@@ -728,10 +877,16 @@ export function deactivate() {
             terminal.dispose();
         }
     });
+    qwenTerminals.forEach((terminal) => {
+        if (terminal && !terminal.exitStatus) {
+            terminal.dispose();
+        }
+    });
     
     // Clear terminals map on deactivation
     geminiTerminals.clear();
     codexTerminals.clear();
+    qwenTerminals.clear();
     
     // Dispose registered webview provider and status bar
     try {
@@ -749,5 +904,6 @@ export function deactivate() {
     // Allow re-activation in tests
     isActivated = false;
     claudeTerminals.clear();
-    isActivated = false;
+
+    // No editor-group cleanup on exit
 }
