@@ -134,9 +134,9 @@ suite('E2E Integration Test Suite', () => {
     });
 
     suite('Error Handling', () => {
-        test('Handles missing workspace gracefully', async () => {
+        test('Handles missing workspace gracefully (no selection)', async () => {
+            // No workspace and no selection should show information message and not throw
             testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
-            // Ensure no selection so the command shows info and returns
             const mockEmptyEditor = {
                 document: {
                     uri: vscode.Uri.file('/workspace/test.ts'),
@@ -146,19 +146,13 @@ suite('E2E Integration Test Suite', () => {
             };
             testContext.sandbox.stub(vscode.window, 'activeTextEditor').value(mockEmptyEditor);
 
-            try {
-                await vscode.commands.executeCommand('gemini-cli-vscode.saveClipboardToHistory');
-                assert.ok(true, 'Command executed (missing workspace handled)');
-            } catch (error) {
-                // In some environments it can throw; accept either path as pass
-                console.error('Command execution error:', error);
-                assert.ok(true, 'Command threw as expected without crashing host');
-            }
-        });
+            await vscode.commands.executeCommand('gemini-cli-vscode.saveClipboardToHistory');
 
-        test.skip('Handles file system errors gracefully', async () => {
-            // NOTE: File system stubs do not intercept the extension host process in integration tests.
-            // This scenario is covered in unit tests; skipping here to avoid false negatives.
+            // Expect graceful info message and no exception
+            assert.ok(
+                testContext.stubs.showInformationMessage.calledWith('No text selected. Select text in terminal or editor first.'),
+                'Should inform user when no selection exists'
+            );
         });
     });
 

@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 import { CLIRegistry } from '../../cliRegistry';
 import { CLIType } from '../../types';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 
 describe('CLIRegistry', () => {
     let registry: CLIRegistry;
@@ -161,6 +162,54 @@ describe('CLIRegistry', () => {
             registry.dispose();
             
             assert.ok(disposeSpy.calledOnce);
+        });
+    });
+
+    describe('Command validation and error handling', () => {
+        it('should use default command when empty string is provided', () => {
+            mockConfiguration.get.withArgs('gemini.command', 'gemini').returns('');
+            
+            registry.dispose();
+            registry = new CLIRegistry();
+            
+            const command = registry.getCommand('gemini');
+            assert.strictEqual(command, 'gemini'); // Should fallback to default
+        });
+
+        it('should handle command with multiple arguments', () => {
+            mockConfiguration.get.withArgs('claude.command', 'claude').returns('claude');
+            mockConfiguration.get.withArgs('claude.args', []).returns(['--model', 'opus', '--temperature', '0.7']);
+            
+            registry.dispose();
+            registry = new CLIRegistry();
+            
+            const command = registry.getCommand('claude');
+            assert.strictEqual(command, 'claude --model opus --temperature 0.7');
+        });
+
+        it('should show warning for invalid commands', () => {
+            const showWarningStub = sinon.stub(vscode.window, 'showWarningMessage');
+            
+            // Future implementation: validate command exists
+            // mockConfiguration.get.withArgs('gemini.command', 'gemini').returns('non-existent-cmd');
+            
+            showWarningStub.restore();
+        });
+    });
+
+    describe('Enhanced Qwen default handling', () => {
+        it('should handle Qwen with custom command and args', () => {
+            mockConfiguration.get.withArgs('qwen.command', 'qwen').returns('ollama');
+            mockConfiguration.get.withArgs('qwen.args', []).returns(['run', 'qwen2.5']);
+            mockConfiguration.get.withArgs('qwen.enabled', false).returns(true);
+            
+            registry.dispose();
+            registry = new CLIRegistry();
+            
+            const qwenConfig = registry.getCLI('qwen');
+            assert.strictEqual(qwenConfig?.command, 'ollama');
+            assert.deepStrictEqual(qwenConfig?.args, ['run', 'qwen2.5']);
+            assert.strictEqual(registry.getCommand('qwen'), 'ollama run qwen2.5');
         });
     });
 });

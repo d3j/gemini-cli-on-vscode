@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2025-08-17
+
+### Added
+
+- **Settings UI Reorganization** 🎨
+  - Two-tier configuration structure: Standard and Advanced
+  - Standard settings reduced to 7 essential decisions
+  - All CLI command/args now configurable for all AI types
+  - Context menu action-level toggles (Send Text / Send File Path)
+
+- **CLI Registry Architecture** 🏗️
+  - Centralized CLI configuration management
+  - Dynamic reload on settings change
+  - Type-safe API for CLI operations
+  - Foundation for future plugin architecture
+
+- **Improved Settings Migration** 🔄
+  - Automatic settings migration on extension activation
+  - Preserves existing user customizations
+  - Safe error handling ensures extension continues working
+
+### Changed
+
+- **Terminal Behavior**
+  - Added `terminal.groupingBehavior` for better multi-CLI management
+  - Improved handling of terminal delays
+
+### Improved
+
+- **Configuration UX**
+  - Enhanced markdown descriptions with examples
+  - Logical ordering with order attributes
+  - Clear dependency relationships in descriptions
+  - Emoji indicators for better visual scanning
+
+### Fixed
+
+- **Settings Compatibility**
+  - Improved handling of settings from previous versions
+  - Better fallback for missing configuration values
+  - Extension continues working even with incomplete settings
+
 ## [0.1.1] - 2025-08-15
 
 ### Fixed

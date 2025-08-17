@@ -74,7 +74,7 @@ export class FileHandler {
         }
 
         // Get delay settings from configuration
-        const config = vscode.workspace.getConfiguration('gemini-cli-vscode.multiAI.composer.delays');
+        const config = vscode.workspace.getConfiguration('gemini-cli-vscode.magusCouncil.composer.delays');
         const delays = {
             initial: config.get<number>('initial', 100),
             claude: {

@@ -2,9 +2,11 @@
 
 **🇯🇵 日本語版** | [🇺🇸 English](README.md)
 
-## 🔮 MAGUS Council - 3つのAI CLIを統一管理
+## 🔮 MAGUS Council - 統一AI CLI管理システム
 
 ![Extension Features](images/Broadcast_your_pain_to_all_AI_CLIs_with_one_click.png)
+
+### ついに：Claude Codeと同じ体験をGemini CLI & Codex CLI (GPT-5)でも
 
 ## 💡 なぜこの拡張が革新的なのか？
 
@@ -19,16 +21,16 @@
 
 ### ✨ この拡張の革新
 
-#### Claude Codeのエディタ統合体験を3つのAI CLIで実現
+#### Claude Codeのエディタ統合体験を複数のAI CLIで実現
 
-- Gemini CLI & Codex CLI がエディタウィンドウで直接動作
+- Gemini, Codex, Qwen がエディタウィンドウへ直接起動
 - **MAGUS Council**で一つのプロンプトを複数のAI CLIへ一括送信
 
 ## ⚡ 主要機能
 
 ### 🖱️ ワンクリック起動
 
-- **3種のAIを一括起動**と個別起動
+- **4種のAIを一括起動**と個別起動
 - **エディタタイトルバーのアイコン**で即座にアクセス
 
 ### 🔧 真のエディタ統合
@@ -46,13 +48,13 @@
 ### 🔮 v0.1.0 メジャーアップデート - MAGUS Council
 
 - **MAGUS Council** - Multiple Agent Guidance & Intelligence System 🔮
-  - **プロンプトの一斉配信機能**: Gemini、Claude、Codexをシンクロ操作
-  - **全てはシナリオ通りに**: 各AI特化の実行タイミングを最適化
+  - **統一プロンプト配信**: Gemini、Claude、Codex、Qwen を完璧にシンクロ操作
+  - **全てはシナリオ通りに**: 各AIタイプに最適化された実行タイミング
 
 ### 🎨 その他の主要機能
 
-- **Claude Code 統合**: 3つのAI CLIを完全統合
-- **一括起動機能**: 「Launch All CLIs」ボタンで3つのCLIを同時起動
+- **Claude Code 統合**: 複数のAI CLIを完全統合
+- **一括起動機能**: 「Launch All CLIs」ボタンで複数のCLIを同時起動
 - **ユニバーサル履歴保存**: 統一履歴フォルダ `.history-memo/` で作業記録を管理
 - **個別CLIコマンド**: 各CLIに専用の送信コマンド
 - **詳細な設定オプション**: 各CLIの有効/無効、メニュー表示制御など
@@ -73,16 +75,21 @@ codex   # OpenAIアカウント認証
 # Claude CLIのインストール（Claude使用時）
 npm install -g @anthropic-ai/claude-cli
 claude  # Anthropicアカウント認証
+
+# Qwen CLIのインストール（Qwen使用時）
+npm install -g @qwen-code/qwen-code@latest
+qwen    # Qwenアカウント認証
 ```
 
 ### 使用方法
 
 1. **VS Codeで任意のプロジェクトを開く**
 2. **エディタタイトルバーのアイコンをクリック**
-   - 🚀 **Launch All CLIs** - 3つのCLIを一括起動
+   - 🚀 **Launch All CLIs** - 設定済みのすべてのCLIを一括起動
    - ✨ Gemini CLI起動
    - ❄️ Codex CLI起動
    - ✴️ Claude Code起動
+   - 🐉 Qwen Code起動
 3. **MAGUS Councilを起動**
    - サイドバーにMAGUS Councilパネルが表示
    - コマンドパレット: "MAGUS Council: Open"
@@ -176,7 +183,7 @@ claude  # Anthropicアカウント認証
 
 **既存のコマンド:**
 
-- **"Launch All CLIs"** - 3つのCLIを一括起動（同じグループにタブとして配置）
+- **"Launch All CLIs"** - 複数のCLIを一括起動（同じグループにタブとして配置）
 
 **Gemini CLI コマンド:**
 
@@ -232,10 +239,15 @@ claude  # Anthropicアカウント認証
 | **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ | ❌ |
 | **OpenAIモデル対応** | ✅ | ❌ | ❌ | ✅ | ❌ |
 | **Claudeモデル対応** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Qwenモデル対応** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ## ⚙️ 設定オプション
 
-### MAGUS Council 設定
+設定は使いやすさのために2階層に整理されています：
+
+### 標準設定（メイン設定）
+
+ほとんどのユーザーが必要とする必須設定：
 
 ```json
 {
@@ -243,26 +255,57 @@ claude  # Anthropicアカウント認証
   "gemini-cli-vscode.gemini.enabled": true,
   "gemini-cli-vscode.codex.enabled": true,
   "gemini-cli-vscode.claude.enabled": true,
+  "gemini-cli-vscode.qwen.enabled": false,  // ベータ機能
   
-  // MAGUS Council実行タイミング
-  "gemini-cli-vscode.multiAI.composer.delays.initial": 100,
-  "gemini-cli-vscode.multiAI.composer.delays.claude.enter": 150,
-  "gemini-cli-vscode.multiAI.composer.delays.gemini.enter": 600,
-  
-  // 一括起動設定
-  "gemini-cli-vscode.multiAI.launch.clis": ["claude", "gemini", "codex"]
+  // コア機能
+  "gemini-cli-vscode.magusCouncil.enabled": true,
+  "gemini-cli-vscode.contextMenu.enabled": true,
+  "gemini-cli-vscode.saveToHistory.enabled": true
 }
 ```
 
-設定の説明:
+### 高度な設定（詳細調整）
 
-- `enabled`: 各CLIの機能とエディタタイトルバーアイコンの表示を制御
-- `showInContextMenu`: 右クリックメニューでのコマンド表示を制御
-- `multiCLI.enabled`: マルチCLI機能（一括起動）の有効/無効
-- `multiCLI.launch.clis`: 一括起動するCLIと起動順序（配列の順番で起動）
-- `saveToHistory.showStatusBar`: ステータスバーの「Save to History」ボタン表示
-- `saveToHistory.includeTerminalName`: 履歴エントリにターミナル名を含める
-- `terminal.disableFlowControl`: XON/XOFFフロー制御を無効化（Ctrl+Sフリーズ防止）
+詳細なコントロールを求めるパワーユーザー向け：
+
+```json
+{
+  // MAGUS Council設定
+  "gemini-cli-vscode.magusCouncil.defaultAgents": ["gemini", "codex", "claude"],
+  "gemini-cli-vscode.magusCouncil.launch.clis": ["claude", "gemini", "codex"],
+  "gemini-cli-vscode.magusCouncil.composer.delays.initial": 100,
+  
+  // コンテキストメニュー詳細調整
+  "gemini-cli-vscode.contextMenu.showSendText": true,
+  "gemini-cli-vscode.contextMenu.showSendFilePath": true,
+  "gemini-cli-vscode.gemini.showInContextMenu": true,
+  
+  // カスタムCLIコマンド（例）
+  "gemini-cli-vscode.gemini.command": "gemini",
+  "gemini-cli-vscode.gemini.args": ["--model", "gemini-pro"],
+  "gemini-cli-vscode.claude.command": "claude",
+  "gemini-cli-vscode.claude.args": [],
+  
+  // ターミナル動作
+  "gemini-cli-vscode.terminal.groupingBehavior": "same",
+  "gemini-cli-vscode.terminal.disableFlowControl": true
+}
+```
+
+### 設定の説明
+
+**標準設定：**
+- `*.enabled`: 各AI CLI統合の有効/無効
+- `magusCouncil.enabled`: 統一AI管理インターフェースの有効化
+- `contextMenu.enabled`: 右クリックメニューにAIコマンドを表示
+- `saveToHistory.enabled`: `.history-memo`への会話保存を有効化
+
+**高度な設定：**
+- `magusCouncil.defaultAgents`: MAGUS Council起動時に事前選択されるAI
+- `magusCouncil.launch.clis`: 「Launch All CLIs」の順序と選択
+- `contextMenu.show*`: メニュー項目の詳細制御
+- `*.command` / `*.args`: CLI起動コマンドのカスタマイズ
+- `terminal.groupingBehavior`: ターミナルのグループ化方法（"same"または"new"）
 
 ## 🛠️ 開発
 
@@ -356,5 +399,3 @@ MIT License - 詳細は[LICENSE](LICENSE)ファイルを参照
 **Joji Jorge Senda** ([@d3j](https://github.com/d3j))
 
 ---
-
-AIコーディングアシスタントを使用中にターミナルとエディタを切り替える日々のフラストレーションから生まれました。この拡張は両方の世界のベストを提供します - Claude Codeのエレガントなエディタ統合とGemini CLIの強力な機能を。このドキュメントは陳腐な機能拡張を世界を変えるほど壮大な機能の様に思わせる機能を期待しています。でも、それでいいのかもしれません。小さなツールでも、誰かの小さな問題を解決できれば世界は少し良くなる。

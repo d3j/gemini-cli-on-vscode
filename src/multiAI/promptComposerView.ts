@@ -52,7 +52,7 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async handleInit(): Promise<void> {
-        const config = vscode.workspace.getConfiguration('gemini-cli-vscode.multiAI');
+        const config = vscode.workspace.getConfiguration('gemini-cli-vscode.magusCouncil');
         const defaultAgents = config.get<string[]>('defaultAgents', ['gemini', 'codex', 'claude']);
 
         this.view?.webview.postMessage({
@@ -90,7 +90,7 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
             return;
         }
 
-        const config = vscode.workspace.getConfiguration('gemini-cli-vscode.multiAI');
+        const config = vscode.workspace.getConfiguration('gemini-cli-vscode.magusCouncil');
         const autoSaveHistory = config.get<boolean>('composer.autoSaveHistory', true);
         if (autoSaveHistory) {
             await this.savePromptToHistory(finalPrompt, payload.agents);

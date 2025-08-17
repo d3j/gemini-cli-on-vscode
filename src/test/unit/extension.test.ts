@@ -79,8 +79,8 @@ describe('Extension Unit Test Suite', () => {
     });
 
     describe('Extension Activation', () => {
-        it('should register all commands on activation', () => {
-            activate(extensionContext);
+        it('should register all commands on activation', async () => {
+            await activate(extensionContext);
             
             // Verify all commands are registered (including multiAI and Qwen commands)
             assert.strictEqual(registerCommandStub.callCount, 24);
@@ -145,12 +145,12 @@ describe('Extension Unit Test Suite', () => {
             assert.ok(commandHandlers.has('gemini-cli-vscode.multiAI.askAll'));
         });
 
-        it('should create status bar item on activation', () => {
+        it('should create status bar item on activation', async () => {
             const mockStatusBarItem = new MockStatusBarItem();
             const createStatusBarItemStub = sandbox.stub(vscode.window, 'createStatusBarItem');
             createStatusBarItemStub.returns(mockStatusBarItem as any);
             
-            activate(extensionContext);
+            await activate(extensionContext);
             
             assert.ok(createStatusBarItemStub.calledOnce);
             assert.ok(createStatusBarItemStub.calledWith(
@@ -159,37 +159,37 @@ describe('Extension Unit Test Suite', () => {
             ));
         });
 
-        it('should not activate twice', () => {
-            activate(extensionContext);
+        it('should not activate twice', async () => {
+            await activate(extensionContext);
             const firstCallCount = registerCommandStub.callCount;
             
             // Try to activate again
-            activate(extensionContext);
+            await activate(extensionContext);
             
             // Should not register commands again
             assert.strictEqual(registerCommandStub.callCount, firstCallCount);
         });
 
-        it('should register terminal close handler', () => {
+        it('should register terminal close handler', async () => {
             const onDidCloseTerminalStub = sandbox.stub(vscode.window, 'onDidCloseTerminal');
             
-            activate(extensionContext);
+            await activate(extensionContext);
             
             assert.ok(onDidCloseTerminalStub.calledOnce);
         });
 
-        it('should register active terminal change handler', () => {
+        it('should register active terminal change handler', async () => {
             const onDidChangeActiveTerminalStub = sandbox.stub(vscode.window, 'onDidChangeActiveTerminal');
             
-            activate(extensionContext);
+            await activate(extensionContext);
             
             assert.ok(onDidChangeActiveTerminalStub.calledOnce);
         });
     });
 
     describe('Terminal Creation Commands', () => {
-        it('startInNewPane should create terminal with Beside view column', async () => {
-            activate(extensionContext);
+        it('startInNewPane should use Active view column by default (with same grouping)', async () => {
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -197,16 +197,27 @@ describe('Extension Unit Test Suite', () => {
             const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace/project');
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
+            // Default configuration with 'same' grouping behavior
+            const mockConfig = {
+                get: (key: string, defaultValue?: any) => {
+                    if (key === 'terminal.groupingBehavior') return 'same';
+                    if (key === 'gemini.enabled') return true;
+                    return defaultValue;
+                }
+            };
+            sandbox.stub(vscode.workspace, 'getConfiguration').returns(mockConfig as any);
+            
             await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
             
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             const args = testContext.stubs.createTerminal.getCall(0).args[0];
             assert.strictEqual(args.name, 'Gemini CLI');
-            assert.strictEqual(args.location.viewColumn, vscode.ViewColumn.Beside);
+            assert.strictEqual(args.location.viewColumn, vscode.ViewColumn.Active,
+                'Should use Active view column with default "same" grouping');
         });
 
         it('startInActivePane should create terminal with Active view column', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -222,8 +233,52 @@ describe('Extension Unit Test Suite', () => {
             assert.strictEqual(args.location.viewColumn, vscode.ViewColumn.Active);
         });
 
+        it('startInNewPane should respect terminal.groupingBehavior setting', async () => {
+            await activate(extensionContext);
+            
+            const mockTerminal = createMockTerminal('Gemini CLI');
+            testContext.stubs.createTerminal.returns(mockTerminal as any);
+            
+            const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace/project');
+            sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
+            
+            // Test with 'same' behavior (default)
+            const mockConfig = {
+                get: (key: string, defaultValue?: any) => {
+                    if (key === 'terminal.groupingBehavior') return 'same';
+                    if (key === 'gemini.enabled') return true;
+                    return defaultValue;
+                }
+            };
+            sandbox.stub(vscode.workspace, 'getConfiguration').returns(mockConfig as any);
+            
+            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            
+            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            let args = testContext.stubs.createTerminal.getCall(0).args[0];
+            assert.strictEqual(args.location.viewColumn, vscode.ViewColumn.Active, 
+                'Should use Active view column when groupingBehavior is "same"');
+            
+            // Reset for next test
+            testContext.stubs.createTerminal.resetHistory();
+            
+            // Test with 'new' behavior
+            mockConfig.get = (key: string, defaultValue?: any) => {
+                if (key === 'terminal.groupingBehavior') return 'new';
+                if (key === 'gemini.enabled') return true;
+                return defaultValue;
+            };
+            
+            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            
+            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            args = testContext.stubs.createTerminal.getCall(0).args[0];
+            assert.strictEqual(args.location.viewColumn, vscode.ViewColumn.Beside,
+                'Should use Beside view column when groupingBehavior is "new"');
+        });
+
         it('should navigate to workspace folder and launch gemini', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -239,7 +294,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should reuse existing terminal for same pane type', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -262,7 +317,7 @@ describe('Extension Unit Test Suite', () => {
 
     describe('Save to History Functionality', () => {
         it('should save selected text from editor to history file', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace');
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
@@ -293,8 +348,34 @@ describe('Extension Unit Test Suite', () => {
             assert.ok(testContext.stubs.showInformationMessage.calledWith('Saved to history'));
         });
 
+        it('should throw when history append fails', async () => {
+            await activate(extensionContext);
+
+            const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace');
+            sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
+
+            const selectedText = 'Selected code snippet';
+            const mockEditor = createMockEditor(
+                'Line 1\n' + selectedText + '\nLine 3',
+                createMockSelection(1, 0, 1, selectedText.length)
+            );
+            sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
+            sandbox.stub(vscode.window, 'activeTerminal').value(undefined);
+
+            testContext.stubs.clipboardRead.resolves('Clipboard content');
+            testContext.stubs.clipboardWrite.resolves();
+
+            // Force append failure to verify error propagation
+            fsStubs.appendFileSync.throws(new Error('disk full'));
+
+            await assert.rejects(
+                vscode.commands.executeCommand('gemini-cli-vscode.saveClipboardToHistory') as unknown as Promise<unknown>,
+                /disk full/
+            );
+        });
+
         it('should handle no selection gracefully', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             // No workspace - which means no file can be created
             sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
@@ -319,7 +400,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should handle missing workspace folder', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
             sandbox.stub(vscode.window, 'activeTerminal').value(undefined);
@@ -337,7 +418,7 @@ describe('Extension Unit Test Suite', () => {
 
     describe('Send Text to Terminal', () => {
         it('should send selected text to active Gemini terminal', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -385,7 +466,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should show warning when no Gemini terminal exists', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             sandbox.stub(vscode.window, 'terminals').value([]);
             
@@ -400,7 +481,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should show info when no text is selected', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -425,7 +506,7 @@ describe('Extension Unit Test Suite', () => {
 
     describe('Send Open Files', () => {
         it('should format and send all open file paths', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -506,7 +587,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should handle no open files', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -546,7 +627,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should show status bar when any terminal is active', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -571,7 +652,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should hide status bar when editor is active', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const geminiTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(geminiTerminal as any);
@@ -597,7 +678,7 @@ describe('Extension Unit Test Suite', () => {
 
     describe('Terminal Workarounds', () => {
         it('should apply terminal workarounds on creation', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Codex CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -639,7 +720,7 @@ describe('Extension Unit Test Suite', () => {
         });
 
         it('should remove terminal from map when closed', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -666,7 +747,7 @@ describe('Extension Unit Test Suite', () => {
 
     describe('Deactivation', () => {
         it('should clear terminals map on deactivation', async () => {
-            activate(extensionContext);
+            await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
             testContext.stubs.createTerminal.returns(mockTerminal as any);
@@ -682,7 +763,7 @@ describe('Extension Unit Test Suite', () => {
             deactivate();
             
             // Reset for new activation
-            activate(extensionContext);
+            await activate(extensionContext);
             
             // Should create new terminal (map was cleared)
             sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);

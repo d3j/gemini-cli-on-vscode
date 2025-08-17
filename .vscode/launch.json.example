@@ -7,7 +7,9 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "/Users/j/Code",
+        // TODO: Replace with your workspace folder path
+        // Example: "/Users/username/projects" or "C:\\Users\\username\\projects"
+        "/path/to/your/workspace",
         "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": [

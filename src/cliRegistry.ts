@@ -22,11 +22,17 @@ export class CLIRegistry {
     private loadConfigs(): void {
         const config = vscode.workspace.getConfiguration('gemini-cli-vscode');
         
+        // Helper function to get command with fallback for empty strings
+        const getCommand = (key: string, defaultValue: string): string => {
+            const value = config.get<string>(key, defaultValue);
+            return value && value.trim() !== '' ? value : defaultValue;
+        };
+        
         this.configs = new Map([
             ['gemini', {
                 id: 'gemini',
                 name: 'Gemini CLI',
-                command: config.get('gemini.command', 'gemini'),
+                command: getCommand('gemini.command', 'gemini'),
                 args: config.get('gemini.args', []),
                 icon: 'icon.png',
                 enabled: config.get('gemini.enabled', true)
@@ -34,7 +40,7 @@ export class CLIRegistry {
             ['codex', {
                 id: 'codex',
                 name: 'Codex CLI',
-                command: config.get('codex.command', 'codex'),
+                command: getCommand('codex.command', 'codex'),
                 args: config.get('codex.args', []),
                 icon: 'codex-icon.png',
                 enabled: config.get('codex.enabled', true)
@@ -42,7 +48,7 @@ export class CLIRegistry {
             ['claude', {
                 id: 'claude',
                 name: 'Claude Code',
-                command: config.get('claude.command', 'claude'),
+                command: getCommand('claude.command', 'claude'),
                 args: config.get('claude.args', []),
                 icon: 'claude-logo.png',
                 enabled: config.get('claude.enabled', true)
@@ -50,7 +56,7 @@ export class CLIRegistry {
             ['qwen', {
                 id: 'qwen',
                 name: 'Qwen CLI',
-                command: config.get('qwen.command', 'qwen'),
+                command: getCommand('qwen.command', 'qwen'),
                 args: config.get('qwen.args', []),
                 icon: 'qwen-color.svg',
                 enabled: config.get('qwen.enabled', false) // デフォルト無効

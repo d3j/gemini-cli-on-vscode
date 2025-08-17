@@ -21,15 +21,16 @@
 
 ### ✨ This Extension's Innovation
 
-#### Brings Claude Code's editor integration experience to three AI CLIs
+#### Brings Claude Code's editor integration experience to multiple AI CLIs
 
-- Gemini CLI & Codex CLI run directly in editor windows
+- Gemini, Codex, and Qwen run directly in editor windows
 - **MAGUS Council** enables broadcasting single prompts to multiple AI CLIs
 
 ## ⚡ Key Features
 
 ### 🖱️ One-Click Launch
 
+- **4 AI types** for batch and individual launch
 - **Editor title bar icon** for instant access
 - **Command palette** integration
 - Choose between **new pane** or **active pane**
@@ -49,13 +50,13 @@
 ### 🔮 v0.1.0 Major Update - MAGUS Council
 
 - **MAGUS Council** - Multiple Agent Guidance & Intelligence System 🔮
-  - **Unified prompt broadcasting**: Operate Gemini, Claude, and Codex in perfect synchronization
+  - **Unified prompt broadcasting**: Operate Gemini, Claude, Codex, and Qwen in perfect synchronization
   - **All according to the scenario**: Optimized execution timing for each AI type
 
 ### 🎨 Other Key Features
 
-- **Claude Code Integration**: Complete integration of three AI CLIs
-- **Batch Launch**: "Launch All CLIs" button starts all three CLIs simultaneously
+- **Claude Code Integration**: Complete integration of multiple AI CLIs
+- **Batch Launch**: "Launch All CLIs" button starts multiple CLIs simultaneously
 - **Universal History**: Unified history folder `.history-memo/` for work logs
 - **Individual CLI Commands**: Dedicated commands for each CLI
 - **Advanced Settings**: Enable/disable CLIs, menu visibility control, etc.
@@ -76,16 +77,21 @@ codex   # OpenAI account authentication
 # Install Claude CLI (for Claude)
 npm install -g @anthropic-ai/claude-cli
 claude  # Anthropic account authentication
+
+# Install Qwen CLI (for Qwen)
+npm install -g @qwen-code/qwen-code@latest
+qwen    # Qwen account authentication
 ```
 
 ### Usage
 
 1. **Open any project in VS Code**
 2. **Click the icon in the editor title bar**
-   - 🚀 **Launch All CLIs** - Launch three CLIs at once
+   - 🚀 **Launch All CLIs** - Launch all configured CLIs at once
    - ✨ Launch Gemini CLI
    - ❄️ Launch Codex CLI
    - ✴️ Launch Claude Code
+   - 🐉 Launch Qwen Code
 3. **Launch MAGUS Council**
    - MAGUS Council panel appears in sidebar
    - Command Palette: "MAGUS Council: Open"
@@ -185,7 +191,7 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 
 **Existing Commands:**
 
-- "Launch All CLIs" - Launch three CLIs at once (tabs in same group)
+- "Launch All CLIs" - Launch multiple CLIs at once (tabs in same group)
 
 **Gemini CLI Commands:**
 
@@ -215,39 +221,6 @@ Set your own keybindings:
 2. Search for "Gemini CLI" or "Codex CLI"
 3. Click the pencil icon to assign your preferred keys
 
-## 💡 Real-World Usage Examples
-
-### Gemini CLI Examples
-
-#### Code Review Request
-
-```bash
-# After Gemini CLI launches in editor pane
-@src/components/Button.tsx Review this component and suggest improvements
-```
-
-#### Project Architecture Analysis
-
-```bash
-@. Analyze the project architecture and explain the main design patterns
-```
-
-#### Error Resolution
-
-```bash
-@package.json @src/main.ts I'm getting build errors. Help me fix them
-```
-
-### Codex CLI (GPT-5) Examples
-
-```bash
-# Advanced code generation
-@src/api.ts Implement rate limiting and caching for this API
-
-# AI agent development
-@agent.py Create an AI agent that can perform multi-step reasoning
-```
-
 ## 🆚 Why Choose This Over Alternatives?
 
 ### 🎯 Perfect For
@@ -266,10 +239,15 @@ Set your own keybindings:
 | **Gemini models** | ✅ | ✅ | ✅ | ❌ | ❌ |
 | **OpenAI models** | ✅ | ❌ | ❌ | ✅ | ❌ |
 | **Claude models** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Qwen models** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 ## ⚙️ Configuration Options
 
-### MAGUS Council Settings
+Settings are organized in two tiers for better usability:
+
+### Standard Settings (Main Configuration)
+
+These are the essential settings most users need:
 
 ```json
 {
@@ -277,23 +255,57 @@ Set your own keybindings:
   "gemini-cli-vscode.gemini.enabled": true,
   "gemini-cli-vscode.codex.enabled": true,
   "gemini-cli-vscode.claude.enabled": true,
+  "gemini-cli-vscode.qwen.enabled": false
   
-  // MAGUS Council execution timing
-  "gemini-cli-vscode.multiAI.composer.delays.initial": 100,
-  "gemini-cli-vscode.multiAI.composer.delays.claude.enter": 150,
-  "gemini-cli-vscode.multiAI.composer.delays.gemini.enter": 600,
-  
-  // Batch launch settings
-  "gemini-cli-vscode.multiAI.launch.clis": ["claude", "gemini", "codex"]
+  // Core features
+  "gemini-cli-vscode.magusCouncil.enabled": true,
+  "gemini-cli-vscode.contextMenu.enabled": true,
+  "gemini-cli-vscode.saveToHistory.enabled": true
 }
 ```
 
-Settings explained:
+### Advanced Settings (Fine-tuning)
 
-- `enabled`: Controls CLI features and editor title bar icon visibility
-- `showInContextMenu`: Controls command visibility in right-click menus
-- `saveToHistory.showStatusBar`: Shows/hides "Save to History" status bar button
-- `saveToHistory.includeTerminalName`: Includes terminal name in history entries
+For power users who want detailed control:
+
+```json
+{
+  // MAGUS Council configuration
+  "gemini-cli-vscode.magusCouncil.defaultAgents": ["gemini", "codex", "claude"],
+  "gemini-cli-vscode.magusCouncil.launch.clis": ["claude", "gemini", "codex"],
+  "gemini-cli-vscode.magusCouncil.composer.delays.initial": 100,
+  
+  // Context menu fine-tuning
+  "gemini-cli-vscode.contextMenu.showSendText": true,
+  "gemini-cli-vscode.contextMenu.showSendFilePath": true,
+  "gemini-cli-vscode.gemini.showInContextMenu": true,
+  
+  // Custom CLI commands (examples)
+  "gemini-cli-vscode.gemini.command": "gemini",
+  "gemini-cli-vscode.gemini.args": ["--model", "gemini-pro"],
+  "gemini-cli-vscode.claude.command": "claude",
+  "gemini-cli-vscode.claude.args": [],
+  
+  // Terminal behavior
+  "gemini-cli-vscode.terminal.groupingBehavior": "same",
+  "gemini-cli-vscode.terminal.disableFlowControl": true
+}
+```
+
+### Settings Explained
+
+**Standard Settings:**
+- `*.enabled`: Enable/disable each AI CLI integration
+- `magusCouncil.enabled`: Enable the unified AI management interface
+- `contextMenu.enabled`: Show AI commands in right-click menus
+- `saveToHistory.enabled`: Enable conversation saving to `.history-memo`
+
+**Advanced Settings:**
+- `magusCouncil.defaultAgents`: Pre-selected AIs when opening MAGUS Council
+- `magusCouncil.launch.clis`: Order and selection for "Launch All CLIs"
+- `contextMenu.show*`: Fine-grained control over menu items
+- `*.command` / `*.args`: Customize CLI launch commands
+- `terminal.groupingBehavior`: How terminals are grouped ("same" or "new")
 
 ## 🛠️ Development
 
@@ -386,6 +398,3 @@ MIT License - See [LICENSE](LICENSE) file for details
 
 **Joji Jorge Senda** ([@d3j](https://github.com/d3j))
 
----
-
-The dream of unified AI coding assistant management becomes reality with MAGUS Council. Skillfully controlling multiple AIs and guiding the development process to the next level - that's the system we aim for. 🔮

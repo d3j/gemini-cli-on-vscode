@@ -108,7 +108,7 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
         
         // Mock configuration for delays
         const configStub = sandbox.stub(vscode.workspace, 'getConfiguration');
-        configStub.withArgs('gemini-cli-vscode.multiAI.composer.delays').returns({
+        configStub.withArgs('gemini-cli-vscode.magusCouncil.composer.delays').returns({
             get: (key: string, defaultValue: any) => {
                 const values: any = {
                     'initial': 100,
