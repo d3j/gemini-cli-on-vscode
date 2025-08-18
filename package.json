@@ -53,7 +53,7 @@
     },
     "commands": [
       {
-        "command": "gemini-cli-vscode.startInNewPane",
+        "command": "gemini-cli-vscode.gemini.start.newPane",
         "title": "Gemini CLI: Start in New Pane",
         "icon": {
           "light": "images/icon.png",
@@ -61,11 +61,11 @@
         }
       },
       {
-        "command": "gemini-cli-vscode.startInActivePane",
+        "command": "gemini-cli-vscode.gemini.start.activePane",
         "title": "Gemini CLI: Start in Active Pane"
       },
       {
-        "command": "gemini-cli-vscode.codexStartInNewPane",
+        "command": "gemini-cli-vscode.codex.start.newPane",
         "title": "Codex CLI: Start in New Pane",
         "icon": {
           "light": "images/codex-icon.png",
@@ -73,7 +73,7 @@
         }
       },
       {
-        "command": "gemini-cli-vscode.codexStartInActivePane",
+        "command": "gemini-cli-vscode.codex.start.activePane",
         "title": "Codex CLI: Start in Active Pane"
       },
       {
@@ -81,31 +81,31 @@
         "title": "Save to History"
       },
       {
-        "command": "gemini-cli-vscode.sendSelectedTextToGemini",
+        "command": "gemini-cli-vscode.gemini.send.selectedText",
         "title": "Gemini CLI: Send Selected Text"
       },
       {
-        "command": "gemini-cli-vscode.sendSelectedTextToCodex",
+        "command": "gemini-cli-vscode.codex.send.selectedText",
         "title": "Codex CLI: Send Selected Text"
       },
       {
-        "command": "gemini-cli-vscode.sendFilePathToGemini",
+        "command": "gemini-cli-vscode.gemini.send.filePath",
         "title": "Gemini CLI: Send File Path"
       },
       {
-        "command": "gemini-cli-vscode.sendFilePathToCodex",
+        "command": "gemini-cli-vscode.codex.send.filePath",
         "title": "Codex CLI: Send File Path"
       },
       {
-        "command": "gemini-cli-vscode.sendOpenFilePathToGemini",
+        "command": "gemini-cli-vscode.gemini.send.openFiles",
         "title": "Gemini CLI: Send Open File Path"
       },
       {
-        "command": "gemini-cli-vscode.sendOpenFilePathToCodex",
+        "command": "gemini-cli-vscode.codex.send.openFiles",
         "title": "Codex CLI: Send Open File Path"
       },
       {
-        "command": "gemini-cli-vscode.claudeStartInNewPane",
+        "command": "gemini-cli-vscode.claude.start.newPane",
         "title": "Claude Code: Start in New Pane",
         "icon": {
           "light": "images/claude-logo.png",
@@ -113,23 +113,23 @@
         }
       },
       {
-        "command": "gemini-cli-vscode.claudeStartInActivePane",
+        "command": "gemini-cli-vscode.claude.start.activePane",
         "title": "Claude Code: Start in Active Pane"
       },
       {
-        "command": "gemini-cli-vscode.sendSelectedTextToClaude",
+        "command": "gemini-cli-vscode.claude.send.selectedText",
         "title": "Claude Code: Send Selected Text"
       },
       {
-        "command": "gemini-cli-vscode.sendFilePathToClaude",
+        "command": "gemini-cli-vscode.claude.send.filePath",
         "title": "Claude Code: Send File Path"
       },
       {
-        "command": "gemini-cli-vscode.sendOpenFilePathToClaude",
+        "command": "gemini-cli-vscode.claude.send.openFiles",
         "title": "Claude Code: Send Open File Path"
       },
       {
-        "command": "gemini-cli-vscode.qwenStartInNewPane",
+        "command": "gemini-cli-vscode.qwen.start.newPane",
         "title": "Qwen CLI: Start in New Pane",
         "icon": {
           "light": "images/qwen-color.svg",
@@ -137,19 +137,19 @@
         }
       },
       {
-        "command": "gemini-cli-vscode.qwenStartInActivePane",
+        "command": "gemini-cli-vscode.qwen.start.activePane",
         "title": "Qwen CLI: Start in Active Pane"
       },
       {
-        "command": "gemini-cli-vscode.sendSelectedTextToQwen",
+        "command": "gemini-cli-vscode.qwen.send.selectedText",
         "title": "Qwen CLI: Send Selected Text"
       },
       {
-        "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
+        "command": "gemini-cli-vscode.qwen.send.openFiles",
         "title": "Qwen CLI: Send Open File Path"
       },
       {
-        "command": "gemini-cli-vscode.sendFilePathToQwen",
+        "command": "gemini-cli-vscode.qwen.send.filePath",
         "title": "Qwen CLI: Send File Path"
       },
       {
@@ -175,22 +175,22 @@
     "menus": {
       "editor/title": [
         {
-          "command": "gemini-cli-vscode.claudeStartInNewPane",
+          "command": "gemini-cli-vscode.claude.start.newPane",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.claude.enabled"
         },
         {
-          "command": "gemini-cli-vscode.codexStartInNewPane",
+          "command": "gemini-cli-vscode.codex.start.newPane",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.codex.enabled"
         },
         {
-          "command": "gemini-cli-vscode.startInNewPane",
+          "command": "gemini-cli-vscode.gemini.start.newPane",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.gemini.enabled"
         },
         {
-          "command": "gemini-cli-vscode.qwenStartInNewPane",
+          "command": "gemini-cli-vscode.qwen.start.newPane",
           "group": "navigation",
           "when": "config.gemini-cli-vscode.qwen.enabled"
         },
@@ -202,42 +202,42 @@
       ],
       "editor/context": [
         {
-          "command": "gemini-cli-vscode.sendOpenFilePathToGemini",
+          "command": "gemini-cli-vscode.gemini.send.openFiles",
           "group": "5_cutcopypaste@99",
           "when": "editorTextFocus && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendOpenFilePathToCodex",
+          "command": "gemini-cli-vscode.codex.send.openFiles",
           "group": "5_cutcopypaste@100",
           "when": "editorTextFocus && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendSelectedTextToGemini",
+          "command": "gemini-cli-vscode.gemini.send.selectedText",
           "group": "5_cutcopypaste@101",
           "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendSelectedTextToCodex",
+          "command": "gemini-cli-vscode.codex.send.selectedText",
           "group": "5_cutcopypaste@102",
           "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendOpenFilePathToClaude",
+          "command": "gemini-cli-vscode.claude.send.openFiles",
           "group": "5_cutcopypaste@103",
           "when": "editorTextFocus && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendSelectedTextToClaude",
+          "command": "gemini-cli-vscode.claude.send.selectedText",
           "group": "5_cutcopypaste@104",
           "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendOpenFilePathToQwen",
+          "command": "gemini-cli-vscode.qwen.send.openFiles",
           "group": "5_cutcopypaste@105",
           "when": "editorTextFocus && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendSelectedTextToQwen",
+          "command": "gemini-cli-vscode.qwen.send.selectedText",
           "group": "5_cutcopypaste@106",
           "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         }
@@ -249,44 +249,44 @@
           "when": "config.gemini-cli-vscode.magusCouncil.enabled"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToGemini",
+          "command": "gemini-cli-vscode.gemini.send.filePath",
           "group": "5_cutcopypaste@103",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToCodex",
+          "command": "gemini-cli-vscode.codex.send.filePath",
           "group": "5_cutcopypaste@104",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToClaude",
+          "command": "gemini-cli-vscode.claude.send.filePath",
           "group": "5_cutcopypaste@105",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToQwen",
+          "command": "gemini-cli-vscode.qwen.send.filePath",
           "group": "5_cutcopypaste@106",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         }
       ],
       "editor/title/context": [
         {
-          "command": "gemini-cli-vscode.sendFilePathToGemini",
+          "command": "gemini-cli-vscode.gemini.send.filePath",
           "group": "5_cutcopypaste@105",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.gemini.enabled && config.gemini-cli-vscode.gemini.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToCodex",
+          "command": "gemini-cli-vscode.codex.send.filePath",
           "group": "5_cutcopypaste@106",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.codex.enabled && config.gemini-cli-vscode.codex.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToClaude",
+          "command": "gemini-cli-vscode.claude.send.filePath",
           "group": "5_cutcopypaste@107",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.claude.enabled && config.gemini-cli-vscode.claude.showInContextMenu"
         },
         {
-          "command": "gemini-cli-vscode.sendFilePathToQwen",
+          "command": "gemini-cli-vscode.qwen.send.filePath",
           "group": "5_cutcopypaste@108",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
         }
@@ -555,6 +555,13 @@
           "description": "Additional arguments for Qwen CLI",
           "markdownDescription": "Additional command-line arguments for Qwen CLI.\n\n**Example arguments**:\n- `[\"--model\", \"qwen-72b\"]`\n- `[\"--temperature\", \"0.8\"]`\n- `[\"--top-p\", \"0.9\"]`\n\n📦 Arguments are passed directly to the CLI",
           "order": 23
+        },
+        "gemini-cli-vscode.migration.v3.notified": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether v0.3.0 migration notification has been shown",
+          "markdownDescription": "Internal flag to track if the v0.3.0 command migration notification has been shown.\n\n⚠️ **Advanced**: Only change this if you want to reset the notification.",
+          "order": 24
         }
       }
     }

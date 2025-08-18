@@ -1,35 +1,26 @@
 import * as vscode from 'vscode';
+import { ConfigService } from './core/ConfigService';
 
 export class MigrationHandler {
     private readonly FIRST_RUN_KEY = 'gemini-cli-vscode.firstRun';
+    private configService: ConfigService;
+    
+    constructor(configService?: ConfigService) {
+        this.configService = configService || new ConfigService();
+        // Keep reference for future use in migration methods
+        void this.configService; // Acknowledge configService is stored for future use
+    }
     
     /**
      * Get configuration value with fallback for deprecated settings
      * This is used for read-time fallback without writing to config
+     * @deprecated Use ConfigService.get() instead
      */
     public static getConfigWithFallback<T>(key: string, defaultValue: T): T {
-        const config = vscode.workspace.getConfiguration('gemini-cli-vscode');
-        
-        // Special handling for deprecated delay settings
-        const deprecatedDefaults: Record<string, any> = {
-            'composer.delays.claude.enter': 150,
-            'composer.delays.gemini.enter': 600,
-            'multiAI.composer.delays.claude.enter': 150,
-            'multiAI.composer.delays.gemini.enter': 600
-        };
-        
-        // Try to get the value
-        const value = config.get<T>(key);
-        if (value !== undefined) {
-            return value;
-        }
-        
-        // Check if this is a deprecated setting with a special default
-        if (key in deprecatedDefaults) {
-            return deprecatedDefaults[key] as T;
-        }
-        
-        return defaultValue;
+        const tempConfigService = new ConfigService();
+        const result = tempConfigService.get(key, defaultValue);
+        tempConfigService.dispose();
+        return result;
     }
     
     async migrate(context: vscode.ExtensionContext): Promise<void> {

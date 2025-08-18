@@ -193,33 +193,53 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 
 - "Launch All CLIs" - Launch multiple CLIs at once (tabs in same group)
 
-**Gemini CLI Commands:**
+**CLI Commands (v0.3.0+ Hierarchical Structure):**
 
-- "Gemini CLI: Start in New Pane" - Launch in new pane
-- "Gemini CLI: Start in Active Pane" - Launch in active pane
-- "Gemini CLI: Send File Path" - Send files/folders
-- "Gemini CLI: Send Open File Path" - Send all open files
-- "Gemini CLI: Send Selected Text" - Send selected text
+All commands now follow a consistent pattern: `{extension}.{cli}.{action}.{target}`
 
-**Codex CLI Commands:**
+**Gemini CLI:**
+- `gemini.start.newPane` - Launch Gemini in new pane
+- `gemini.start.activePane` - Launch Gemini in active pane  
+- `gemini.send.selectedText` - Send selected text to Gemini
+- `gemini.send.filePath` - Send files/folders to Gemini
+- `gemini.send.openFiles` - Send all open files to Gemini
 
-- "Codex CLI: Start in New Pane" - Launch in new pane
-- "Codex CLI: Start in Active Pane" - Launch in active pane
-- "Codex CLI: Send File Path" - Send files/folders
-- "Codex CLI: Send Open File Path" - Send all open files
-- "Codex CLI: Send Selected Text" - Send selected text
+**Codex CLI:**
+- `codex.start.newPane` - Launch Codex in new pane
+- `codex.start.activePane` - Launch Codex in active pane
+- `codex.send.selectedText` - Send selected text to Codex
+- `codex.send.filePath` - Send files/folders to Codex
+- `codex.send.openFiles` - Send all open files to Codex
+
+**Claude CLI:**
+- `claude.start.newPane` - Launch Claude in new pane
+- `claude.start.activePane` - Launch Claude in active pane
+- `claude.send.selectedText` - Send selected text to Claude
+- `claude.send.filePath` - Send files/folders to Claude
+- `claude.send.openFiles` - Send all open files to Claude
+
+**Qwen CLI:**
+- `qwen.start.newPane` - Launch Qwen in new pane
+- `qwen.start.activePane` - Launch Qwen in active pane
+- `qwen.send.selectedText` - Send selected text to Qwen
+- `qwen.send.filePath` - Send files/folders to Qwen
+- `qwen.send.openFiles` - Send all open files to Qwen
 
 **Common Commands:**
-
-- "Save to History" - Save conversation (works with all terminals)
+- `saveClipboardToHistory` - Save conversation (works with all terminals)
+- `launchAllCLIs` - Launch all enabled CLIs simultaneously
+- `multiAI.openComposer` - Open MAGUS Council composer
+- `multiAI.askAll` - Send to all active CLIs
 
 ### ⌨️ Custom Keyboard Shortcuts
 
 Set your own keybindings:
 
 1. Open Keyboard Shortcuts: `Cmd+K Cmd+S` (Mac) or `Ctrl+K Ctrl+S` (Windows/Linux)
-2. Search for "Gemini CLI" or "Codex CLI"
+2. Search for the command (e.g., "gemini.start" or "claude.send")
 3. Click the pencil icon to assign your preferred keys
+
+**Note:** If you had custom keybindings from v0.2.0 or earlier, please see [MIGRATION.md](./MIGRATION.md) for updating instructions.
 
 ## 🆚 Why Choose This Over Alternatives?
 

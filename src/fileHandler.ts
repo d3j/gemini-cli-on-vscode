@@ -24,6 +24,16 @@ export class FileHandler {
         return needsQuotes ? `@"${path}"` : `@${path}`;
     }
 
+    prepareMultipleFilesMessage(filePaths: string[]): string {
+        const formattedPaths = filePaths.map(filePath => {
+            const uri = vscode.Uri.file(filePath);
+            return this.formatFilePath(uri);
+        });
+        
+        const fileList = formattedPaths.join(' ');
+        return `These files are currently open: ${fileList}`;
+    }
+
     findCLITerminal(terminals: readonly vscode.Terminal[], targetCLI?: 'gemini' | 'codex' | 'claude' | 'qwen'): vscode.Terminal | undefined {
         const terminalMaps = {
             'claude': this.claudeTerminals,

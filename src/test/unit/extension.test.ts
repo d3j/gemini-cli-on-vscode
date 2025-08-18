@@ -84,29 +84,29 @@ describe('Extension Unit Test Suite', () => {
             
             // Verify all commands are registered (including multiAI and Qwen commands)
             assert.strictEqual(registerCommandStub.callCount, 24);
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInNewPane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.startInActivePane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codexStartInNewPane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codexStartInActivePane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.gemini.start.newPane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.gemini.start.activePane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codex.start.newPane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codex.start.activePane'));
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.saveClipboardToHistory'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedTextToGemini'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedTextToCodex'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePathToGemini'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePathToCodex'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToGemini'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToCodex'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.gemini.send.selectedText'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codex.send.selectedText'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.gemini.send.openFiles'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codex.send.openFiles'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.gemini.send.filePath'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.codex.send.filePath'));
             // Claude commands
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claudeStartInNewPane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claudeStartInActivePane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedTextToClaude'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePathToClaude'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToClaude'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claude.start.newPane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claude.start.activePane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claude.send.selectedText'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claude.send.openFiles'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.claude.send.filePath'));
             // Qwen commands
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwenStartInNewPane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwenStartInActivePane'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendSelectedTextToQwen'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendOpenFilePathToQwen'));
-            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.sendFilePathToQwen'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwen.start.newPane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwen.start.activePane'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwen.send.selectedText'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwen.send.openFiles'));
+            assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.qwen.send.filePath'));
             // Launch all CLIs command
             assert.ok(registerCommandStub.calledWith('gemini-cli-vscode.launchAllCLIs'));
             // MultiAI commands
@@ -115,29 +115,29 @@ describe('Extension Unit Test Suite', () => {
             
             // Verify handlers are stored (including multiAI and Qwen commands)
             assert.strictEqual(commandHandlers.size, 24);
-            assert.ok(commandHandlers.has('gemini-cli-vscode.startInNewPane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.startInActivePane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.codexStartInNewPane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.codexStartInActivePane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.gemini.start.newPane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.gemini.start.activePane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codex.start.newPane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codex.start.activePane'));
             assert.ok(commandHandlers.has('gemini-cli-vscode.saveClipboardToHistory'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedTextToGemini'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedTextToCodex'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePathToGemini'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePathToCodex'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePathToGemini'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePathToCodex'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.gemini.send.selectedText'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codex.send.selectedText'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.gemini.send.openFiles'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codex.send.openFiles'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.gemini.send.filePath'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.codex.send.filePath'));
             // Claude commands
-            assert.ok(commandHandlers.has('gemini-cli-vscode.claudeStartInNewPane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.claudeStartInActivePane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedTextToClaude'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePathToClaude'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePathToClaude'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.claude.start.newPane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.claude.start.activePane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.claude.send.selectedText'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.claude.send.openFiles'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.claude.send.filePath'));
             // Qwen commands
-            assert.ok(commandHandlers.has('gemini-cli-vscode.qwenStartInNewPane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.qwenStartInActivePane'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendSelectedTextToQwen'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendOpenFilePathToQwen'));
-            assert.ok(commandHandlers.has('gemini-cli-vscode.sendFilePathToQwen'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.qwen.start.newPane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.qwen.start.activePane'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.qwen.send.selectedText'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.qwen.send.openFiles'));
+            assert.ok(commandHandlers.has('gemini-cli-vscode.qwen.send.filePath'));
             // Launch all CLIs command
             assert.ok(commandHandlers.has('gemini-cli-vscode.launchAllCLIs'));
             // MultiAI commands
@@ -207,7 +207,7 @@ describe('Extension Unit Test Suite', () => {
             };
             sandbox.stub(vscode.workspace, 'getConfiguration').returns(mockConfig as any);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             const args = testContext.stubs.createTerminal.getCall(0).args[0];
@@ -225,7 +225,7 @@ describe('Extension Unit Test Suite', () => {
             const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace/project');
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInActivePane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.activePane');
             
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             const args = testContext.stubs.createTerminal.getCall(0).args[0];
@@ -252,7 +252,7 @@ describe('Extension Unit Test Suite', () => {
             };
             sandbox.stub(vscode.workspace, 'getConfiguration').returns(mockConfig as any);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             let args = testContext.stubs.createTerminal.getCall(0).args[0];
@@ -269,7 +269,7 @@ describe('Extension Unit Test Suite', () => {
                 return defaultValue;
             };
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             args = testContext.stubs.createTerminal.getCall(0).args[0];
@@ -286,7 +286,7 @@ describe('Extension Unit Test Suite', () => {
             const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace/project');
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             assert.ok(mockTerminal.sendText.calledWith('cd "/workspace/project"'));
             assert.ok(mockTerminal.sendText.calledWith('gemini'));
@@ -305,11 +305,11 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // First call - creates terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             
             // Second call - should reuse terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             assert.ok(testContext.stubs.createTerminal.calledOnce); // Still only once
             assert.strictEqual(mockTerminal.show.callCount, 2); // Show called twice
         });
@@ -436,7 +436,7 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal first
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             // Reset call counts
             mockTerminal.show.resetHistory();
@@ -444,7 +444,7 @@ describe('Extension Unit Test Suite', () => {
             testContext.stubs.clipboardWrite.resetHistory();
             
             // Send selected text
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedTextToGemini');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.send.selectedText');
             
             // Wait for async operation (including the setTimeout)
             await waitForAsync(150);
@@ -473,7 +473,7 @@ describe('Extension Unit Test Suite', () => {
             const mockEditor = createMockEditor('Some code', createMockSelection(0, 0, 0, 9));
             sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedTextToGemini');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.send.selectedText');
             
             assert.ok(testContext.stubs.showWarningMessage.calledWith(
                 'Gemini CLI is not running. Please start it first.'
@@ -494,9 +494,9 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal first
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendSelectedTextToGemini');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.send.selectedText');
             
             assert.ok(testContext.stubs.showInformationMessage.calledWith(
                 'No text selected in editor. Select text in editor first.'
@@ -556,10 +556,10 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal first
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             // Send open files (now returns a Promise)
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePathToGemini');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.send.openFiles');
             
             // Wait a moment for the setTimeout inside sendOpenFilesToCLI
             await waitForAsync(150);
@@ -603,9 +603,9 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal first
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.sendOpenFilePathToGemini');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.send.openFiles');
             
             assert.ok(testContext.stubs.showInformationMessage.calledWith('No files are currently open.'));
         });
@@ -637,7 +637,7 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             // Set active terminal to be the Gemini terminal
             sandbox.stub(vscode.window, 'activeTerminal').value(mockTerminal);
@@ -661,7 +661,7 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create Gemini terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             // Set active editor (not terminal)
             sandbox.stub(vscode.window, 'activeTerminal').value(undefined);
@@ -696,7 +696,7 @@ describe('Extension Unit Test Suite', () => {
             };
             sandbox.stub(vscode.workspace, 'getConfiguration').returns(mockConfig as any);
             
-            await vscode.commands.executeCommand('gemini-cli-vscode.codexStartInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.codex.start.newPane');
             
             // Verify stty -ixon was sent to disable flow control
             assert.ok(mockTerminal.sendText.calledWith('stty -ixon 2>/dev/null'), 
@@ -730,7 +730,7 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             
             // Simulate terminal close
@@ -740,7 +740,7 @@ describe('Extension Unit Test Suite', () => {
             }
             
             // Try to create again - should create new terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             assert.strictEqual(testContext.stubs.createTerminal.callCount, 2, 'Should create new terminal after close');
         });
     });
@@ -756,7 +756,7 @@ describe('Extension Unit Test Suite', () => {
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
             // Create terminal
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             assert.ok(testContext.stubs.createTerminal.calledOnce);
             
             // Deactivate
@@ -767,7 +767,7 @@ describe('Extension Unit Test Suite', () => {
             
             // Should create new terminal (map was cleared)
             sandbox.stub(vscode.window, 'terminals').value([mockTerminal]);
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
             
             // Should not reuse the old terminal
             assert.strictEqual(testContext.stubs.createTerminal.callCount, 2);
