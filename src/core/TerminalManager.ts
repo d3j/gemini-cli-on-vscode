@@ -7,7 +7,7 @@ import { Logger } from './Logger';
 /**
  * Terminal lifecycle event data
  */
-export interface TerminalLifecycleEvent {
+interface TerminalLifecycleEvent {
     terminal?: vscode.Terminal;
     terminalId: string;
     cliType: CLIType;
@@ -16,7 +16,7 @@ export interface TerminalLifecycleEvent {
 /**
  * Terminal text sent event data (test/dev only)
  */
-export interface TerminalTextSentEvent {
+interface TerminalTextSentEvent {
     terminal: vscode.Terminal;
     text: string;
     cliType: CLIType;
@@ -210,7 +210,8 @@ export class TerminalManager implements vscode.Disposable {
         
         // Also store in legacy maps for compatibility
         const legacyMap = this.getTerminalMapForCLI(cli);
-        legacyMap.set('global', terminal);
+        const terminalKey = this.getTerminalKey(cli, placement);
+        legacyMap.set(terminalKey, terminal);
         
         // Track CLI type for this terminal
         this.terminalCliTypeMap.set(terminal, cli);

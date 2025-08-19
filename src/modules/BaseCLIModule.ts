@@ -37,10 +37,14 @@ export abstract class BaseCLIModule implements ICLIModule {
             return undefined;
         }
         
-        // Create or focus terminal (forceNew can be controlled by settings if needed)
+        // Always reuse existing terminal if available, regardless of pane type
+        // This ensures only one instance per CLI type
         const terminal = await this.terminalManager.createOrFocusTerminal(
             this.cliType,
-            { preserveFocus: false }
+            { 
+                preserveFocus: false,
+                forceNew: false  // Never force new, always reuse existing
+            }
         );
         
         if (terminal) {

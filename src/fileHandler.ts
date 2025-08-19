@@ -34,7 +34,7 @@ export class FileHandler {
         return `These files are currently open: ${fileList}`;
     }
 
-    findCLITerminal(terminals: readonly vscode.Terminal[], targetCLI?: 'gemini' | 'codex' | 'claude' | 'qwen'): vscode.Terminal | undefined {
+    findCLITerminal(_terminals: readonly vscode.Terminal[], targetCLI?: 'gemini' | 'codex' | 'claude' | 'qwen'): vscode.Terminal | undefined {
         const terminalMaps = {
             'claude': this.claudeTerminals,
             'codex': this.codexTerminals,
@@ -43,12 +43,12 @@ export class FileHandler {
         };
         
         if (targetCLI) {
-            return this.findInMap(terminalMaps[targetCLI], terminals);
+            return this.findInMap(terminalMaps[targetCLI]);
         }
         
         // Priority: Claude -> Codex -> Gemini
         for (const cli of ['claude', 'codex', 'gemini'] as const) {
-            const terminal = this.findInMap(terminalMaps[cli], terminals);
+            const terminal = this.findInMap(terminalMaps[cli]);
             if (terminal) return terminal;
         }
         
@@ -56,11 +56,11 @@ export class FileHandler {
     }
     
     private findInMap(
-        map: Map<string, vscode.Terminal>,
-        terminals: readonly vscode.Terminal[]
+        map: Map<string, vscode.Terminal>
     ): vscode.Terminal | undefined {
         for (const terminal of map.values()) {
-            if (terminals.includes(terminal)) {
+            // Check if terminal exists and is not disposed
+            if (terminal && !terminal.exitStatus) {
                 return terminal;
             }
         }

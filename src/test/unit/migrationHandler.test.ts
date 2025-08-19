@@ -3,20 +3,24 @@ import * as vscode from 'vscode';
 import * as sinon from 'sinon';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import { MigrationHandler } from '../../migrationHandler';
+import { ConfigService } from '../../core/ConfigService';
 
 describe('MigrationHandler', () => {
     describe('Configuration Fallback', () => {
-        it('should provide fallback for deprecated delay settings', () => {
-            const claudeDelay = MigrationHandler.getConfigWithFallback('composer.delays.claude.enter', 0);
+        it('should provide fallback for deprecated delay settings via ConfigService', () => {
+            const config = new ConfigService();
+            const claudeDelay = config.get('composer.delays.claude.enter', 0);
             assert.strictEqual(claudeDelay, 150);
-            
-            const geminiDelay = MigrationHandler.getConfigWithFallback('composer.delays.gemini.enter', 0);
+            const geminiDelay = config.get('composer.delays.gemini.enter', 0);
             assert.strictEqual(geminiDelay, 600);
+            config.dispose();
         });
-        
-        it('should return default for non-deprecated settings', () => {
-            const value = MigrationHandler.getConfigWithFallback('some.other.setting', 'default');
+
+        it('should return provided default for unknown settings', () => {
+            const config = new ConfigService();
+            const value = config.get('some.other.setting', 'default');
             assert.strictEqual(value, 'default');
+            config.dispose();
         });
     });
     

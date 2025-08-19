@@ -309,7 +309,7 @@ describe('Extension Unit Test Suite', () => {
             assert.ok(mockTerminal.show.called);
         });
 
-        it('should reuse existing terminal for same pane type', async () => {
+        it('should reuse existing terminal for same CLI type', async () => {
             await activate(extensionContext);
             
             const mockTerminal = createMockTerminal('Gemini CLI');
@@ -320,15 +320,107 @@ describe('Extension Unit Test Suite', () => {
             const mockWorkspaceFolder = createMockWorkspaceFolder('/workspace/project');
             sandbox.stub(vscode.workspace, 'workspaceFolders').value([mockWorkspaceFolder]);
             
-            // First call - creates terminal
+            // First call with newPane - creates terminal
             await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
-            assert.ok(testContext.stubs.createTerminal.calledOnce);
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 1, 'Should create first terminal');
             
-            // Second call - should reuse terminal
+            // Second call with newPane - should reuse existing terminal
             await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
-            assert.ok(testContext.stubs.createTerminal.calledOnce); // Still only once
-            // Terminal show may be called multiple times per invocation (manager + module)
-            assert.ok(mockTerminal.show.callCount >= 2);
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 1, 'Should still have only one terminal');
+            
+            // Third call with activePane - should also reuse existing terminal
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.activePane');
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 1, 'Should still have only one terminal');
+            
+            // Terminal show should be called multiple times (once per command)
+            assert.ok(mockTerminal.show.callCount >= 3, 'Terminal should be shown for each command');
+        });
+    });
+
+    describe('Single Terminal Instance per CLI', () => {
+        it('should maintain only one instance per CLI type', async () => {
+            // Activate extension
+            await activate(extensionContext);
+            
+            // Create mock terminals
+            const claudeTerminal = createMockTerminal();
+            claudeTerminal.name = 'Claude Code';
+            
+            // Set up window.createTerminal to return the same terminal
+            testContext.stubs.createTerminal.returns(claudeTerminal);
+            
+            // Launch Claude in new pane (should create new terminal)
+            const newPaneHandler = commandHandlers.get('gemini-cli-vscode.claude.start.newPane');
+            assert.ok(newPaneHandler, 'New pane command should be registered');
+            await newPaneHandler();
+            
+            // Launch Claude in new pane again (should reuse existing terminal)
+            await newPaneHandler();
+            
+            // Should only create one terminal
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 1, 'Should create only 1 terminal for same CLI');
+            
+            // Launch Claude in active pane (should also reuse existing)
+            const activePaneHandler = commandHandlers.get('gemini-cli-vscode.claude.start.activePane');
+            assert.ok(activePaneHandler, 'Active pane command should be registered');
+            await activePaneHandler();
+            
+            // Still should have only one terminal
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 1, 'Should still have only 1 terminal');
+            
+            // Terminal should be shown multiple times
+            assert.ok(claudeTerminal.show.callCount >= 3, 'Terminal should be shown for each command');
+        });
+        
+        it('should maintain separate terminal instances per CLI type', async () => {
+            // Activate extension
+            await activate(extensionContext);
+            
+            // Create mock terminals with names
+            const geminiTerminal = createMockTerminal();
+            geminiTerminal.name = 'Gemini CLI';
+            const claudeTerminal = createMockTerminal();
+            claudeTerminal.name = 'Claude Code';
+            const codexTerminal = createMockTerminal();
+            codexTerminal.name = 'Codex CLI';
+            
+            // Set up window.createTerminal to return different terminals based on options
+            testContext.stubs.createTerminal.callsFake((options: any) => {
+                if (options?.name === 'Gemini CLI') return geminiTerminal;
+                if (options?.name === 'Claude Code') return claudeTerminal;
+                if (options?.name === 'Codex CLI') return codexTerminal;
+                return createMockTerminal();
+            });
+            
+            // Launch different CLIs in new panes
+            const geminiHandler = commandHandlers.get('gemini-cli-vscode.gemini.start.newPane');
+            const claudeHandler = commandHandlers.get('gemini-cli-vscode.claude.start.newPane');
+            const codexHandler = commandHandlers.get('gemini-cli-vscode.codex.start.newPane');
+            
+            assert.ok(geminiHandler, 'Gemini handler should be registered');
+            assert.ok(claudeHandler, 'Claude handler should be registered');
+            assert.ok(codexHandler, 'Codex handler should be registered');
+            
+            await geminiHandler!();
+            await claudeHandler!();
+            await codexHandler!();
+            
+            // Each CLI type should create exactly one terminal
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 3, 'Should create 3 different terminals (one per CLI type)');
+            
+            // Launch same CLIs again - should reuse existing terminals
+            testContext.stubs.createTerminal.resetHistory();
+            await geminiHandler!();
+            await claudeHandler!();
+            await codexHandler!();
+            
+            // Should not create any new terminals
+            assert.strictEqual(testContext.stubs.createTerminal.callCount, 0, 'Should not create new terminals when relaunching same CLIs');
+            
+            // Verify terminals were shown multiple times
+            assert.ok(geminiTerminal.show.callCount >= 2, 'Gemini terminal should be shown multiple times');
+            assert.ok(claudeTerminal.show.callCount >= 2, 'Claude terminal should be shown multiple times');
+            assert.ok(codexTerminal.show.callCount >= 2, 'Codex terminal should be shown multiple times');
         });
     });
 

@@ -100,6 +100,54 @@ describe('FileHandler.broadcastToMultipleClis Test Suite', () => {
         assert.ok(warningStub.firstCall.args[0].includes('Empty prompt'));
     });
 
+    it('should find terminals in map regardless of vscode.window.terminals', async () => {
+        // デグレテストケース: ターミナルマップに存在するが、vscode.window.terminalsに含まれていない
+        const prompt = 'Test prompt for regression';
+        const agents = ['gemini', 'codex'] as ('gemini' | 'codex' | 'claude')[];
+        
+        const geminiTerminal = {
+            name: 'Gemini CLI',
+            processId: Promise.resolve(123),
+            creationOptions: {},
+            exitStatus: undefined,
+            state: { isInteractedWith: false, shell: undefined },
+            sendText: sandbox.stub(),
+            show: sandbox.stub(),
+            hide: sandbox.stub(),
+            dispose: sandbox.stub()
+        } as any as vscode.Terminal;
+        
+        const codexTerminal = {
+            name: 'Codex CLI',
+            processId: Promise.resolve(456),
+            creationOptions: {},
+            exitStatus: undefined,
+            state: { isInteractedWith: false, shell: undefined },
+            sendText: sandbox.stub(),
+            show: sandbox.stub(),
+            hide: sandbox.stub(),
+            dispose: sandbox.stub()
+        } as any as vscode.Terminal;
+        
+        // ターミナルをマップに追加
+        geminiTerminals.set('gemini-global', geminiTerminal);
+        codexTerminals.set('codex-global', codexTerminal);
+        
+        // vscode.window.terminalsは空（作成直後を再現）
+        sandbox.stub(vscode.window, 'terminals').value([]);
+        const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+        
+        // Act
+        await fileHandler.broadcastToMultipleClis(prompt, agents);
+        
+        // Assert - ターミナルが見つかって送信される
+        assert.strictEqual(warningStub.callCount, 0, 'Should not show warning');
+        assert.ok((geminiTerminal.show as sinon.SinonStub).called, 'Gemini terminal should be shown');
+        assert.ok((codexTerminal.show as sinon.SinonStub).called, 'Codex terminal should be shown');
+        assert.ok((geminiTerminal.sendText as sinon.SinonStub).called, 'Should send to Gemini');
+        assert.ok((codexTerminal.sendText as sinon.SinonStub).called, 'Should send to Codex');
+    });
+
     it('should add delay between sends when specified', async () => {
         // Arrange
         const prompt = 'Test prompt';

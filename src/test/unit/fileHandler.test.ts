@@ -225,4 +225,78 @@ describe('FileHandler Unit Test Suite', () => {
             ));
         });
     });
+
+    describe('Terminal Map Regression Tests', () => {
+        it('should find terminal in map even if not in vscode.window.terminals', () => {
+            // デグレケース: ターミナルがマップにあるが、vscode.window.terminalsにない
+            const geminiTerminal = createMockTerminal('Gemini CLI');
+            const codexTerminal = createMockTerminal('Codex CLI');
+            
+            // geminiTerminalsに追加
+            const geminiMap = new Map<string, vscode.Terminal>();
+            geminiMap.set('gemini-global', geminiTerminal as unknown as vscode.Terminal);
+            
+            // codexTerminalsに追加
+            const codexMap = new Map<string, vscode.Terminal>();
+            codexMap.set('codex-global', codexTerminal as unknown as vscode.Terminal);
+            
+            // FileHandlerを作成
+            const handler = new FileHandler(geminiMap, codexMap, new Map(), new Map());
+            
+            // vscode.window.terminalsは空（作成直後の状態を再現）
+            const emptyTerminalsList: vscode.Terminal[] = [];
+            
+            // Act
+            const foundGemini = handler.findCLITerminal(emptyTerminalsList, 'gemini');
+            const foundCodex = handler.findCLITerminal(emptyTerminalsList, 'codex');
+            
+            // Assert - マップ内のターミナルが見つかるべき
+            assert.strictEqual(foundGemini, geminiTerminal, 
+                'Should find Gemini terminal in map even if not in terminals list');
+            assert.strictEqual(foundCodex, codexTerminal, 
+                'Should find Codex terminal in map even if not in terminals list');
+        });
+
+        it('should not return disposed terminals from map', () => {
+            // 終了したターミナルをマップに追加
+            const disposedTerminal = createMockTerminal('Gemini CLI');
+            (disposedTerminal as any).exitStatus = { code: 0 }; // ターミナルが終了している
+            
+            const geminiMap = new Map<string, vscode.Terminal>();
+            geminiMap.set('gemini-global', disposedTerminal as unknown as vscode.Terminal);
+            
+            const handler = new FileHandler(geminiMap, new Map(), new Map(), new Map());
+            
+            // Act
+            const found = handler.findCLITerminal([], 'gemini');
+            
+            // Assert - 終了したターミナルは返さない
+            assert.strictEqual(found, undefined, 
+                'Should not return disposed terminal');
+        });
+
+        it('should prioritize Claude -> Codex -> Gemini when no target specified', () => {
+            const claudeTerminal = createMockTerminal('Claude CLI');
+            const codexTerminal = createMockTerminal('Codex CLI');
+            const geminiTerminal = createMockTerminal('Gemini CLI');
+            
+            const claudeMap = new Map<string, vscode.Terminal>();
+            claudeMap.set('claude-global', claudeTerminal as unknown as vscode.Terminal);
+            
+            const codexMap = new Map<string, vscode.Terminal>();
+            codexMap.set('codex-global', codexTerminal as unknown as vscode.Terminal);
+            
+            const geminiMap = new Map<string, vscode.Terminal>();
+            geminiMap.set('gemini-global', geminiTerminal as unknown as vscode.Terminal);
+            
+            const handler = new FileHandler(geminiMap, codexMap, claudeMap, new Map());
+            
+            // Act - targetCLIを指定しない
+            const found = handler.findCLITerminal([]);
+            
+            // Assert - Claudeが優先される
+            assert.strictEqual(found, claudeTerminal, 
+                'Should return Claude terminal due to priority');
+        });
+    });
 });

@@ -147,7 +147,7 @@ export class CommandHandler implements vscode.Disposable {
                     cliType,
                     {
                         preserveFocus: true,
-                        forceNew: true  // Force new terminal for each CLI in launch all
+                        forceNew: false  // Reuse existing terminal if available
                     }
                 );
                 

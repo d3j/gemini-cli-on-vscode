@@ -1,7 +1,7 @@
 import { CLIType } from './types';
 import * as vscode from 'vscode';
 
-export interface CLIConfig {
+interface CLIConfig {
     id: CLIType;
     name: string;
     command: string;  // 設定可能

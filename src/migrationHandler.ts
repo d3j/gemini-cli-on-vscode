@@ -11,18 +11,6 @@ export class MigrationHandler {
         void this.configService; // Acknowledge configService is stored for future use
     }
     
-    /**
-     * Get configuration value with fallback for deprecated settings
-     * This is used for read-time fallback without writing to config
-     * @deprecated Use ConfigService.get() instead
-     */
-    public static getConfigWithFallback<T>(key: string, defaultValue: T): T {
-        const tempConfigService = new ConfigService();
-        const result = tempConfigService.get(key, defaultValue);
-        tempConfigService.dispose();
-        return result;
-    }
-    
     async migrate(context: vscode.ExtensionContext): Promise<void> {
         const isFirstRun = !context.globalState.get(this.FIRST_RUN_KEY);
         
