@@ -1,8 +1,8 @@
-# Migration Guide - v0.3.0
+# Migration Guide - v0.2.1
 
 ## 🔄 Command Name Changes (Hierarchical Naming)
 
-In v0.3.0, all CLI commands have been reorganized with a hierarchical naming structure for better consistency and future extensibility.
+In v0.2.1, all CLI commands have been reorganized with a hierarchical naming structure for better consistency and future extensibility.
 
 ### Command Name Migration Table
 

@@ -2,14 +2,48 @@ import * as vscode from 'vscode';
 import { CLIType } from '../types';
 import { ConfigService } from './ConfigService';
 import { CLIRegistry } from '../cliRegistry';
+import { Logger } from './Logger';
+
+/**
+ * Terminal lifecycle event data
+ */
+export interface TerminalLifecycleEvent {
+    terminal?: vscode.Terminal;
+    terminalId: string;
+    cliType: CLIType;
+}
+
+/**
+ * Terminal text sent event data (test/dev only)
+ */
+export interface TerminalTextSentEvent {
+    terminal: vscode.Terminal;
+    text: string;
+    cliType: CLIType;
+}
 
 /**
  * Manages terminal creation, reuse, and interaction for different CLIs
  */
-export class TerminalManager {
+export class TerminalManager implements vscode.Disposable {
     private terminals: Map<string, vscode.Terminal> = new Map();
     private disposables: vscode.Disposable[] = [];
     private terminalCounter = 0;
+    private terminalCliTypeMap = new Map<vscode.Terminal, CLIType>();
+    
+    // Event emitters
+    private readonly _onDidCreateTerminal = new vscode.EventEmitter<TerminalLifecycleEvent>();
+    private readonly _onDidDisposeTerminal = new vscode.EventEmitter<TerminalLifecycleEvent>();
+    
+    // Development/test only event
+    private readonly _onDidSendText = process.env.VSCODE_TEST 
+        ? new vscode.EventEmitter<TerminalTextSentEvent>()
+        : undefined;
+    
+    // Public events
+    readonly onDidCreateTerminal: vscode.Event<TerminalLifecycleEvent> = this._onDidCreateTerminal.event;
+    readonly onDidDisposeTerminal: vscode.Event<TerminalLifecycleEvent> = this._onDidDisposeTerminal.event;
+    readonly onDidSendText: vscode.Event<TerminalTextSentEvent> | undefined = this._onDidSendText?.event;
     
     // Legacy terminal maps for compatibility with FileHandler
     public geminiTerminals = new Map<string, vscode.Terminal>();
@@ -18,14 +52,23 @@ export class TerminalManager {
     public qwenTerminals = new Map<string, vscode.Terminal>();
     
     constructor(
+        private context: vscode.ExtensionContext,
         private configService: ConfigService,
-        private cliRegistry: CLIRegistry
+        private cliRegistry: CLIRegistry,
+        private logger?: Logger
     ) {
         // Register terminal close handler
         const closeHandler = vscode.window.onDidCloseTerminal(terminal => {
             this.handleTerminalClose(terminal);
         });
         this.disposables.push(closeHandler);
+        
+        // Add event emitters to disposables
+        this.disposables.push(this._onDidCreateTerminal);
+        this.disposables.push(this._onDidDisposeTerminal);
+        if (this._onDidSendText) {
+            this.disposables.push(this._onDidSendText);
+        }
     }
     
     /**
@@ -132,15 +175,23 @@ export class TerminalManager {
      * Create a new terminal
      */
     private async createTerminal(cli: CLIType, placement: 'new' | 'active'): Promise<vscode.Terminal> {
+        const startTime = Date.now();
+        
         const cliConfig = this.cliRegistry.getCLI(cli);
         if (!cliConfig) {
             throw new Error(`Unknown CLI type: ${cli}`);
         }
         
+        // Get icon path relative to extension root
+        const iconPath = vscode.Uri.joinPath(this.context.extensionUri, 'images', cliConfig.icon);
+        
         const terminalOptions: vscode.TerminalOptions = {
             name: cliConfig.name,
-            iconPath: vscode.Uri.file(cliConfig.icon),
-            location: this.getTerminalLocation(placement)
+            iconPath: iconPath,
+            location: this.getTerminalLocation(placement),
+            isTransient: true,  // Prevent terminal persistence on restart
+            hideFromUser: false,  // Show in terminal dropdown but don't persist
+            env: {}  // Clean environment to prevent restoration
         };
         
         const terminal = vscode.window.createTerminal(terminalOptions);
@@ -161,27 +212,48 @@ export class TerminalManager {
         const legacyMap = this.getTerminalMapForCLI(cli);
         legacyMap.set('global', terminal);
         
+        // Track CLI type for this terminal
+        this.terminalCliTypeMap.set(terminal, cli);
+        
+        // Fire terminal created event
+        this._onDidCreateTerminal.fire({
+            terminal,
+            terminalId: terminal.name,
+            cliType: cli
+        });
+        
+        // Log performance if enabled
+        const performanceEnabled = this.configService.get<boolean>('diagnostics.performance', false);
+        if (performanceEnabled) {
+            const duration = Date.now() - startTime;
+            this.logger?.debug(`Terminal created for ${cli} in ${duration}ms`);
+        }
+        
         return terminal;
     }
     
     /**
-     * Get terminal location based on placement
+     * Get terminal location based on configuration
      */
-    private getTerminalLocation(placement: 'new' | 'active'): vscode.TerminalLocation {
-        if (placement === 'new') {
-            const groupingBehavior = this.configService.get<string>('terminal.groupingBehavior', 'same');
-            
-            if (groupingBehavior === 'new') {
-                // Create in new group (split terminal) - use Editor area
-                return vscode.TerminalLocation.Editor;
-            } else {
-                // Default: same group behavior - use Panel
-                return vscode.TerminalLocation.Panel;
-            }
-        }
+    private getTerminalLocation(_placement: 'new' | 'active'): vscode.TerminalLocation | vscode.TerminalEditorLocationOptions {
+        // Get terminal grouping behavior configuration
+        const groupingBehavior = this.configService.get<string>('terminal.groupingBehavior', 'same');
         
-        // Active placement: use panel
-        return vscode.TerminalLocation.Panel;
+        if (groupingBehavior === 'new') {
+            // When groupingBehavior is 'new', create terminals in new editor groups
+            // Use ViewColumn.Beside to create a new split group
+            return {
+                viewColumn: vscode.ViewColumn.Beside,
+                preserveFocus: false
+            };
+        } else {
+            // When groupingBehavior is 'same', create terminals in the current editor group
+            // Use ViewColumn.Active to add to the current group
+            return {
+                viewColumn: vscode.ViewColumn.Active,
+                preserveFocus: false
+            };
+        }
     }
     
     /**
@@ -202,12 +274,24 @@ export class TerminalManager {
      * Handle terminal close event
      */
     private handleTerminalClose(terminal: vscode.Terminal): void {
+        // Get CLI type before removal
+        const cliType = this.terminalCliTypeMap.get(terminal);
+        
         // Remove from our map
         for (const [key, term] of this.terminals.entries()) {
             if (term === terminal) {
                 this.terminals.delete(key);
                 break;
             }
+        }
+        
+        // Fire terminal disposed event if we know the CLI type
+        if (cliType) {
+            this._onDidDisposeTerminal.fire({
+                terminalId: terminal.name,
+                cliType
+            });
+            this.terminalCliTypeMap.delete(terminal);
         }
         
         // Also clean up legacy terminal maps
@@ -239,7 +323,11 @@ export class TerminalManager {
         this.qwenTerminals.clear();
         
         // Dispose event handlers
-        this.disposables.forEach(d => d.dispose());
+        this.disposables.forEach(d => {
+            if (d && typeof d.dispose === 'function') {
+                d.dispose();
+            }
+        });
     }
     
     /**
@@ -262,16 +350,17 @@ export class TerminalManager {
         cli: CLIType,
         options?: {
             preserveFocus?: boolean;
-            location?: vscode.ViewColumn | { viewColumn: vscode.ViewColumn };
+            forceNew?: boolean;  // Force creating a new terminal instead of reusing
         }
     ): Promise<vscode.Terminal | undefined> {
         try {
-            // Check for existing terminal
-            let terminal = this.findTerminal(cli);
+            // Check for existing terminal (unless forceNew is true)
+            let terminal = options?.forceNew ? undefined : this.findTerminal(cli);
             
             if (!terminal || terminal.exitStatus) {
                 // Create new terminal
-                const placement = options?.location ? 'new' : 'active';
+                // Use 'new' placement for new terminals, 'active' for reuse
+                const placement = options?.forceNew ? 'new' : 'active';
                 terminal = await this.getOrCreate(cli, placement);
             }
             
@@ -295,6 +384,8 @@ export class TerminalManager {
         text: string,
         cli: CLIType
     ): Promise<void> {
+        const startTime = Date.now();
+        
         // Show terminal
         terminal.show();
         
@@ -311,5 +402,21 @@ export class TerminalManager {
         // Send Enter after delay
         await new Promise(resolve => setTimeout(resolve, delay));
         terminal.sendText('', true);
+        
+        // Fire text sent event for testing
+        if (this._onDidSendText) {
+            this._onDidSendText.fire({
+                terminal,
+                text,
+                cliType: cli
+            });
+        }
+        
+        // Log performance if enabled
+        const performanceEnabled = this.configService.get<boolean>('diagnostics.performance', false);
+        if (performanceEnabled) {
+            const duration = Date.now() - startTime;
+            this.logger?.debug(`Text sent to ${cli} terminal in ${duration}ms (${text.length} chars)`);
+        }
     }
 }

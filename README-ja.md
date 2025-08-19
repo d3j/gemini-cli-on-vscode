@@ -1,4 +1,4 @@
-# Gemini CLI on VSCode
+# Gemini CLI on VSCode ?
 
 **🇯🇵 日本語版** | [🇺🇸 English](README.md)
 
@@ -185,41 +185,53 @@ qwen    # Qwenアカウント認証
 
 - **"Launch All CLIs"** - 複数のCLIを一括起動（同じグループにタブとして配置）
 
-**Gemini CLI コマンド:**
+**CLIコマンド（v0.2.1+ 階層構造）:**
 
-- "Gemini CLI: Start in New Pane" - 新しいペインで起動
-- "Gemini CLI: Start in Active Pane" - アクティブペインで起動
-- "Gemini CLI: Send File Path" - ファイル/フォルダパスを送信
-- "Gemini CLI: Send Open File Path" - 開いているファイルをすべて送信
-- "Gemini CLI: Send Selected Text" - 選択テキストを送信
+すべてのコマンドは一貫したパターンに従います: `{拡張機能}.{CLI}.{アクション}.{対象}`
 
-**Codex CLI コマンド:**
+**Gemini CLI:**
+- `gemini.start.newPane` - 新しいペインでGeminiを起動
+- `gemini.start.activePane` - アクティブペインでGeminiを起動
+- `gemini.send.selectedText` - 選択テキストをGeminiに送信
+- `gemini.send.filePath` - ファイル/フォルダをGeminiに送信
+- `gemini.send.openFiles` - 開いているすべてのファイルをGeminiに送信
 
-- "Codex CLI: Start in New Pane" - 新しいペインで起動
-- "Codex CLI: Start in Active Pane" - アクティブペインで起動
-- "Codex CLI: Send File Path" - ファイル/フォルダパスを送信
-- "Codex CLI: Send Open File Path" - 開いているファイルをすべて送信
-- "Codex CLI: Send Selected Text" - 選択テキストを送信
+**Codex CLI:**
+- `codex.start.newPane` - 新しいペインでCodexを起動
+- `codex.start.activePane` - アクティブペインでCodexを起動
+- `codex.send.selectedText` - 選択テキストをCodexに送信
+- `codex.send.filePath` - ファイル/フォルダをCodexに送信
+- `codex.send.openFiles` - 開いているすべてのファイルをCodexに送信
 
-**Claude Code コマンド:**
+**Claude CLI:**
+- `claude.start.newPane` - 新しいペインでClaudeを起動
+- `claude.start.activePane` - アクティブペインでClaudeを起動
+- `claude.send.selectedText` - 選択テキストをClaudeに送信
+- `claude.send.filePath` - ファイル/フォルダをClaudeに送信
+- `claude.send.openFiles` - 開いているすべてのファイルをClaudeに送信
 
-- "Claude Code: Start in New Pane" - 新しいペインで起動
-- "Claude Code: Start in Active Pane" - アクティブペインで起動
-- "Claude Code: Send File Path" - ファイル/フォルダパスを送信
-- "Claude Code: Send Open File Path" - 開いているファイルをすべて送信
-- "Claude Code: Send Selected Text" - 選択テキストを送信
+**Qwen CLI:**
+- `qwen.start.newPane` - 新しいペインでQwenを起動
+- `qwen.start.activePane` - アクティブペインでQwenを起動
+- `qwen.send.selectedText` - 選択テキストをQwenに送信
+- `qwen.send.filePath` - ファイル/フォルダをQwenに送信
+- `qwen.send.openFiles` - 開いているすべてのファイルをQwenに送信
 
 **共通コマンド:**
-
-- "Save to History" - 履歴を保存（すべてのターミナルで動作）
+- `saveClipboardToHistory` - 会話を保存（すべてのターミナルで動作）
+- `launchAllCLIs` - 有効化されているすべてのCLIを同時起動
+- `multiAI.openComposer` - MAGUS Councilコンポーザーを開く
+- `multiAI.askAll` - すべてのアクティブなCLIに送信
 
 ### ⌨️ カスタムキーボードショートカット
 
-独自のキーバインディングを設定可能：
+独自のキーバインディングを設定できます：
 
 1. キーボードショートカットを開く: `Cmd+K Cmd+S`（Mac）または `Ctrl+K Ctrl+S`（Windows/Linux）
-2. "CLI" で検索
+2. コマンドを検索（例: "gemini.start" または "claude.send"）
 3. 鉛筆アイコンをクリックしてお好みのキーを割り当て
+
+**注意:** v0.2.0以前のバージョンからカスタムキーバインディングを使用している場合は、[MIGRATION.md](./MIGRATION.md)を参照して更新手順をご確認ください。
 
 ## 🆚 他の選択肢との比較
 

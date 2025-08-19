@@ -22,7 +22,7 @@
     "cli",
     "terminal"
   ],
-  "version": "0.2.0",
+  "version": "0.2.1-beta",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -297,164 +297,185 @@
       {
         "title": "Gemini CLI on VSCode",
         "properties": {
-        "gemini-cli-vscode.gemini.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable Gemini CLI features",
-          "markdownDescription": "Enable **Gemini CLI** integration. When enabled, you can:\n- Launch Gemini CLI in editor panes\n- Send selected text and file paths to Gemini\n- Access Gemini commands in context menus",
-          "order": 1
-        },
-        "gemini-cli-vscode.codex.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable Codex CLI features",
-          "markdownDescription": "Enable **Codex CLI (GPT-5)** integration. When enabled, you can:\n- Launch Codex CLI in editor panes\n- Send selected text and file paths to Codex\n- Access Codex commands in context menus",
-          "order": 2
-        },
-        "gemini-cli-vscode.claude.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable Claude Code CLI features",
-          "markdownDescription": "Enable **Claude Code** integration. When enabled, you can:\n- Launch Claude Code in editor panes\n- Send selected text and file paths to Claude\n- Access Claude commands in context menus",
-          "order": 3
-        },
-        "gemini-cli-vscode.qwen.enabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable Qwen CLI features",
-          "markdownDescription": "Enable **Qwen CLI** integration. When enabled, you can:\n- Launch Qwen CLI in editor panes\n- Send selected text and file paths to Qwen\n- Access Qwen commands in context menus",
-          "order": 4
-        },
-        "gemini-cli-vscode.magusCouncil.enabled": {
-          "type": "boolean",
-          "default": true,
-          "title": "MAGUS Council Enabled",
-          "description": "Enable MAGUS Council (multi-AI features)",
-          "markdownDescription": "Enable **MAGUS Council** - a unified interface to interact with multiple AI agents simultaneously.\n\n**Features**:\n- Send the same prompt to multiple AIs at once\n- Compare responses side-by-side\n- Launch all configured CLIs with one command\n\n🔮 *The Council awaits your questions*",
-          "order": 5
-        },
-        "gemini-cli-vscode.contextMenu.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show context menu commands for all CLIs",
-          "markdownDescription": "Show AI-related commands in context menus (right-click menus).\n\n**Available in**:\n- Editor context menu\n- Explorer context menu\n- Editor tab context menu\n\n💡 **Tip**: You can fine-tune which commands appear in the Advanced settings",
-          "order": 6
-        },
-        "gemini-cli-vscode.saveToHistory.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable save to history feature",
-          "markdownDescription": "Enable the **Save to History** feature for saving terminal and editor selections to `.history-memo` folder.\n\n**Features**:\n- Save terminal conversations with one click\n- Preserve important code snippets and discussions\n- Automatically organize by date\n- Shows status bar button when terminal is active\n\n💾 **Keep your AI conversations for future reference**",
-          "order": 7
+          "gemini-cli-vscode.gemini.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable Gemini CLI features",
+            "markdownDescription": "Enable **Gemini CLI** integration. When enabled, you can:\n- Launch Gemini CLI in editor panes\n- Send selected text and file paths to Gemini\n- Access Gemini commands in context menus",
+            "order": 1
+          },
+          "gemini-cli-vscode.codex.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable Codex CLI features",
+            "markdownDescription": "Enable **Codex CLI (GPT-5)** integration. When enabled, you can:\n- Launch Codex CLI in editor panes\n- Send selected text and file paths to Codex\n- Access Codex commands in context menus",
+            "order": 2
+          },
+          "gemini-cli-vscode.claude.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable Claude Code CLI features",
+            "markdownDescription": "Enable **Claude Code** integration. When enabled, you can:\n- Launch Claude Code in editor panes\n- Send selected text and file paths to Claude\n- Access Claude commands in context menus",
+            "order": 3
+          },
+          "gemini-cli-vscode.qwen.enabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable Qwen CLI features",
+            "markdownDescription": "Enable **Qwen CLI** integration. When enabled, you can:\n- Launch Qwen CLI in editor panes\n- Send selected text and file paths to Qwen\n- Access Qwen commands in context menus",
+            "order": 4
+          },
+          "gemini-cli-vscode.magusCouncil.enabled": {
+            "type": "boolean",
+            "default": true,
+            "title": "MAGUS Council Enabled",
+            "description": "Enable MAGUS Council (multi-AI features)",
+            "markdownDescription": "Enable **MAGUS Council** - a unified interface to interact with multiple AI agents simultaneously.\n\n**Features**:\n- Send the same prompt to multiple AIs at once\n- Compare responses side-by-side\n- Launch all configured CLIs with one command\n\n\ud83d\udd2e *The Council awaits your questions*",
+            "order": 5
+          },
+          "gemini-cli-vscode.contextMenu.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show context menu commands for all CLIs",
+            "markdownDescription": "Show AI-related commands in context menus (right-click menus).\n\n**Available in**:\n- Editor context menu\n- Explorer context menu\n- Editor tab context menu\n\n\ud83d\udca1 **Tip**: You can fine-tune which commands appear in the Advanced settings",
+            "order": 6
+          },
+          "gemini-cli-vscode.saveToHistory.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable save to history feature",
+            "markdownDescription": "Enable the **Save to History** feature for saving terminal and editor selections to `.history-memo` folder.\n\n**Features**:\n- Save terminal conversations with one click\n- Preserve important code snippets and discussions\n- Automatically organize by date\n- Shows status bar button when terminal is active\n\n\ud83d\udcbe **Keep your AI conversations for future reference**",
+            "order": 7
+          }
         }
-      }
       },
       {
         "title": "Advanced",
         "properties": {
           "gemini-cli-vscode.magusCouncil.defaultAgents": {
             "type": "array",
-            "default": ["gemini", "codex", "claude"],
+            "default": [
+              "gemini",
+              "codex",
+              "claude"
+            ],
             "items": {
               "type": "string",
-              "enum": ["gemini", "codex", "claude", "qwen"]
+              "enum": [
+                "gemini",
+                "codex",
+                "claude",
+                "qwen"
+              ]
             },
             "uniqueItems": true,
             "description": "Default agents to select in MAGUS Council",
-            "markdownDescription": "Choose which AI agents are selected by default when opening MAGUS Council.\n\n**Available agents**:\n- `gemini` - Google's Gemini AI\n- `codex` - OpenAI Codex (GPT-5)\n- `claude` - Anthropic's Claude\n- `qwen` - Alibaba's Qwen\n\n🎯 Select your preferred AI team",
+            "markdownDescription": "Choose which AI agents are selected by default when opening MAGUS Council.\n\n**Available agents**:\n- `gemini` - Google's Gemini AI\n- `codex` - OpenAI Codex (GPT-5)\n- `claude` - Anthropic's Claude\n- `qwen` - Alibaba's Qwen\n\n\ud83c\udfaf Select your preferred AI team",
             "order": 1
           },
           "gemini-cli-vscode.magusCouncil.launch.clis": {
             "type": "array",
-            "default": ["claude", "gemini", "codex"],
+            "default": [
+              "claude",
+              "gemini",
+              "codex"
+            ],
             "items": {
               "type": "string",
-              "enum": ["gemini", "codex", "claude", "qwen"]
+              "enum": [
+                "gemini",
+                "codex",
+                "claude",
+                "qwen"
+              ]
             },
             "uniqueItems": true,
             "minItems": 1,
             "maxItems": 4,
             "title": "Launch CLIs",
             "description": "CLIs to launch with 'Launch All CLIs' command (order matters)",
-            "markdownDescription": "Configure which **CLIs** to launch and their order when using **Launch All CLIs** command.\n\n**Tips**:\n- Order determines terminal arrangement (left to right)\n- Only enabled CLIs will actually launch\n- Perfect for setting up your AI workspace quickly\n\n🚀 Launch your AI fleet with one click",
+            "markdownDescription": "Configure which **CLIs** to launch and their order when using **Launch All CLIs** command.\n\n**Tips**:\n- Order determines terminal arrangement (left to right)\n- Only enabled CLIs will actually launch\n- Perfect for setting up your AI workspace quickly\n\n\ud83d\ude80 Launch your AI fleet with one click",
             "order": 2
           },
           "gemini-cli-vscode.saveToHistory.showStatusBar": {
             "type": "boolean",
             "default": true,
             "description": "Show 'Save to History' button in status bar when terminal is active",
-            "markdownDescription": "Show **Save to History** button in the status bar when a terminal is active.\n\n**Features**:\n- Quick access to save terminal conversations\n- Appears only when terminal is focused\n- Saves to `.history-memo` folder\n\n💾 One-click conversation backup",
+            "markdownDescription": "Show **Save to History** button in the status bar when a terminal is active.\n\n**Features**:\n- Quick access to save terminal conversations\n- Appears only when terminal is focused\n- Saves to `.history-memo` folder\n\n\ud83d\udcbe One-click conversation backup",
             "order": 3
           },
           "gemini-cli-vscode.saveToHistory.includeTerminalName": {
             "type": "boolean",
             "default": true,
             "description": "Include terminal name in history entries",
-            "markdownDescription": "Include the terminal name (e.g., 'Gemini CLI', 'Codex CLI') in saved history entries.\n\n**Benefits**:\n- Track which AI provided each response\n- Easier to search through history\n- Better context when reviewing past conversations\n\n🏷️ Adds source attribution to saved content",
+            "markdownDescription": "Include the terminal name (e.g., 'Gemini CLI', 'Codex CLI') in saved history entries.\n\n**Benefits**:\n- Track which AI provided each response\n- Easier to search through history\n- Better context when reviewing past conversations\n\n\ud83c\udff7\ufe0f Adds source attribution to saved content",
             "order": 4
           },
           "gemini-cli-vscode.magusCouncil.composer.autoSaveHistory": {
             "type": "boolean",
             "default": true,
             "description": "Automatically save sent prompts to .history-memo",
-            "markdownDescription": "Automatically save prompts sent from **MAGUS Council Composer** to `.history-memo/YYYY-MM-DD.md` files.\n\n**What gets saved**:\n- Prompts sent via MAGUS Council Composer interface\n- Timestamp and target AI agents\n- Context files if included\n\n**Note**: Direct terminal conversations are NOT included. Use the 'Save to History' button for terminal sessions.\n\n📝 Files are organized by date for easy navigation",
+            "markdownDescription": "Automatically save prompts sent from **MAGUS Council Composer** to `.history-memo/YYYY-MM-DD.md` files.\n\n**What gets saved**:\n- Prompts sent via MAGUS Council Composer interface\n- Timestamp and target AI agents\n- Context files if included\n\n**Note**: Direct terminal conversations are NOT included. Use the 'Save to History' button for terminal sessions.\n\n\ud83d\udcdd Files are organized by date for easy navigation",
             "order": 5
           },
           "gemini-cli-vscode.contextMenu.showSendText": {
             "type": "boolean",
             "default": true,
             "description": "Show 'Send Selected Text' commands in context menus",
-            "markdownDescription": "Show **Send Selected Text** commands in context menus.\n\n**When enabled**:\n- Right-click selected text to send it to any active AI terminal\n- Works with code, comments, or any text selection\n\n✍️ Quick way to ask AI about selected code",
+            "markdownDescription": "Show **Send Selected Text** commands in context menus.\n\n**When enabled**:\n- Right-click selected text to send it to any active AI terminal\n- Works with code, comments, or any text selection\n\n\u270d\ufe0f Quick way to ask AI about selected code",
             "order": 7
           },
           "gemini-cli-vscode.contextMenu.showSendFilePath": {
             "type": "boolean",
             "default": true,
             "description": "Show 'Send File Path' and 'Send Open File Path' commands in context menus",
-            "markdownDescription": "Show **Send File Path** commands in context menus.\n\n**Commands**:\n- `Send File Path` - Send a specific file path to AI\n- `Send Open File Path` - Send all open file paths at once\n\n📁 Perfect for asking AI to analyze multiple files",
+            "markdownDescription": "Show **Send File Path** commands in context menus.\n\n**Commands**:\n- `Send File Path` - Send a specific file path to AI\n- `Send Open File Path` - Send all open file paths at once\n\n\ud83d\udcc1 Perfect for asking AI to analyze multiple files",
             "order": 7
           },
           "gemini-cli-vscode.gemini.showInContextMenu": {
             "type": "boolean",
             "default": true,
             "description": "Show Gemini CLI commands in context menus",
-            "markdownDescription": "Show Gemini-specific commands in right-click context menus.\n\n⚠️ **Note**: Requires `contextMenu.enabled` to be true\n\n🖉 Customize your context menu per AI",
+            "markdownDescription": "Show Gemini-specific commands in right-click context menus.\n\n\u26a0\ufe0f **Note**: Requires `contextMenu.enabled` to be true\n\n\ud83d\udd89 Customize your context menu per AI",
             "order": 7
           },
           "gemini-cli-vscode.codex.showInContextMenu": {
             "type": "boolean",
             "default": true,
             "description": "Show Codex CLI commands in context menus",
-            "markdownDescription": "Show Codex-specific commands in right-click context menus.\n\n⚠️ **Note**: Requires `contextMenu.enabled` to be true\n\n🖉 Customize your context menu per AI",
+            "markdownDescription": "Show Codex-specific commands in right-click context menus.\n\n\u26a0\ufe0f **Note**: Requires `contextMenu.enabled` to be true\n\n\ud83d\udd89 Customize your context menu per AI",
             "order": 8
           },
           "gemini-cli-vscode.claude.showInContextMenu": {
             "type": "boolean",
             "default": true,
             "description": "Show Claude Code commands in context menus",
-            "markdownDescription": "Show Claude-specific commands in right-click context menus.\n\n⚠️ **Note**: Requires `contextMenu.enabled` to be true\n\n🖉 Customize your context menu per AI",
+            "markdownDescription": "Show Claude-specific commands in right-click context menus.\n\n\u26a0\ufe0f **Note**: Requires `contextMenu.enabled` to be true\n\n\ud83d\udd89 Customize your context menu per AI",
             "order": 9
           },
           "gemini-cli-vscode.qwen.showInContextMenu": {
             "type": "boolean",
             "default": true,
             "description": "Show Qwen commands in context menus",
-            "markdownDescription": "Show Qwen-specific commands in right-click context menus.\n\n⚠️ **Note**: Requires `contextMenu.enabled` to be true\n\n🖉 Customize your context menu per AI",
+            "markdownDescription": "Show Qwen-specific commands in right-click context menus.\n\n\u26a0\ufe0f **Note**: Requires `contextMenu.enabled` to be true\n\n\ud83d\udd89 Customize your context menu per AI",
             "order": 10
           },
           "gemini-cli-vscode.terminal.disableFlowControl": {
             "type": "boolean",
             "default": true,
             "description": "Disable XON/XOFF flow control (stty -ixon) to prevent Ctrl+S from freezing output",
-            "markdownDescription": "Disable terminal flow control to prevent `Ctrl+S` from freezing the output.\n\n**Why this matters**:\n- `Ctrl+S` normally pauses terminal output (XON/XOFF)\n- This can make the terminal appear frozen\n- Disabling allows `Ctrl+S` to work as Save in VS Code\n\n⚙️ Runs `stty -ixon` automatically in each terminal",
+            "markdownDescription": "Disable terminal flow control to prevent `Ctrl+S` from freezing the output.\n\n**Why this matters**:\n- `Ctrl+S` normally pauses terminal output (XON/XOFF)\n- This can make the terminal appear frozen\n- Disabling allows `Ctrl+S` to work as Save in VS Code\n\n\u2699\ufe0f Runs `stty -ixon` automatically in each terminal",
             "order": 11
           },
           "gemini-cli-vscode.terminal.groupingBehavior": {
             "type": "string",
-            "enum": ["same", "new"],
+            "enum": [
+              "same",
+              "new"
+            ],
             "default": "same",
             "description": "Terminal grouping behavior when launching CLIs from editor buttons",
-            "markdownDescription": "How to group terminals when launching CLIs from **editor buttons**.\n\n**Options**:\n- `same`: Open in the same editor group (recommended for multiple CLIs)\n- `new`: Open in a new editor group (VS Code default)\n\n💡 **Note**: This affects editor button commands. Context menu commands still allow explicit choice.",
+            "markdownDescription": "How to group terminals when launching CLIs from **editor buttons**.\n\n**Options**:\n- `same`: Open in the same editor group (recommended for multiple CLIs)\n- `new`: Open in a new editor group (VS Code default)\n\n\ud83d\udca1 **Note**: This affects editor button commands. Context menu commands still allow explicit choice.",
             "enumDescriptions": [
               "Open terminals in the same editor group",
               "Open terminals in new editor groups"
@@ -467,7 +488,7 @@
             "minimum": 0,
             "maximum": 5000,
             "description": "Initial delay before sending prompt to each AI (milliseconds)",
-            "markdownDescription": "Delay before sending prompts to AI terminals (in milliseconds).\n\n**When to adjust**:\n- Increase if terminals need more time to initialize\n- Decrease for faster systems\n- Set to 0 for instant sending (may cause issues)\n\n⏱️ Default: 100ms",
+            "markdownDescription": "Delay before sending prompts to AI terminals (in milliseconds).\n\n**When to adjust**:\n- Increase if terminals need more time to initialize\n- Decrease for faster systems\n- Set to 0 for instant sending (may cause issues)\n\n\u23f1\ufe0f Default: 100ms",
             "order": 13
           },
           "gemini-cli-vscode.magusCouncil.composer.delays.claude.enter": {
@@ -476,7 +497,7 @@
             "minimum": 0,
             "maximum": 5000,
             "description": "Delay before sending Enter to Claude Code after prompt (milliseconds)",
-            "markdownDescription": "⚠️ **Advanced Setting**\n\nDelay before pressing Enter after pasting prompt to Claude (milliseconds).\n\n**When to adjust**:\n- Increase if Claude doesn't receive the full prompt\n- Decrease for faster response\n\n⏱️ Default: 150ms",
+            "markdownDescription": "\u26a0\ufe0f **Advanced Setting**\n\nDelay before pressing Enter after pasting prompt to Claude (milliseconds).\n\n**When to adjust**:\n- Increase if Claude doesn't receive the full prompt\n- Decrease for faster response\n\n\u23f1\ufe0f Default: 150ms",
             "order": 14
           },
           "gemini-cli-vscode.magusCouncil.composer.delays.gemini.enter": {
@@ -485,14 +506,14 @@
             "minimum": 0,
             "maximum": 5000,
             "description": "Delay before sending Enter to Gemini CLI after prompt (milliseconds)",
-            "markdownDescription": "⚠️ **Advanced Setting**\n\nDelay before pressing Enter after pasting prompt to Gemini (milliseconds).\n\n**When to adjust**:\n- Increase if Gemini doesn't receive the full prompt\n- Decrease for faster response\n- Gemini typically needs more time than other CLIs\n\n⏱️ Default: 600ms",
+            "markdownDescription": "\u26a0\ufe0f **Advanced Setting**\n\nDelay before pressing Enter after pasting prompt to Gemini (milliseconds).\n\n**When to adjust**:\n- Increase if Gemini doesn't receive the full prompt\n- Decrease for faster response\n- Gemini typically needs more time than other CLIs\n\n\u23f1\ufe0f Default: 600ms",
             "order": 15
           },
           "gemini-cli-vscode.gemini.command": {
             "type": "string",
             "default": "gemini",
             "description": "Command to launch Gemini CLI",
-            "markdownDescription": "Custom command to launch Gemini CLI.\n\n**Examples**:\n- `gemini` (default)\n- `/usr/local/bin/gemini`\n- `docker run gemini-cli`\n- Custom wrapper script\n\n🔧 Change only if using non-standard installation",
+            "markdownDescription": "Custom command to launch Gemini CLI.\n\n**Examples**:\n- `gemini` (default)\n- `/usr/local/bin/gemini`\n- `docker run gemini-cli`\n- Custom wrapper script\n\n\ud83d\udd27 Change only if using non-standard installation",
             "order": 16
           },
           "gemini-cli-vscode.gemini.args": {
@@ -502,14 +523,14 @@
               "type": "string"
             },
             "description": "Additional arguments for Gemini CLI",
-            "markdownDescription": "Additional command-line arguments for Gemini CLI.\n\n**Example arguments**:\n- `[\"--model\", \"gemini-pro\"]`\n- `[\"--temperature\", \"0.7\"]`\n- `[\"--max-tokens\", \"2000\"]`\n\n📦 Arguments are passed directly to the CLI",
+            "markdownDescription": "Additional command-line arguments for Gemini CLI.\n\n**Example arguments**:\n- `[\"--model\", \"gemini-pro\"]`\n- `[\"--temperature\", \"0.7\"]`\n- `[\"--max-tokens\", \"2000\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
             "order": 17
           },
           "gemini-cli-vscode.codex.command": {
             "type": "string",
             "default": "codex",
             "description": "Command to launch Codex CLI",
-            "markdownDescription": "Custom command to launch Codex CLI.\n\n**Examples**:\n- `codex` (default)\n- `/usr/local/bin/codex`\n- `npx codex-cli`\n- Custom wrapper script\n\n🔧 Change only if using non-standard installation",
+            "markdownDescription": "Custom command to launch Codex CLI.\n\n**Examples**:\n- `codex` (default)\n- `/usr/local/bin/codex`\n- `npx codex-cli`\n- Custom wrapper script\n\n\ud83d\udd27 Change only if using non-standard installation",
             "order": 18
           },
           "gemini-cli-vscode.codex.args": {
@@ -519,14 +540,14 @@
               "type": "string"
             },
             "description": "Additional arguments for Codex CLI",
-            "markdownDescription": "Additional command-line arguments for Codex CLI.\n\n**Example arguments**:\n- `[\"--model\", \"gpt-4\"]`\n- `[\"--temperature\", \"0.5\"]`\n- `[\"--max-tokens\", \"4000\"]`\n\n📦 Arguments are passed directly to the CLI",
+            "markdownDescription": "Additional command-line arguments for Codex CLI.\n\n**Example arguments**:\n- `[\"--model\", \"gpt-4\"]`\n- `[\"--temperature\", \"0.5\"]`\n- `[\"--max-tokens\", \"4000\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
             "order": 19
           },
           "gemini-cli-vscode.claude.command": {
             "type": "string",
             "default": "claude",
             "description": "Command to launch Claude Code CLI",
-            "markdownDescription": "Custom command to launch Claude Code.\n\n**Examples**:\n- `claude` (default)\n- `npx @anthropic/claude-code`\n- `/opt/claude/bin/claude`\n- Custom wrapper script\n\n🔧 Change only if using non-standard installation",
+            "markdownDescription": "Custom command to launch Claude Code.\n\n**Examples**:\n- `claude` (default)\n- `npx @anthropic/claude-code`\n- `/opt/claude/bin/claude`\n- Custom wrapper script\n\n\ud83d\udd27 Change only if using non-standard installation",
             "order": 20
           },
           "gemini-cli-vscode.claude.args": {
@@ -536,35 +557,42 @@
               "type": "string"
             },
             "description": "Additional arguments for Claude Code CLI",
-            "markdownDescription": "Additional command-line arguments for Claude Code.\n\n**Example arguments**:\n- `[\"--model\", \"claude-3-opus\"]`\n- `[\"--max-tokens\", \"4000\"]`\n- `[\"--temperature\", \"0.7\"]`\n\n📦 Arguments are passed directly to the CLI",
+            "markdownDescription": "Additional command-line arguments for Claude Code.\n\n**Example arguments**:\n- `[\"--model\", \"claude-3-opus\"]`\n- `[\"--max-tokens\", \"4000\"]`\n- `[\"--temperature\", \"0.7\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
             "order": 21
           },
           "gemini-cli-vscode.qwen.command": {
-          "type": "string",
-          "default": "qwen",
-          "description": "Command to launch Qwen CLI (e.g., 'qwen' or custom command)",
-          "markdownDescription": "Custom command to launch Qwen CLI.\n\n**Examples**:\n- `qwen` (default)\n- `python -m qwen_cli`\n- `docker run qwen-cli`\n- Custom wrapper script\n\n🔧 Configure based on your Qwen installation",
-          "order": 22
-        },
-        "gemini-cli-vscode.qwen.args": {
-          "type": "array",
-          "default": [],
-          "items": {
-            "type": "string"
+            "type": "string",
+            "default": "qwen",
+            "description": "Command to launch Qwen CLI (e.g., 'qwen' or custom command)",
+            "markdownDescription": "Custom command to launch Qwen CLI.\n\n**Examples**:\n- `qwen` (default)\n- `python -m qwen_cli`\n- `docker run qwen-cli`\n- Custom wrapper script\n\n\ud83d\udd27 Configure based on your Qwen installation",
+            "order": 22
           },
-          "description": "Additional arguments for Qwen CLI",
-          "markdownDescription": "Additional command-line arguments for Qwen CLI.\n\n**Example arguments**:\n- `[\"--model\", \"qwen-72b\"]`\n- `[\"--temperature\", \"0.8\"]`\n- `[\"--top-p\", \"0.9\"]`\n\n📦 Arguments are passed directly to the CLI",
-          "order": 23
-        },
-        "gemini-cli-vscode.migration.v3.notified": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether v0.3.0 migration notification has been shown",
-          "markdownDescription": "Internal flag to track if the v0.3.0 command migration notification has been shown.\n\n⚠️ **Advanced**: Only change this if you want to reset the notification.",
-          "order": 24
+          "gemini-cli-vscode.qwen.args": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "description": "Additional arguments for Qwen CLI",
+            "markdownDescription": "Additional command-line arguments for Qwen CLI.\n\n**Example arguments**:\n- `[\"--model\", \"qwen-72b\"]`\n- `[\"--temperature\", \"0.8\"]`\n- `[\"--top-p\", \"0.9\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
+            "order": 23
+          },
+          "gemini-cli-vscode.migration.v3.notified": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether v0.3.0 migration notification has been shown",
+            "markdownDescription": "Internal flag to track if the v0.3.0 command migration notification has been shown.\n\n\u26a0\ufe0f **Advanced**: Only change this if you want to reset the notification.",
+            "order": 24
+          },
+          "gemini-cli-vscode.diagnostics.performance": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable performance metrics logging",
+            "markdownDescription": "\ud83d\udcca Enable performance metrics logging to track extension and terminal operation times.\n\n**When enabled**:\n- Logs timing for extension activation\n- Tracks terminal creation time\n- Measures text send operations\n\n\u26a0\ufe0f **Advanced**: May impact performance slightly when enabled.",
+            "order": 25
+          }
         }
       }
-    }
     ]
   },
   "scripts": {
@@ -577,7 +605,10 @@
     "test:unit": "npm run compile && vscode-test --config .vscode-test-unit.mjs",
     "test:integration": "npm run compile && vscode-test --config .vscode-test-integration.mjs",
     "test:coverage": "npm run compile && nyc vscode-test",
-    "test:watch": "npm run compile && vscode-test --watch"
+    "test:watch": "npm run compile && vscode-test --watch",
+    "test:unit:focus-ext": "npm run compile && vscode-test --config .vscode-test-unit.mjs --files out/test/unit/{extension,terminalManager}.test.js --grep \"Extension Activation|Terminal Creation Commands|Save to History Functionality|Send Open Files|Terminal Cleanup|Paste and Enter\" --reporter dot",
+    "test:unit:send-open-files": "npm run compile && vscode-test --config .vscode-test-unit.mjs --files out/test/unit/extension.test.js --grep \"Send Open Files\" --reporter dot",
+    "test:unit:save-history": "npm run compile && vscode-test --config .vscode-test-unit.mjs --files out/test/unit/extension.test.js --grep \"Save to History Functionality\" --reporter dot"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",

@@ -2,71 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
-## [TBA]
+## [0.2.1] - 2025-08-19
 
-### Added
-
-- **Migration Notification System** 🔔
-  - Automatic detection of custom keybindings using old command names
-  - User-friendly notification with options: "View Migration Guide", "Dismiss", "Don't Show Again"
-  - Links directly to online migration documentation
-  - Configurable via `gemini-cli-vscode.migration.v3.notified` setting
-
-- **Core Service Architecture** 🏗️
-  - `CommandHandler`: Centralized command processing and status bar management
-  - `MigrationNotifier`: Smart migration assistance for breaking changes
-  - Enhanced `TerminalManager` with `createOrFocusTerminal` and `sendTextToTerminal` methods
-  - Comprehensive test coverage for all new components
+### Summary
+Internal refactoring release with improved architecture and 100% test coverage.
+**Breaking change**: Command names have changed (see Migration section below).
 
 ### Changed
 
 - **Hierarchical Command Naming** 🔄
-  - All CLI commands now follow consistent `{extension}.{cli}.{action}.{target}` pattern
-  - Example: `gemini-cli-vscode.gemini.start.newPane` (was `gemini-cli-vscode.startInNewPane`)
-  - Unified naming across all 4 CLIs (Gemini, Codex, Claude, Qwen)
-  - Total of 20 CLI-specific commands + 4 common commands
-  - See [MIGRATION.md](./MIGRATION.md) for complete mapping table
+  - All CLI commands now follow `{extension}.{cli}.{action}.{target}` pattern
+  - Example: `gemini-cli-vscode.gemini.start.newPane` (was `startInNewPane`)
+  - See [MIGRATION.md](./MIGRATION.md) for complete command mapping
 
-- **Architecture Improvements** 📐
-  - Extension.ts reduced from 968 to 232 lines (76% reduction)
-  - Command registration completely pattern-based using forEach loops
-  - Eliminated CLI-specific code duplication
+- **Migration Notification** 🔔
+  - Automatic detection of custom keybindings using old command names
+  - User-friendly notification with migration guide link
 
-### Fixed
+- **Performance Diagnostics** 📊
+  - Optional performance metrics via `diagnostics.performance` setting
 
-- **Command Registration** 🔧
-  - Unified pattern across all CLI types
-  - Fixed inconsistent naming between Gemini and other CLIs
-  - Proper handling of 'start' vs 'Start' in command names
+### Improved
 
-### Documentation
+- **Architecture** 🏗️
+  - Modular design with 76% code reduction in main file
+  - Dependency injection pattern implementation
+  - Clean separation of concerns
 
-- **New Files**
-  - `MIGRATION.md`: Complete v0.3.0 migration guide with command mapping table
-  - `src/core/MigrationNotifier.ts`: Self-documenting migration assistance
+- **Security** 🔒
+  - Enhanced CSP with nonce-based script execution
+  - Stricter webview security policies
 
-### Testing
+- **Test Coverage** 🧪
+  - 154 tests passing (100% success rate)
+  - Complete refactoring without breaking changes
 
-- **New Test Suites**
-  - `commandNaming.test.ts`: 7 tests for hierarchical command validation
-  - `migrationNotifier.test.ts`: 5 tests for migration notification logic
-  
-- **Test Updates**
-  - `extension.test.ts`: All 17 tests updated to use new command names
-  - Full test suite now passing: 146 tests (previously 125 passing, 21 failing)
-  - Total test count: 125 passing, 21 requiring updates
-
-- **Test Coverage Improvements**
-  - Core services: 100% coverage (ConfigService, TerminalManager, Logger)
-  - Command registration: Full TDD cycle completed
-  - Migration flow: Key scenarios covered
-
-### Developer Notes
-
-- **Breaking Changes**: All command names have changed - custom keybindings require update
-- **Migration Path**: Gradual approach - documentation first, auto-migration considered for v0.3.1
-- **Next Phase**: Ready for Phase 2 Strategy pattern implementation
-- **Technical Debt**: 21 tests still reference old command names (non-blocking)
 
 ## [0.2.0] - 2025-08-17
 

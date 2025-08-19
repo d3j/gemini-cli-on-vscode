@@ -10,33 +10,37 @@ import {
     cleanupTestContext
 } from '../helpers/testUtils';
 
-suite('E2E Integration Test Suite', () => {
+describe('E2E Integration Test Suite', () => {
     let testContext: ReturnType<typeof createTestContext>;
     let extensionContext: vscode.ExtensionContext;
     let originalEnv: NodeJS.ProcessEnv;
 
-    suiteSetup(() => {
+    before(() => {
         originalEnv = { ...process.env };
     });
 
-    suiteSetup(async () => {
+    before(async () => {
         extensionContext = createMockContext();
         const commands = await vscode.commands.getCommands(true);
-        if (!commands.includes('gemini-cli-vscode.startInNewPane')) {
+        if (!commands.includes('gemini-cli-vscode.gemini.start.newPane')) {
             activate(extensionContext);
         }
     });
 
-    setup(() => {
+    beforeEach(() => {
         testContext = createTestContext();
+        // executeCommand のグローバルスタブはE2Eでは不正通過の原因になるため解除
+        if (testContext.stubs.executeCommand && typeof testContext.stubs.executeCommand.restore === 'function') {
+            testContext.stubs.executeCommand.restore();
+        }
     });
 
-    teardown(() => {
+    afterEach(() => {
         cleanupTestContext(testContext);
         process.env = originalEnv;
     });
 
-    suiteTeardown(() => {
+    after(() => {
         try { 
             deactivate(); 
         } catch (error) {
@@ -44,8 +48,8 @@ suite('E2E Integration Test Suite', () => {
         }
     });
 
-    suite('Full Workflow Tests', () => {
-        test('Complete workflow: Save history with editor selection', async function() {
+    describe('Full Workflow Tests', () => {
+        it('Complete workflow: Save history with editor selection', async function() {
             this.timeout(5000);
 
             const fsStubs = {
@@ -118,23 +122,23 @@ suite('E2E Integration Test Suite', () => {
             // End-to-end send is covered elsewhere; here we stop after save
         });
 
-        test('Multiple terminals management (smoke)', async function() {
+        it('Multiple terminals management (smoke)', async function() {
             this.timeout(3000);
             // Only verify commands can be invoked without throwing
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInActivePane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.activePane');
         });
 
-        test('Terminal cleanup on close (smoke)', async function() {
+        it('Terminal cleanup on close (smoke)', async function() {
             this.timeout(3000);
             // Only verify start command can be invoked multiple times without throwing
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
-            await vscode.commands.executeCommand('gemini-cli-vscode.startInNewPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
+            await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.newPane');
         });
     });
 
-    suite('Error Handling', () => {
-        test('Handles missing workspace gracefully (no selection)', async () => {
+    describe('Error Handling', () => {
+        it('Handles missing workspace gracefully (no selection)', async () => {
             // No workspace and no selection should show information message and not throw
             testContext.sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
             const mockEmptyEditor = {
@@ -156,14 +160,14 @@ suite('E2E Integration Test Suite', () => {
         });
     });
 
-    suite('Command Palette Integration', () => {
-        test('Key commands are available in command palette', async () => {
+    describe('Command Palette Integration', () => {
+        it('Key commands are available in command palette', async () => {
             const commands = await vscode.commands.getCommands(true);
 
-            assert.ok(commands.includes('gemini-cli-vscode.startInNewPane'));
-            assert.ok(commands.includes('gemini-cli-vscode.startInActivePane'));
+            assert.ok(commands.includes('gemini-cli-vscode.gemini.start.newPane'));
+            assert.ok(commands.includes('gemini-cli-vscode.gemini.start.activePane'));
             assert.ok(commands.includes('gemini-cli-vscode.saveClipboardToHistory'));
-            assert.ok(commands.includes('gemini-cli-vscode.sendSelectedTextToGemini'));
+            assert.ok(commands.includes('gemini-cli-vscode.gemini.send.selectedText'));
             assert.ok(commands.includes('gemini-cli-vscode.multiAI.openComposer'));
         });
     });

@@ -3,19 +3,19 @@ import * as vscode from 'vscode';
 import { activate, deactivate } from '../../extension';
 import { createMockContext } from '../mocks/vscode';
 
-suite('MultiAI Integration Test Suite', () => {
+describe('MultiAI Integration Test Suite', () => {
     let extensionContext: vscode.ExtensionContext;
 
-    suiteSetup(() => {
+    before(() => {
         extensionContext = createMockContext();
         activate(extensionContext);
     });
 
-    suiteTeardown(() => {
+    after(() => {
         deactivate();
     });
     
-    test('should register multiAI commands', async () => {
+    it('should register multiAI commands', async () => {
         // Get all registered commands
         const commands = await vscode.commands.getCommands(true);
         
@@ -26,7 +26,7 @@ suite('MultiAI Integration Test Suite', () => {
             'askAll command should be registered');
     });
 
-    test('should be able to execute openComposer command', async () => {
+    it('should be able to execute openComposer command', async () => {
         // This test verifies the command can be executed without errors
         // In a real scenario, it would open the input box
         try {
@@ -37,7 +37,7 @@ suite('MultiAI Integration Test Suite', () => {
         }
     });
 
-    test('should be able to execute askAll command', async () => {
+    it('should be able to execute askAll command', async () => {
         // This test verifies the command can be executed without errors
         try {
             await vscode.commands.executeCommand('gemini-cli-vscode.multiAI.askAll');

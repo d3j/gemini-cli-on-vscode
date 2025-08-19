@@ -5,7 +5,7 @@ export default defineConfig({
     'out/test/integration/**/*.test.js'
   ],
   mocha: {
-    ui: 'tdd',
+    ui: 'bdd',
     timeout: 20000,
     color: true
   }

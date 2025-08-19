@@ -7,6 +7,7 @@ import { CLIRegistry } from '../../cliRegistry';
 
 describe('TerminalManager', () => {
     let terminalManager: TerminalManager;
+    let mockContext: vscode.ExtensionContext;
     let configService: ConfigService;
     let cliRegistry: CLIRegistry;
     let sandbox: sinon.SinonSandbox;
@@ -16,6 +17,12 @@ describe('TerminalManager', () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
         mockTerminals = new Map();
+        
+        // Mock ExtensionContext
+        mockContext = {
+            extensionUri: vscode.Uri.file('/test/extension'),
+            subscriptions: []
+        } as any;
         
         // Mock ConfigService
         configService = sandbox.createStubInstance(ConfigService) as any;
@@ -63,7 +70,7 @@ describe('TerminalManager', () => {
             configurable: true
         });
         
-        terminalManager = new TerminalManager(configService, cliRegistry);
+        terminalManager = new TerminalManager(mockContext, configService, cliRegistry);
     });
 
     afterEach(() => {
@@ -116,96 +123,106 @@ describe('TerminalManager', () => {
     });
 
     describe('Terminal placement', () => {
-        it('should use Panel for active placement', async () => {
+        it('should use ViewColumn.Active for same grouping behavior', async () => {
+            // Mock same grouping behavior (default)
+            (configService.get as sinon.SinonStub).withArgs('terminal.groupingBehavior', 'same').returns('same');
+            
             await terminalManager.getOrCreate('gemini', 'active');
             
             const createOptions = createTerminalStub.firstCall.args[0];
-            assert.strictEqual(createOptions.location, vscode.TerminalLocation.Panel);
+            assert.ok(createOptions.location, 'Location should be set');
+            assert.strictEqual(createOptions.location.viewColumn, vscode.ViewColumn.Active, 
+                'Should use Active view column for same grouping');
         });
 
-        it('should respect grouping behavior for new placement', async () => {
+        it('should use ViewColumn.Beside for new grouping behavior', async () => {
             // Mock new grouping behavior
             (configService.get as sinon.SinonStub).withArgs('terminal.groupingBehavior', 'same').returns('new');
             
             await terminalManager.getOrCreate('gemini', 'new');
             
             const createOptions = createTerminalStub.firstCall.args[0];
-            assert.strictEqual(createOptions.location, vscode.TerminalLocation.Editor);
+            assert.ok(createOptions.location, 'Location should be set');
+            assert.strictEqual(createOptions.location.viewColumn, vscode.ViewColumn.Beside,
+                'Should use Beside view column for new grouping');
         });
 
-        it('should use Panel for same grouping behavior', async () => {
-            // Mock same grouping behavior (default)
-            (configService.get as sinon.SinonStub).withArgs('terminal.groupingBehavior', 'same').returns('same');
+        it('should respect grouping behavior for all CLI types', async () => {
+            // Test with 'new' grouping behavior
+            (configService.get as sinon.SinonStub).withArgs('terminal.groupingBehavior', 'same').returns('new');
             
-            await terminalManager.getOrCreate('gemini', 'new');
+            await terminalManager.getOrCreate('claude', 'active');
             
             const createOptions = createTerminalStub.firstCall.args[0];
-            assert.strictEqual(createOptions.location, vscode.TerminalLocation.Panel);
+            assert.ok(createOptions.location, 'Location should be set');
+            assert.strictEqual(createOptions.location.viewColumn, vscode.ViewColumn.Beside,
+                'Should use Beside view column for new grouping behavior');
         });
     });
 
-    describe.skip('Paste and Enter with delays', () => {
-        // Note: These tests are skipped because vscode.env.clipboard cannot be mocked in the test environment
-        // The functionality is tested in integration tests instead
-        let clipboardStub: sinon.SinonStub;
-        let executeCommandStub: sinon.SinonStub;
-        let setTimeoutStub: sinon.SinonStub;
-
-        beforeEach(() => {
-            clipboardStub = sandbox.stub();  // Initialize as stub
-            executeCommandStub = sandbox.stub(vscode.commands, 'executeCommand');
-            setTimeoutStub = sandbox.stub(global, 'setTimeout');
-            setTimeoutStub.callsFake((callback: Function) => {
-                callback();
-                return {} as any;
-            });
+    describe('Terminal icon paths', () => {
+        it('should set correct icon path for terminals', async () => {
+            await terminalManager.getOrCreate('gemini', 'active');
+            
+            const createOptions = createTerminalStub.firstCall.args[0];
+            assert.ok(createOptions.iconPath, 'Icon path should be set');
+            assert.ok(createOptions.iconPath.path.includes('images'), 'Icon path should include images directory');
+            assert.ok(createOptions.iconPath.path.includes('gemini-icon.png'), 'Icon path should include correct icon file');
         });
 
-        it('should apply Claude-specific delay for long text', async () => {
-            const terminal = await terminalManager.getOrCreate('claude', 'active');
-            mockTerminals.set('claude-global', terminal);
+        it('should use extension URI for icon path', async () => {
+            await terminalManager.getOrCreate('claude', 'active');
             
-            const longText = 'x'.repeat(2500);
-            await terminalManager.pasteAndEnter('claude', longText);
-            
-            assert.strictEqual(clipboardStub.calledWith(longText), true);
-            assert.strictEqual(executeCommandStub.calledWith('workbench.action.terminal.paste'), true);
-            assert.strictEqual((terminal.sendText as sinon.SinonStub).calledWith('', true), true);
-            
-            // Check that correct delay was used (2500ms for long text)
-            const calls = setTimeoutStub.getCalls();
-            const enterDelayCall = calls.find(call => call.args[1] === 2500);
-            assert.ok(enterDelayCall, 'Should use 2500ms delay for long Claude text');
-        });
-
-        it('should apply Gemini-specific delay', async () => {
-            const terminal = await terminalManager.getOrCreate('gemini', 'active');
-            mockTerminals.set('gemini-global', terminal);
-            
-            await terminalManager.pasteAndEnter('gemini', 'test prompt');
-            
-            assert.strictEqual((terminal.sendText as sinon.SinonStub).calledWith('', true), true);
-            
-            // Check that correct delay was used (600ms for Gemini)
-            const calls = setTimeoutStub.getCalls();
-            const enterDelayCall = calls.find(call => call.args[1] === 600);
-            assert.ok(enterDelayCall, 'Should use 600ms delay for Gemini');
-        });
-
-        it('should apply default delay for Codex', async () => {
-            const terminal = await terminalManager.getOrCreate('codex', 'active');
-            mockTerminals.set('codex-global', terminal);
-            
-            await terminalManager.pasteAndEnter('codex', 'test prompt');
-            
-            assert.strictEqual((terminal.sendText as sinon.SinonStub).calledWith('', true), true);
-            
-            // Check that correct delay was used (100ms default)
-            const calls = setTimeoutStub.getCalls();
-            const enterDelayCall = calls.find(call => call.args[1] === 100);
-            assert.ok(enterDelayCall, 'Should use 100ms delay for Codex');
+            const createOptions = createTerminalStub.firstCall.args[0];
+            assert.ok(createOptions.iconPath, 'Icon path should be set');
+            assert.ok(createOptions.iconPath.path.includes('/test/extension'), 'Icon path should use extension URI');
+            assert.ok(createOptions.iconPath.path.includes('claude-icon.png'), 'Icon path should include correct icon file');
         });
     });
+
+    describe('Terminal persistence settings', () => {
+        it('should set isTransient to true to prevent persistence', async () => {
+            await terminalManager.getOrCreate('gemini', 'active');
+            
+            const createOptions = createTerminalStub.firstCall.args[0];
+            assert.strictEqual(createOptions.isTransient, true, 
+                'isTransient should be true to prevent terminal persistence on VS Code restart');
+        });
+
+        it('should set hideFromUser to false to show in dropdown', async () => {
+            await terminalManager.getOrCreate('codex', 'active');
+            
+            const createOptions = createTerminalStub.firstCall.args[0];
+            assert.strictEqual(createOptions.hideFromUser, false,
+                'hideFromUser should be false to show terminal in dropdown');
+        });
+
+        it('should set empty env to prevent restoration', async () => {
+            await terminalManager.getOrCreate('claude', 'active');
+            
+            const createOptions = createTerminalStub.firstCall.args[0];
+            assert.deepStrictEqual(createOptions.env, {},
+                'env should be empty object to prevent terminal restoration');
+        });
+
+        it('should apply persistence settings for all CLI types', async () => {
+            const cliTypes: Array<'gemini' | 'codex' | 'claude' | 'qwen'> = ['gemini', 'codex', 'claude', 'qwen'];
+            
+            for (const cli of cliTypes) {
+                createTerminalStub.resetHistory();
+                await terminalManager.getOrCreate(cli, 'active');
+                
+                const createOptions = createTerminalStub.firstCall.args[0];
+                assert.strictEqual(createOptions.isTransient, true, 
+                    `${cli}: isTransient should be true`);
+                assert.strictEqual(createOptions.hideFromUser, false,
+                    `${cli}: hideFromUser should be false`);
+                assert.deepStrictEqual(createOptions.env, {},
+                    `${cli}: env should be empty`);
+            }
+        });
+    });
+
 
     describe('Send text', () => {
         it('should send text to terminal', async () => {
@@ -281,6 +298,22 @@ describe('TerminalManager', () => {
             terminalManager.dispose();
             
             assert.strictEqual(disposeStub.calledOnce, true);
+        });
+    });
+
+    describe('Paste and Enter', () => {
+        it('should paste text then send enter with delay', async () => {
+            // Arrange: create a terminal for gemini
+            const terminal = await terminalManager.getOrCreate('gemini', 'active');
+            // Only stub paste command; clipboard API may be non-configurable in VS Code test env
+            const execCmd = sandbox.stub(vscode.commands, 'executeCommand').resolves();
+
+            // Act
+            await terminalManager.pasteAndEnter('gemini', 'Hello');
+
+            // Assert: paste was invoked and Enter was sent
+            assert.ok(execCmd.calledWith('workbench.action.terminal.paste'));
+            assert.ok((terminal.sendText as sinon.SinonStub).calledWith('', true));
         });
     });
 });

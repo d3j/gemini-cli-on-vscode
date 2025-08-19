@@ -117,6 +117,38 @@ export class ConfigService {
     }
     
     /**
+     * Subscribe to configuration changes
+     */
+    onConfigurationChange(callback: (changedKeys: string[]) => void): vscode.Disposable {
+        const disposable = vscode.workspace.onDidChangeConfiguration((e) => {
+            const changedKeys: string[] = [];
+            
+            // Check all possible configuration keys
+            const allKeys = [
+                'saveToHistory.showInStatusBar',
+                'magusCouncil.enabled',
+                'gemini.enabled',
+                'codex.enabled',
+                'claude.enabled',
+                'qwen.enabled'
+            ];
+            
+            allKeys.forEach(key => {
+                const fullKey = `${this.configSection}.${key}`;
+                if (e.affectsConfiguration(fullKey)) {
+                    changedKeys.push(key);
+                }
+            });
+            
+            if (changedKeys.length > 0) {
+                callback(changedKeys);
+            }
+        });
+        
+        return disposable;
+    }
+    
+    /**
      * Observe configuration changes for specific keys
      */
     observe(keys: string[], callback: () => void): vscode.Disposable {

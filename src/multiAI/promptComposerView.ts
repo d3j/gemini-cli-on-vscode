@@ -3,6 +3,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FileHandler } from '../fileHandler';
 import { ContextManager } from './contextManager';
+import { 
+    WebviewToExtensionMessage, 
+    ExtensionToWebviewMessage,
+    isWebviewToExtensionMessage,
+    TerminalInfo
+} from '../types/ipc';
+import { createNonce, getCspMeta, asWebviewUri, getLocalResourceRoots } from '../ui/webviewUtils';
 
 export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewId = 'gemini-cli-vscode.promptComposerView';
@@ -22,10 +29,7 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.options = {
             enableScripts: true,
-            localResourceRoots: [
-                vscode.Uri.joinPath(this.context.extensionUri, 'resources'),
-                vscode.Uri.joinPath(this.context.extensionUri, 'images')
-            ]
+            localResourceRoots: getLocalResourceRoots(this.context)
         };
 
         // VS Code側にパネルタイトルを表示（コンテナ名と統一）
@@ -34,21 +38,106 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = this.getWebviewContent(webviewView.webview);
 
         webviewView.webview.onDidReceiveMessage(async (message) => {
-            switch (message.type) {
-                case 'composer/init':
-                    await this.handleInit();
-                    break;
-                case 'composer/askAll':
-                    await this.handleAskAll(message.payload);
-                    break;
-                case 'composer/addContext':
-                    await this.handleAddContext(message.payload);
-                    break;
-                case 'composer/preview':
-                    await this.handlePreview(message.payload);
-                    break;
+            // Handle legacy message format for backward compatibility
+            if (message.type) {
+                await this.handleLegacyMessage(message);
+                return;
             }
+            
+            // Handle new IPC format
+            if (isWebviewToExtensionMessage(message)) {
+                await this.handleIPCMessage(message);
+                return;
+            }
+            
+            console.error('Unknown message format:', message);
         });
+    }
+    
+    private async handleLegacyMessage(message: any): Promise<void> {
+        switch (message.type) {
+            case 'composer/init':
+                await this.handleInit();
+                break;
+            case 'composer/askAll':
+                await this.handleAskAll(message.payload);
+                break;
+            case 'composer/addContext':
+                await this.handleAddContext(message.payload);
+                break;
+            case 'composer/preview':
+                await this.handlePreview(message.payload);
+                break;
+        }
+    }
+    
+    private async handleIPCMessage(message: WebviewToExtensionMessage): Promise<void> {
+        const { requestId } = message;
+        
+        try {
+            switch (message.command) {
+                case 'sendToTerminal':
+                    // Send text to terminal
+                    await this.sendToTerminal(message.text, message.terminal);
+                    await this.sendResponse(requestId, { 
+                        type: 'result', 
+                        success: true
+                    });
+                    break;
+                    
+                case 'saveHistory':
+                    // Save content to history
+                    await this.saveToHistory(message.text);
+                    await this.sendResponse(requestId, { 
+                        type: 'result', 
+                        success: true
+                    });
+                    break;
+                    
+                case 'clearPrompt':
+                    // Clear prompt is handled in webview
+                    await this.sendResponse(requestId, { 
+                        type: 'result', 
+                        success: true
+                    });
+                    break;
+                    
+                case 'updateTerminals':
+                    // Update terminal list
+                    await this.sendResponse(requestId, {
+                        type: 'terminalsUpdate',
+                        terminals: message.terminals
+                    });
+                    break;
+                    
+                default:
+                    // exhaustiveness check
+                    throw new Error(`Unknown command: ${(message as any).command}`);
+            }
+        } catch (error) {
+            await this.sendResponse(requestId, {
+                type: 'error',
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+        }
+    }
+    
+    private async sendResponse(
+        requestId: string | undefined, 
+        payload: { type: 'stateUpdate'; terminals: TerminalInfo[] } | 
+                 { type: 'result'; success: boolean; error?: string } |
+                 { type: 'error'; error: string; code?: string } |
+                 { type: 'terminalsUpdate'; terminals: string[] }
+    ): Promise<void> {
+        if (!this.view) return;
+        
+        const response: ExtensionToWebviewMessage = {
+            ...payload,
+            requestId,
+            version: 1
+        } as ExtensionToWebviewMessage;
+        
+        await this.view.webview.postMessage(response);
     }
 
     private async handleInit(): Promise<void> {
@@ -141,6 +230,20 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
         this.view?.webview.postMessage({ type: 'composer/contextAdded', payload: contextInfo });
     }
 
+    private async sendToTerminal(text: string, target: string): Promise<void> {
+        // Implementation for sending text to terminal
+        const terminal = vscode.window.terminals.find(t => t.name.toLowerCase().includes(target.toLowerCase()));
+        if (terminal) {
+            terminal.show();
+            terminal.sendText(text);
+        }
+    }
+    
+    private async saveToHistory(content: string): Promise<void> {
+        // Reuse existing save to history logic
+        await this.savePromptToHistory(content, []);
+    }
+    
     private async handlePreview(payload: { prompt: string; includeContext: boolean; }): Promise<void> {
         let preview = payload.prompt;
         if (payload.includeContext) {
@@ -155,32 +258,21 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
     }
 
     private getWebviewContent(webview: vscode.Webview): string {
-        const scriptUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'promptComposer.js')
-        );
-        const styleUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'promptComposer.css')
-        );
-        const geminiIconUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.context.extensionUri, 'images', 'icon.png')
-        );
-        const claudeIconUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.context.extensionUri, 'images', 'claude-logo.png')
-        );
-        const codexIconUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.context.extensionUri, 'images', 'codex-icon.png')
-        );
-        const qwenIconUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.context.extensionUri, 'images', 'qwen-color.svg')
-        );
-        const nonce = this.getNonce();
+        const scriptUri = asWebviewUri(this.context, webview, 'resources', 'promptComposer.js');
+        const styleUri = asWebviewUri(this.context, webview, 'resources', 'promptComposer.css');
+        const geminiIconUri = asWebviewUri(this.context, webview, 'images', 'icon.png');
+        const claudeIconUri = asWebviewUri(this.context, webview, 'images', 'claude-logo.png');
+        const codexIconUri = asWebviewUri(this.context, webview, 'images', 'codex-icon.png');
+        const qwenIconUri = asWebviewUri(this.context, webview, 'images', 'qwen-color.svg');
+        const nonce = createNonce();
+        const cspContent = getCspMeta(webview, nonce, { allowInlineStyles: false });
 
         return `<!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
+            <meta http-equiv="Content-Security-Policy" content="${cspContent}">
             <link href="${styleUri}" rel="stylesheet">
             <title>MAGUS Council</title>
         </head>
@@ -240,12 +332,4 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
         </html>`;
     }
 
-    private getNonce(): string {
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let text = '';
-        for (let i = 0; i < 32; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
-    }
 }

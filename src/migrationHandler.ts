@@ -104,7 +104,7 @@ export class MigrationHandler {
         
         // Log migration summary
         if (migratedSettings.length > 0) {
-            console.log(`Migrated ${migratedSettings.length} settings from multiAI to magusCouncil`);
+            // Migration completed successfully - no need to log
         }
     }
 }

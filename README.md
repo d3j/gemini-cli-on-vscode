@@ -1,4 +1,4 @@
-# Gemini CLI on VSCode
+# Gemini CLI on VSCode ?
 
 [🇯🇵 日本語版](README-ja.md) | **🇺🇸 English**
 
@@ -193,7 +193,7 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 
 - "Launch All CLIs" - Launch multiple CLIs at once (tabs in same group)
 
-**CLI Commands (v0.3.0+ Hierarchical Structure):**
+**CLI Commands (v0.2.1+ Hierarchical Structure):**
 
 All commands now follow a consistent pattern: `{extension}.{cli}.{action}.{target}`
 
