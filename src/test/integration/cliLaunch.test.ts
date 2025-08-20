@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { activate } from '../../extension';
 
 /**
  * Wait for a condition to be true
@@ -30,77 +29,16 @@ describe('E2E: CLI Launch', function() {
     // Set longer timeout for E2E tests
     this.timeout(60000);
     
-    let extensionContext: vscode.ExtensionContext;
-    
     before(async function() {
-        // Create mock extension context
-        extensionContext = {
-            subscriptions: [],
-            extensionUri: vscode.Uri.file(__dirname),
-            extensionPath: __dirname,
-            globalState: {
-                get: () => undefined,
-                update: async () => {},
-                keys: () => [],
-                setKeysForSync: () => {}
+        // Extension should already be activated by VS Code test runner
+        // Wait for commands to be registered
+        await waitFor(
+            async () => {
+                const commands = await vscode.commands.getCommands();
+                return commands.includes('gemini-cli-vscode.gemini.start.newPane');
             },
-            workspaceState: {
-                get: () => undefined,
-                update: async () => {},
-                keys: () => []
-            },
-            extensionMode: vscode.ExtensionMode.Test,
-            storagePath: undefined,
-            globalStoragePath: __dirname,
-            logPath: __dirname,
-            asAbsolutePath: (path: string) => path,
-            storageUri: vscode.Uri.file(__dirname),
-            globalStorageUri: vscode.Uri.file(__dirname),
-            logUri: vscode.Uri.file(__dirname),
-            extension: {
-                id: 'test.extension',
-                extensionUri: vscode.Uri.file(__dirname),
-                extensionPath: __dirname,
-                isActive: true,
-                packageJSON: { version: '0.0.1' },
-                extensionKind: vscode.ExtensionKind.Workspace,
-                exports: undefined,
-                activate: async () => {}
-            },
-            environmentVariableCollection: {
-                persistent: false,
-                replace: () => {},
-                append: () => {},
-                prepend: () => {},
-                get: () => undefined,
-                forEach: () => {},
-                delete: () => {},
-                clear: () => {},
-                getScoped: () => ({
-                    persistent: false,
-                    replace: () => {},
-                    append: () => {},
-                    prepend: () => {},
-                    get: () => undefined,
-                    forEach: () => {},
-                    delete: () => {},
-                    clear: () => {}
-                })
-            },
-            secrets: {
-                get: async () => undefined,
-                store: async () => {},
-                delete: async () => {},
-                onDidChange: new vscode.EventEmitter().event
-            },
-            languageModelAccessInformation: {
-                canSendRequest: () => undefined,
-                onDidChange: new vscode.EventEmitter().event
-            }
-        } as any;
-        
-        // Activate extension
-        await activate(extensionContext);
+            { timeout: 5000, interval: 100 }
+        );
     });
     
     after(async function() {
@@ -142,29 +80,37 @@ describe('E2E: CLI Launch', function() {
         });
         
         it('should reuse existing terminal when using active placement', async () => {
-            const initialCount = vscode.window.terminals.length;
             
             // First launch
             await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.activePane');
             
+            // Wait for terminal to be created by name (more reliable than count)
             await waitFor(
-                () => vscode.window.terminals.length > initialCount,
-                { timeout: 5000, interval: 100 }
+                () => findTerminalByName('Gemini') !== undefined,
+                { timeout: 10000, interval: 200 }
             );
             
             const countAfterFirst = vscode.window.terminals.length;
+            const firstTerminal = findTerminalByName('Gemini');
             
             // Second launch should reuse
             await vscode.commands.executeCommand('gemini-cli-vscode.gemini.start.activePane');
             
             // Give some time to ensure no new terminal is created
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Verify terminal count did not increase
+            // Verify terminal count did not increase and same terminal exists
             assert.strictEqual(
                 vscode.window.terminals.length,
                 countAfterFirst,
                 'Should reuse existing terminal'
+            );
+            
+            const secondTerminal = findTerminalByName('Gemini');
+            assert.strictEqual(
+                secondTerminal,
+                firstTerminal,
+                'Should be the same terminal instance'
             );
         });
     });
@@ -201,16 +147,19 @@ describe('E2E: CLI Launch', function() {
     
     describe('Launch All CLIs', () => {
         it('should launch all enabled CLIs with single command', async () => {
-            const initialCount = vscode.window.terminals.length;
             
             // Execute launch all command
             await vscode.commands.executeCommand('gemini-cli-vscode.launchAllCLIs');
             
-            // Wait for multiple terminals to be created
-            // Assuming at least 3 CLIs are enabled by default
+            // Wait for terminals to be created by checking names (more reliable)
             await waitFor(
-                () => vscode.window.terminals.length >= initialCount + 3,
-                { timeout: 10000, interval: 200 }
+                () => {
+                    const hasGemini = findTerminalByName('Gemini') !== undefined;
+                    const hasCodex = findTerminalByName('Codex') !== undefined;
+                    const hasClaude = findTerminalByName('Claude') !== undefined;
+                    return hasGemini && hasCodex && hasClaude;
+                },
+                { timeout: 15000, interval: 500 }
             );
             
             // Verify terminals were created for different CLIs
@@ -221,6 +170,11 @@ describe('E2E: CLI Launch', function() {
             assert.ok(geminiTerminal, 'Should create Gemini terminal');
             assert.ok(codexTerminal, 'Should create Codex terminal');
             assert.ok(claudeTerminal, 'Should create Claude terminal');
+            
+            // Verify they are different terminals
+            assert.notStrictEqual(geminiTerminal, codexTerminal, 'Gemini and Codex should be different');
+            assert.notStrictEqual(geminiTerminal, claudeTerminal, 'Gemini and Claude should be different');
+            assert.notStrictEqual(codexTerminal, claudeTerminal, 'Codex and Claude should be different');
         });
     });
 });

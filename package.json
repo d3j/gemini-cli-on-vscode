@@ -1,6 +1,7 @@
 {
   "name": "gemini-cli-on-vscode",
   "displayName": "Gemini CLI on VSCode",
+  "version": "0.2.1-beta2",
   "icon": "images/icon.png",
   "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
@@ -12,22 +13,34 @@
   "bugs": {
     "url": "https://github.com/d3j/gemini-cli-on-vscode/issues"
   },
-  "keywords": [
-    "gemini",
-    "codex",
-    "gpt-5",
-    "openai",
-    "google",
+"keywords": [
     "ai",
+    "assistant",
+    "agent", 
+    "multi-ai",
+    "gemini",
+    "claude",
+    "gpt-5",
+    "codex",
+    "qwen",
+    "openai",
+    "anthropic",
+    "google",
     "cli",
-    "terminal"
+    "terminal",
+    "development",
+    "programming",
+    "consultation",
+    "workflow",
+    "productivity",
+    "automation"
   ],
-  "version": "0.2.1-beta",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",

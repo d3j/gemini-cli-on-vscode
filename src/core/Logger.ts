@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 export class Logger {
     private outputChannel: vscode.OutputChannel;
     private timers: Map<string, number> = new Map();
+    private disposed: boolean = false;
     
     constructor() {
         this.outputChannel = vscode.window.createOutputChannel('Gemini CLI on VSCode');
@@ -43,6 +44,7 @@ export class Logger {
      * Show the output channel
      */
     show(): void {
+        if (this.disposed) return;
         this.outputChannel.show(true);
     }
     
@@ -50,6 +52,7 @@ export class Logger {
      * Clear the output channel
      */
     clear(): void {
+        if (this.disposed) return;
         this.outputChannel.clear();
     }
     
@@ -106,6 +109,11 @@ export class Logger {
      * Internal log method
      */
     private log(level: string, message: string, data?: any): void {
+        // Guard against logging after disposal
+        if (this.disposed) {
+            return;
+        }
+        
         const timestamp = new Date().toISOString();
         let logMessage = `[${timestamp}] [${level}] ${message}`;
         
@@ -126,13 +134,24 @@ export class Logger {
             }
         }
         
-        this.outputChannel.appendLine(logMessage);
+        try {
+            this.outputChannel.appendLine(logMessage);
+        } catch {
+            // Silently ignore if channel is closed
+            // This can happen during test teardown
+        }
     }
     
     /**
      * Dispose of resources
      */
     dispose(): void {
-        this.outputChannel.dispose();
+        if (this.disposed) return;
+        this.disposed = true;
+        try {
+            this.outputChannel.dispose();
+        } catch {
+            // ignore
+        }
     }
 }

@@ -1,14 +1,11 @@
 import * as vscode from 'vscode';
-import { ConfigService } from './core/ConfigService';
+import type { ConfigService } from './core/ConfigService';
 
 export class MigrationHandler {
     private readonly FIRST_RUN_KEY = 'gemini-cli-vscode.firstRun';
-    private configService: ConfigService;
     
-    constructor(configService?: ConfigService) {
-        this.configService = configService || new ConfigService();
-        // Keep reference for future use in migration methods
-        void this.configService; // Acknowledge configService is stored for future use
+    constructor(_configService?: ConfigService) {
+        // Keep optional ConfigService for backward compatibility; currently unused
     }
     
     async migrate(context: vscode.ExtensionContext): Promise<void> {
