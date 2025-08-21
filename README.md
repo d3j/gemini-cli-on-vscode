@@ -308,7 +308,12 @@ For power users who want detailed control:
   
   // Terminal behavior
   "gemini-cli-vscode.terminal.groupingBehavior": "same",
-  "gemini-cli-vscode.terminal.disableFlowControl": true
+  "gemini-cli-vscode.terminal.disableFlowControl": true,
+  
+  // History file settings 🕐
+  "gemini-cli-vscode.saveToHistory.useLocalTimezone": true,
+  "gemini-cli-vscode.saveToHistory.dayBoundary": "00:00",
+  "gemini-cli-vscode.saveToHistory.includeTerminalName": true
 }
 ```
 
@@ -326,53 +331,9 @@ For power users who want detailed control:
 - `contextMenu.show*`: Fine-grained control over menu items
 - `*.command` / `*.args`: Customize CLI launch commands
 - `terminal.groupingBehavior`: How terminals are grouped ("same" or "new")
-
-## 🛠️ Development
-
-### Local Development
-
-```bash
-git clone https://github.com/d3j/gemini-cli-on-vscode.git
-cd gemini-cli-on-vscode
-npm install
-npm run compile
-```
-
-### Debugging
-
-1. Open the project in VS Code
-2. Press `F5` to launch Extension Development Host
-3. Test the extension in the new VS Code window
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Q: "gemini: command not found" error
-
-```bash
-# Solution: Install Gemini CLI
-npm install -g @google/gemini-cli
-```
-
-#### Q: Authentication error
-
-```bash
-# Solution: Authenticate directly in terminal first
-gemini
-# Complete browser authentication, then retry extension
-```
-
-#### Q: Extension not appearing in editor title bar
-
-- Ensure you have an active editor open
-- Try reloading VS Code window (`Cmd+R` / `Ctrl+R`)
-
-### 🔧 Output Freezing Prevention
-
-This extension automatically prevents flow control issues when launching Gemini or Codex CLI by applying `stty -ixon`.
-
-**Note:** This addresses a known VS Code integrated terminal issue with long, rapid outputs.
+- `saveToHistory.useLocalTimezone`: Use local timezone for history timestamps
+- `saveToHistory.dayBoundary`: Custom day boundary time (e.g., "02:00" for night shift workers)
+- `saveToHistory.includeTerminalName`: Include terminal name in saved history entries
 
 ## 🤝 Contributing
 
@@ -395,7 +356,6 @@ Icons used in this extension are property of their respective owners:
 - **AllCLIs-icon.png** - [Irasutoya](https://www.irasutoya.com/)
 - **claude-logo.png** - Anthropic
 - **codex-icon.png** - OpenAI
-- **icon.png** (Gemini) - Google
 
 ※ Company logos are used for identification purposes only. This extension has no official affiliation with these companies.
 
@@ -417,4 +377,3 @@ MIT License - See [LICENSE](LICENSE) file for details
 ## 👤 Author
 
 **Joji Jorge Senda** ([@d3j](https://github.com/d3j))
-

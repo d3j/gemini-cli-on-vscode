@@ -32,6 +32,9 @@ export class ExtensionBootstrap {
     async initialize(context: vscode.ExtensionContext): Promise<void> {
         this.startTime = Date.now();
         
+        // Initialize ready state context key to false first
+        await vscode.commands.executeCommand('setContext', 'gemini-cli-vscode.isReady', false);
+        
         // Initialize core services
         this.configService = new ConfigService();
         context.subscriptions.push(this.configService);
@@ -91,6 +94,9 @@ export class ExtensionBootstrap {
         this.statusBarManager.initialize();
         context.subscriptions.push(this.statusBarManager);
         
+        // Register Sidebar Prompt Composer (after fileHandler initialization)
+        this.registerComposerView(context);
+        
         // Initialize CLI Module Manager
         this.cliModuleManager = new CLIModuleManager({
             configService: this.configService,
@@ -99,9 +105,6 @@ export class ExtensionBootstrap {
             commandHandler: this.commandHandler,
             logger: this.logger
         });
-        
-        // Register Sidebar Prompt Composer
-        this.registerComposerView(context);
         
         // Register commands
         this.registerCommands(context);
@@ -112,9 +115,18 @@ export class ExtensionBootstrap {
         // Check for migration notifications
         await this.checkMigrationNotifications();
         
+        // Set ready state context key to enable UI buttons
+        try {
+            await vscode.commands.executeCommand('setContext', 'gemini-cli-vscode.isReady', true);
+            this.logger.info('Context key "gemini-cli-vscode.isReady" set to true');
+        } catch (error) {
+            this.logger.error('Failed to set context key "gemini-cli-vscode.isReady":', error);
+        }
+        
         // Log activation time
         const activationTime = Date.now() - this.startTime;
         this.logger.debug('Performance', { name: 'activation.ms', ms: activationTime });
+        this.logger.info(`Extension initialization completed in ${activationTime}ms`);
     }
     
     private async runMigration(context: vscode.ExtensionContext): Promise<void> {

@@ -4,6 +4,9 @@
 .gitignore
 .gitmodules
 
+# VCS
+.git/**
+
 # Source files (TypeScript)
 src/**
 
@@ -16,6 +19,7 @@ tsconfig.json
 
 # Package files
 *.vsix
+package-lock.json
 
 # GitHub files
 .github/
@@ -31,8 +35,7 @@ images/ExtensionFeatures.png
 
 # Test configuration files
 .nycrc.json
-.vscode-test.mjs
-.vscode-test-unit.mjs
+.vscode-test*.mjs
 
 # Test coverage files
 .nyc_output/**
@@ -56,3 +59,7 @@ QWEN.md
 # Dev-only resources not bundled into extension
 resources/test-pageupdown.html
 resources/textareaCaret.js
+
+# OS and logs
+.DS_Store
+*.log

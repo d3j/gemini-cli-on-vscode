@@ -3,15 +3,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigService } from './ConfigService';
 import { Logger } from './Logger';
+import { DateCalculator } from './DateCalculator';
 
 /**
  * Service for managing conversation history
  */
 export class HistoryService implements vscode.Disposable {
+    private readonly dateCalculator: DateCalculator;
+    private hasShownBoundaryWarning = false;
+
     constructor(
         private readonly configService: ConfigService,
         private readonly logger: Logger
-    ) {}
+    ) {
+        this.dateCalculator = new DateCalculator();
+    }
 
     /**
      * Save clipboard content to history file
@@ -87,7 +93,12 @@ export class HistoryService implements vscode.Disposable {
         
         try {
             // Prepare content with timestamp and terminal info
-            const timestamp = new Date().toISOString();
+            const now = new Date();
+            const useLocalTimezone = this.configService.get<boolean>('saveToHistory.useLocalTimezone', true);
+            
+            const timestamp = useLocalTimezone 
+                ? this.dateCalculator.formatLocalDateTime(now)
+                : now.toISOString();
             
             // Include terminal name if configured and from terminal
             const includeTerminalName = this.configService.get<boolean>('saveToHistory.includeTerminalName', false);
@@ -104,7 +115,7 @@ export class HistoryService implements vscode.Disposable {
                 fs.appendFileSync(historyPath, content, 'utf8');
             } else {
                 // Create new file with header
-                const dateStr = new Date().toISOString().split('T')[0];
+                const dateStr = this.getLogicalDateString();
                 const fileHeader = `# History - ${dateStr}\n\n`;
                 fs.writeFileSync(historyPath, fileHeader + content, 'utf8');
             }
@@ -113,6 +124,36 @@ export class HistoryService implements vscode.Disposable {
         } catch (error) {
             this.logger.error('Failed to save to history', error);
             vscode.window.showErrorMessage(`Failed to save to history: ${error}`);
+        }
+    }
+
+    /**
+     * Get logical date string based on configuration
+     */
+    private getLogicalDateString(): string {
+        const now = new Date();
+        const useLocalTimezone = this.configService.get<boolean>('saveToHistory.useLocalTimezone', true);
+        const dayBoundary = this.configService.get<string>('saveToHistory.dayBoundary', '00:00');
+        
+        if (useLocalTimezone) {
+            try {
+                return this.dateCalculator.getLogicalDate(now, dayBoundary);
+            } catch (error) {
+                this.logger.error('Invalid day boundary configuration, falling back to local date', error);
+                
+                // Show warning only once
+                if (!this.hasShownBoundaryWarning) {
+                    this.hasShownBoundaryWarning = true;
+                    vscode.window.showWarningMessage(
+                        `Invalid day boundary time "${dayBoundary}". Please use HH:MM format (e.g., 02:00). Using local date instead.`
+                    );
+                }
+                
+                return this.dateCalculator.formatLocalDate(now);
+            }
+        } else {
+            // Legacy UTC behavior
+            return now.toISOString().split('T')[0];
         }
     }
 
@@ -133,8 +174,8 @@ export class HistoryService implements vscode.Disposable {
             fs.mkdirSync(historyDir, { recursive: true });
         }
         
-        // Use date as filename
-        const dateStr = new Date().toISOString().split('T')[0];
+        // Use logical date as filename
+        const dateStr = this.getLogicalDateString();
         return path.join(historyDir, `${dateStr}.md`);
     }
 
@@ -149,14 +190,20 @@ export class HistoryService implements vscode.Disposable {
         }
 
         try {
-            const timestamp = new Date().toISOString();
+            const now = new Date();
+            const useLocalTimezone = this.configService.get<boolean>('saveToHistory.useLocalTimezone', true);
+            
+            const timestamp = useLocalTimezone 
+                ? this.dateCalculator.formatLocalDateTime(now)
+                : now.toISOString();
+                
             const header = `\n## ${timestamp} - MAGUS Council Composer`;
             const content = `${header}\n\n\`\`\`\n${text}\n\`\`\`\n`;
             
             if (fs.existsSync(historyPath)) {
                 fs.appendFileSync(historyPath, content, 'utf8');
             } else {
-                const dateStr = new Date().toISOString().split('T')[0];
+                const dateStr = this.getLogicalDateString();
                 const fileHeader = `# History - ${dateStr}\n\n`;
                 fs.writeFileSync(historyPath, fileHeader + content, 'utf8');
             }

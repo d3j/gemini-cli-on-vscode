@@ -78,8 +78,8 @@ export class CommandHandler implements vscode.Disposable {
         // Show terminal
         terminal.show(false);
         
-        // Send text with appropriate delay
-        await this.terminalManager.sendTextToTerminal(terminal, text, targetCLI);
+        // Send text without Enter (keep input for user to modify)
+        await this.terminalManager.sendTextToTerminal(terminal, text, targetCLI, false);
     }
 
     public async sendOpenFilesToCLI(targetCLI?: CLIType): Promise<void> {
@@ -131,8 +131,8 @@ export class CommandHandler implements vscode.Disposable {
         // Show terminal
         terminal.show(false);
         
-        // Send message with appropriate delay
-        await this.terminalManager.sendTextToTerminal(terminal, message, targetCLI);
+        // Send message without Enter (keep input for user to modify)
+        await this.terminalManager.sendTextToTerminal(terminal, message, targetCLI, false);
         
         vscode.window.showInformationMessage(`Sent ${openFiles.length} open file(s) to ${targetCLI}`);
     }

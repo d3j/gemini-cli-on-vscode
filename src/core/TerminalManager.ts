@@ -383,7 +383,8 @@ export class TerminalManager implements vscode.Disposable {
     public async sendTextToTerminal(
         terminal: vscode.Terminal,
         text: string,
-        cli: CLIType
+        cli: CLIType,
+        sendEnter: boolean = false
     ): Promise<void> {
         const startTime = Date.now();
         
@@ -400,9 +401,11 @@ export class TerminalManager implements vscode.Disposable {
         await vscode.env.clipboard.writeText(text);
         await vscode.commands.executeCommand('workbench.action.terminal.paste');
         
-        // Send Enter after delay
-        await new Promise(resolve => setTimeout(resolve, delay));
-        terminal.sendText('', true);
+        // Send Enter after delay only if requested
+        if (sendEnter) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+            terminal.sendText('', true);
+        }
         
         // Fire text sent event for testing
         if (this._onDidSendText) {

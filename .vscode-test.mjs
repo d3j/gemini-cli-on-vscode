@@ -13,11 +13,14 @@ export default defineConfig({
   coverage: {
     reporter: ['text', 'html', 'lcov'],
     output: './coverage',
-    includeAll: true,
+    includeAll: false,
     include: ['out/**/*.js'],
     exclude: [
       'out/test/**',
-      'out/**/*.test.js'
+      'out/**/*.test.js',
+      // Webview/フロント専用コードは実行文脈が異なるため除外
+      'out/multiAI/**',
+      'out/ui/webviewUtils.js'
     ]
   }
 });

@@ -25,6 +25,9 @@ export async function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
     // Dispose bootstrap
     try {
+        // Reset ready state context key
+        vscode.commands.executeCommand('setContext', 'gemini-cli-vscode.isReady', false);
+        
         bootstrap?.dispose();
         bootstrap = undefined;
     } catch (error) {

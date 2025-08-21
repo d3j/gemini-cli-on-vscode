@@ -12,6 +12,12 @@
 # macOS
 .DS_Store
 
+# TypeScript build info
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
 # VSIX packages
 *.vsix
 

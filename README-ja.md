@@ -300,7 +300,12 @@ qwen    # Qwenアカウント認証
   
   // ターミナル動作
   "gemini-cli-vscode.terminal.groupingBehavior": "same",
-  "gemini-cli-vscode.terminal.disableFlowControl": true
+  "gemini-cli-vscode.terminal.disableFlowControl": true,
+  
+  // 履歴ファイル設定 🕐
+  "gemini-cli-vscode.saveToHistory.useLocalTimezone": true,
+  "gemini-cli-vscode.saveToHistory.dayBoundary": "00:00",
+  "gemini-cli-vscode.saveToHistory.includeTerminalName": true
 }
 ```
 
@@ -318,53 +323,9 @@ qwen    # Qwenアカウント認証
 - `contextMenu.show*`: メニュー項目の詳細制御
 - `*.command` / `*.args`: CLI起動コマンドのカスタマイズ
 - `terminal.groupingBehavior`: ターミナルのグループ化方法（"same"または"new"）
-
-## 🛠️ 開発
-
-### ローカル開発
-
-```bash
-git clone https://github.com/d3j/gemini-cli-on-vscode.git
-cd gemini-cli-on-vscode
-npm install
-npm run compile
-```
-
-### デバッグ
-
-1. VS Codeでプロジェクトを開く
-2. `F5` を押してExtension Development Hostを起動
-3. 新しいVS Codeウィンドウで拡張機能をテスト
-
-## 🐛 トラブルシューティング
-
-### よくある問題
-
-#### Q: "gemini: command not found" エラー
-
-```bash
-# 解決策：Gemini CLIをインストール
-npm install -g @google/gemini-cli
-```
-
-#### Q: 認証エラー
-
-```bash
-# 解決策：最初にターミナルで直接認証
-gemini
-# ブラウザ認証を完了してから、拡張機能を再試行
-```
-
-#### Q: エディタタイトルバーに拡張機能が表示されない
-
-- アクティブなエディタが開いていることを確認
-- VS Codeウィンドウをリロード（`Cmd+R` / `Ctrl+R`）してみる
-
-### 🔧 出力フリーズ防止
-
-この拡張機能によって起動した Gemini または Codex CLI のフロー制御の問題を `stty -ixon` を自動的に適用して防止します。
-
-**注意:** これは長く高速な出力に伴うVS Code統合ターミナルの既知の問題への対処です。
+- `saveToHistory.useLocalTimezone`: 履歴タイムスタンプでローカルタイムゾーンを使用
+- `saveToHistory.dayBoundary`: カスタム日付境界時刻（例: 夜勤者向けに"02:00"）
+- `saveToHistory.includeTerminalName`: 保存された履歴エントリにターミナル名を含める
 
 ## 🤝 コントリビューション
 
@@ -387,7 +348,6 @@ gemini
 - **AllCLIs-icon.png** - [いらすとや](https://www.irasutoya.com/)
 - **claude-logo.png** - Anthropic
 - **codex-icon.png** - OpenAI
-- **icon.png** (Gemini) - Google
 
 ※ 各企業のロゴは識別目的でのみ使用しており、この拡張機能は各社と公式な提携関係にはありません。
 

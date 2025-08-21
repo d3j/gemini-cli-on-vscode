@@ -49,7 +49,9 @@ const DEFAULT_VALUES: Record<string, any> = {
     
     // Other settings
     'saveToHistory.enabled': true,
-    'saveToHistory.includeTerminalName': false
+    'saveToHistory.includeTerminalName': false,
+    'saveToHistory.useLocalTimezone': true,
+    'saveToHistory.dayBoundary': '00:00'
 };
 
 /**

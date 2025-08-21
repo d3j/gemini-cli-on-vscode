@@ -67,6 +67,10 @@ describe('Extension Unit Test Suite', () => {
                 command === 'gemini-cli-vscode.promptComposerView.focus') {
                 return Promise.resolve();
             }
+            if (command === 'setContext') {
+                // Mock setContext command for context key management
+                return Promise.resolve();
+            }
             throw new Error(`Command '${command}' not found`);
         });
         

@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.1] - 2025-08-19
+## [0.3.0] - 2025-08-20
 
 ### Summary
-Internal refactoring release with improved architecture and 100% test coverage.
-**Breaking change**: Command names have changed (see Migration section below).
+
+Feature release with customizable history timestamps and comprehensive internal refactoring.
+**Breaking change**: Command names have changed
 
 ### Changed
 
@@ -19,24 +20,29 @@ Internal refactoring release with improved architecture and 100% test coverage.
   - Automatic detection of custom keybindings using old command names
   - User-friendly notification with migration guide link
 
-- **Performance Diagnostics** 📊
-  - Optional performance metrics via `diagnostics.performance` setting
+### Added
+
+- **Customizable History Timestamps** 🕐
+  - Local timezone support for history files
+  - Custom day boundary configuration (e.g., "02:00" for night shift)
+  - Terminal name inclusion in history entries
+  - New DateCalculator service for flexible date handling
 
 ### Improved
 
+- **Editor Title Bar Buttons** 🔧
+  - Corrected initialization order to show buttons immediately
+
 - **Architecture** 🏗️
-  - Modular design with 76% code reduction in main file
+  - Modular design with 76% code reduction
+  - 179 tests with full coverage
+  - Enhanced documentation for end users
   - Dependency injection pattern implementation
   - Clean separation of concerns
 
-- **Security** 🔒
-  - Enhanced CSP with nonce-based script execution
-  - Stricter webview security policies
-
 - **Test Coverage** 🧪
-  - 154 tests passing (100% success rate)
   - Complete refactoring without breaking changes
-
+  - Enhanced test environment with VS Code extension-optimized coverage
 
 ## [0.2.0] - 2025-08-17
 

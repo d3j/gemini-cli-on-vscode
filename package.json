@@ -1,7 +1,7 @@
 {
   "name": "gemini-cli-on-vscode",
   "displayName": "Gemini CLI on VSCode",
-  "version": "0.2.1-beta2",
+  "version": "0.3.0",
   "icon": "images/icon.png",
   "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
@@ -42,7 +42,9 @@
   "categories": [
     "Programming Languages"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -190,27 +192,27 @@
         {
           "command": "gemini-cli-vscode.claude.start.newPane",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.claude.enabled"
+          "when": "gemini-cli-vscode.isReady && config.gemini-cli-vscode.claude.enabled"
         },
         {
           "command": "gemini-cli-vscode.codex.start.newPane",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.codex.enabled"
+          "when": "gemini-cli-vscode.isReady && config.gemini-cli-vscode.codex.enabled"
         },
         {
           "command": "gemini-cli-vscode.gemini.start.newPane",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.gemini.enabled"
+          "when": "gemini-cli-vscode.isReady && config.gemini-cli-vscode.gemini.enabled"
         },
         {
           "command": "gemini-cli-vscode.qwen.start.newPane",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.qwen.enabled"
+          "when": "gemini-cli-vscode.isReady && config.gemini-cli-vscode.qwen.enabled"
         },
         {
           "command": "gemini-cli-vscode.launchAllCLIs",
           "group": "navigation",
-          "when": "config.gemini-cli-vscode.magusCouncil.enabled"
+          "when": "gemini-cli-vscode.isReady && config.gemini-cli-vscode.magusCouncil.enabled"
         }
       ],
       "editor/context": [
@@ -256,11 +258,6 @@
         }
       ],
       "explorer/context": [
-        {
-          "command": "gemini-cli-vscode.multiAI.openComposer",
-          "group": "navigation@1",
-          "when": "config.gemini-cli-vscode.magusCouncil.enabled"
-        },
         {
           "command": "gemini-cli-vscode.gemini.send.filePath",
           "group": "5_cutcopypaste@103",
@@ -344,7 +341,7 @@
             "title": "MAGUS Council Enabled",
             "description": "Enable MAGUS Council (multi-AI features)",
             "markdownDescription": "Enable **MAGUS Council** - a unified interface to interact with multiple AI agents simultaneously.\n\n**Features**:\n- Send the same prompt to multiple AIs at once\n- Compare responses side-by-side\n- Launch all configured CLIs with one command\n\n\ud83d\udd2e *The Council awaits your questions*",
-            "order": 5
+            "order": 7
           },
           "gemini-cli-vscode.contextMenu.enabled": {
             "type": "boolean",
@@ -424,12 +421,28 @@
             "markdownDescription": "Include the terminal name (e.g., 'Gemini CLI', 'Codex CLI') in saved history entries.\n\n**Benefits**:\n- Track which AI provided each response\n- Easier to search through history\n- Better context when reviewing past conversations\n\n\ud83c\udff7\ufe0f Adds source attribution to saved content",
             "order": 4
           },
+          "gemini-cli-vscode.saveToHistory.useLocalTimezone": {
+            "type": "boolean",
+            "default": true,
+            "description": "Use local timezone for history file dates",
+            "markdownDescription": "Use local timezone instead of UTC for history file dates and timestamps.\n\n**Benefits**:\n- Files are dated according to your local time\n- Late-night work stays in the correct day\n- More intuitive file organization\n- Timestamps show your actual local time\n\n🕐 **Example**: Work at 1 AM stays in previous day's file with boundary at 2 AM",
+            "order": 7
+          },
+          "gemini-cli-vscode.saveToHistory.dayBoundary": {
+            "type": "string",
+            "default": "00:00",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$",
+            "patternErrorMessage": "Time must be in HH:MM format (e.g., 02:00)",
+            "description": "Day boundary time for history files",
+            "markdownDescription": "Time when a new day starts for history files (HH:MM format).\n\n**Use cases**:\n- `00:00` - Standard midnight boundary\n- `02:00` - For night shift workers (2 AM boundary)\n- `05:00` - For early birds (5 AM boundary)\n- `06:00` - For 6-to-6 day cycles\n\n📅 **Work before this time goes to previous day's file**\n\n💡 **Tip**: Set to 2-6 AM if you often work late nights",
+            "order": 6
+          },
           "gemini-cli-vscode.magusCouncil.composer.autoSaveHistory": {
             "type": "boolean",
             "default": true,
             "description": "Automatically save sent prompts to .history-memo",
             "markdownDescription": "Automatically save prompts sent from **MAGUS Council Composer** to `.history-memo/YYYY-MM-DD.md` files.\n\n**What gets saved**:\n- Prompts sent via MAGUS Council Composer interface\n- Timestamp and target AI agents\n- Context files if included\n\n**Note**: Direct terminal conversations are NOT included. Use the 'Save to History' button for terminal sessions.\n\n\ud83d\udcdd Files are organized by date for easy navigation",
-            "order": 5
+            "order": 7
           },
           "gemini-cli-vscode.contextMenu.showSendText": {
             "type": "boolean",
@@ -617,7 +630,8 @@
     "test": "vscode-test",
     "test:unit": "npm run compile && vscode-test --config .vscode-test-unit.mjs",
     "test:integration": "npm run compile && vscode-test --config .vscode-test-integration.mjs",
-    "test:coverage": "npm run compile && nyc vscode-test",
+    "test:coverage": "npm run compile && vscode-test --config .vscode-test.mjs",
+    "test:coverage:unit": "npm run compile && vscode-test --config .vscode-test-unit.mjs",
     "test:watch": "npm run compile && vscode-test --watch",
     "test:unit:focus-ext": "npm run compile && vscode-test --config .vscode-test-unit.mjs --files out/test/unit/{extension,terminalManager}.test.js --grep \"Extension Activation|Terminal Creation Commands|Save to History Functionality|Send Open Files|Terminal Cleanup|Paste and Enter\" --reporter dot",
     "test:unit:send-open-files": "npm run compile && vscode-test --config .vscode-test-unit.mjs --files out/test/unit/extension.test.js --grep \"Send Open Files\" --reporter dot",
