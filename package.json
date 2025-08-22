@@ -1,7 +1,7 @@
 {
   "name": "gemini-cli-on-vscode",
   "displayName": "Gemini CLI on VSCode",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "icon": "images/icon.png",
   "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
@@ -185,6 +185,14 @@
         "command": "gemini-cli-vscode.multiAI.askAll",
         "title": "AI: Ask All Agents",
         "category": "Multi AI"
+      },
+      {
+        "command": "gemini-cli-vscode.multiAI.send.selectedText",
+        "title": "MAGUS Council: Send Selected Text"
+      },
+      {
+        "command": "gemini-cli-vscode.multiAI.send.filePath",
+        "title": "MAGUS Council: Send File Path"
       }
     ],
     "menus": {
@@ -255,6 +263,11 @@
           "command": "gemini-cli-vscode.qwen.send.selectedText",
           "group": "5_cutcopypaste@106",
           "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.multiAI.send.selectedText",
+          "group": "5_cutcopypaste@107",
+          "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.magusCouncil.enabled"
         }
       ],
       "explorer/context": [
@@ -277,6 +290,11 @@
           "command": "gemini-cli-vscode.qwen.send.filePath",
           "group": "5_cutcopypaste@106",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
+        },
+        {
+          "command": "gemini-cli-vscode.multiAI.send.filePath",
+          "group": "5_cutcopypaste@107",
+          "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.magusCouncil.enabled"
         }
       ],
       "editor/title/context": [

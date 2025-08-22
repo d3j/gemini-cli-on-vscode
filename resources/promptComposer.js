@@ -21,7 +21,9 @@
     // Auto-resize textarea function
     function autoResizeTextarea() {
         const minHeight = 120;
-        const maxHeight = 400;
+        // VS Codeウィンドウの高さの90%を最大高さとする
+        const viewportHeight = window.innerHeight;
+        const maxHeight = Math.floor(viewportHeight * 0.9);
         
         // 一旦autoにしてコンテンツの高さを取得
         promptInput.style.height = 'auto';
@@ -66,6 +68,11 @@
         } catch (e) {}
 
         vscode.postMessage({ type: 'composer/init' });
+        
+        // Notify extension that WebView is ready
+        setTimeout(() => {
+            vscode.postMessage({ type: 'composer/ready' });
+        }, 100);
         
         // Set up event listeners
         promptInput.addEventListener('input', () => { 
@@ -118,6 +125,11 @@
         
         updateStats();
         autoResizeTextarea();  // 初期表示時にも高さ調整
+        
+        // ウィンドウサイズ変更時にも最大高さを再計算
+        window.addEventListener('resize', debounce(() => {
+            autoResizeTextarea();
+        }, 100));
     }
     
     // Handle messages from extension
@@ -137,6 +149,9 @@
             case 'composer/previewUpdate':
                 handlePreviewUpdate(message.payload);
                 break;
+            case 'composer/setPrompt':
+                handleSetPrompt(message.payload);
+                break;
         }
     });
     
@@ -154,6 +169,7 @@
                 }
             });
         }
+        
         
         // Context indicators removed - only Include Context button remains
         
@@ -232,6 +248,26 @@
         // Update stats with context
         charCount.textContent = data.characterCount || 0;
         tokenCount.textContent = data.estimatedTokens || 0;
+    }
+    
+    function handleSetPrompt(payload) {
+        if (payload && payload.text) {
+            // Always append to existing content
+            if (promptInput.value) {
+                promptInput.value += '\n\n' + payload.text;
+            } else {
+                promptInput.value = payload.text;
+            }
+            
+            // Update UI state
+            updateStats();
+            autoResizeTextarea();
+            saveState();
+            
+            // Focus and move cursor to end
+            promptInput.focus();
+            promptInput.setSelectionRange(promptInput.value.length, promptInput.value.length);
+        }
     }
     
     function getSelectedAgents() {

@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2025-08-22
+
+### Added
+
+- **MAGUS Council: Send Selected Text** 📝
+  - New command `multiAI.send.selectedText` to send editor selection to MAGUS Council Composer
+
+- **MAGUS Council: Send File Path** 📁
+  - New command `multiAI.send.filePath` to send file/folder paths to MAGUS Council Composer
+  - Explorer context menu integration for quick file sharing
+
+### Fixed
+
+- **Layout Stability** 📐
+  - Fixed prompt box text position shift when scrollbar appears in MAGUS Council sidebar
+  - Implemented `scrollbar-gutter: stable` to reserve scrollbar space
+  - Applied to both container and textarea elements for consistent layout
+
+- **Clipboard Protection** 📋
+  - Fixed clipboard content loss when using Send Selected Text feature
+  - Added clipboard backup and restore mechanism with exception safety
+  - Implemented conditional restore to respect user's clipboard changes
+  - Unified clipboard handling across `sendTextToTerminal` and `pasteAndEnter` methods
+
 ## [0.3.0] - 2025-08-20
 
 ### Summary

@@ -154,12 +154,12 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 **Send Selected Text:**
 
 - Select text in editor → Right-click
-- "Gemini CLI: Send Selected Text" or "Codex CLI: Send Selected Text"
+- "Gemini CLI: Send Selected Text", "Codex CLI: Send Selected Text", "Claude Code: Send Selected Text", or "MAGUS Council: Send Selected Text"
 
 **Send File/Folder Paths:**
 
 - Right-click in Explorer
-- Choose your preferred CLI command
+- Choose your preferred CLI command ("MAGUS Council: Send File Path" also available)
 - Supports multiple selection and folders
 
 **Send All Open Files:**
@@ -187,6 +187,8 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 **MAGUS Council Commands:**
 
 - "MAGUS Council: Open" - Open unified control panel
+- "MAGUS Council: Send Selected Text" - Send selected text to MAGUS Council
+- "MAGUS Council: Send File Path" - Send file/folder paths to MAGUS Council
 - "Multi-AI: Ask All" - Batch send to selected AIs
 
 **Existing Commands:**

@@ -16,6 +16,7 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
 
     private view: vscode.WebviewView | undefined;
     private contextManager: ContextManager;
+    private isReady = false;
 
     constructor(
         private readonly context: vscode.ExtensionContext,
@@ -58,6 +59,9 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
         switch (message.type) {
             case 'composer/init':
                 await this.handleInit();
+                break;
+            case 'composer/ready':
+                this.isReady = true;
                 break;
             case 'composer/askAll':
                 await this.handleAskAll(message.payload);
@@ -330,6 +334,34 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
             <script nonce="${nonce}" src="${scriptUri}"></script>
         </body>
         </html>`;
+    }
+
+    /**
+     * Set prompt text in the composer (with retry mechanism)
+     */
+    public async setPromptText(text: string): Promise<void> {
+        const maxRetries = 5;
+        const retryDelay = 100;
+        
+        for (let i = 0; i < maxRetries; i++) {
+            if (this.view && this.isReady) {
+                // Send text to webview using legacy message format
+                this.view.webview.postMessage({
+                    type: 'composer/setPrompt',
+                    payload: { text }
+                });
+                return;
+            }
+            
+            // Wait for WebView to be ready
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+        
+        // Fallback: copy to clipboard
+        await vscode.env.clipboard.writeText(text);
+        vscode.window.showInformationMessage(
+            'Text copied to clipboard. Please paste it into the MAGUS Council composer.'
+        );
     }
 
 }

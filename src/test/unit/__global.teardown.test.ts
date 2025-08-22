@@ -5,7 +5,7 @@ import { deactivate } from '../../extension';
 afterEach(() => {
   try {
     deactivate();
-  } catch (e) {
+  } catch {
     // ignore teardown errors to avoid masking test failures
   }
 });

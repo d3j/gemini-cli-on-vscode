@@ -5,8 +5,11 @@ import { TerminalManager } from './TerminalManager';
 import { Logger } from './Logger';
 import { HistoryService } from './HistoryService';
 import { CLIType } from '../types';
+import { PromptComposerViewProvider } from '../multiAI/promptComposerView';
 
 export class CommandHandler implements vscode.Disposable {
+    private promptComposerViewProvider?: PromptComposerViewProvider;
+    
     constructor(
         _context: vscode.ExtensionContext,
         private configService: ConfigService,
@@ -15,6 +18,13 @@ export class CommandHandler implements vscode.Disposable {
         private fileHandler: FileHandler,
         private historyService: HistoryService
     ) {
+    }
+    
+    /**
+     * Set the PromptComposerViewProvider for MAGUS Council integration
+     */
+    public setPromptComposerViewProvider(provider?: PromptComposerViewProvider): void {
+        this.promptComposerViewProvider = provider;
     }
 
     public async saveClipboardToHistory(): Promise<void> {
@@ -158,6 +168,96 @@ export class CommandHandler implements vscode.Disposable {
         }
         
         vscode.window.showInformationMessage('All enabled CLIs have been launched');
+    }
+
+    /**
+     * Send selected text to MAGUS Council Composer
+     */
+    public async sendSelectedToMAGUSCouncil(): Promise<void> {
+        // 1. Get selected text from active editor
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showWarningMessage('No active editor');
+            return;
+        }
+        
+        const selection = editor.selection;
+        let text: string;
+        
+        if (selection && !selection.isEmpty) {
+            text = editor.document.getText(selection);
+        } else {
+            // Send entire document if no selection
+            text = editor.document.getText();
+        }
+        
+        if (!text) {
+            vscode.window.showWarningMessage('No text selected or document is empty');
+            return;
+        }
+        
+        // 2. Check text size (100KB limit warning)
+        const textSizeKB = Buffer.byteLength(text, 'utf8') / 1024;
+        if (textSizeKB > 100) {
+            const choice = await vscode.window.showWarningMessage(
+                `Selected text is ${Math.round(textSizeKB)}KB. This may affect performance.`,
+                'Continue', 'Cancel'
+            );
+            if (choice !== 'Continue') {
+                return;
+            }
+        }
+        
+        // 3. Open/focus MAGUS Council WebView
+        try {
+            await vscode.commands.executeCommand('gemini-cli-vscode.multiAI.openComposer');
+        } catch (error) {
+            this.logger.error('Failed to open MAGUS Council', error);
+            vscode.window.showErrorMessage('Failed to open MAGUS Council');
+            return;
+        }
+        
+        // 4. Send text to WebView (with ready wait and retry)
+        if (this.promptComposerViewProvider) {
+            await this.promptComposerViewProvider.setPromptText(text);
+        } else {
+            // Fallback: copy to clipboard
+            await vscode.env.clipboard.writeText(text);
+            vscode.window.showInformationMessage(
+                'MAGUS Council is initializing. Text copied to clipboard - please paste it into the composer.'
+            );
+        }
+    }
+
+    /**
+     * Send file path to MAGUS Council
+     */
+    public async sendFilePathToMAGUSCouncil(uri: vscode.Uri | undefined, uris: vscode.Uri[] | undefined): Promise<void> {
+        // Prepare file paths
+        const selectedFiles = fileHandler.prepareFilePaths(uri, uris);
+        if (!selectedFiles) {
+            return;
+        }
+        
+        // Open/focus MAGUS Council WebView
+        try {
+            await vscode.commands.executeCommand('gemini-cli-vscode.multiAI.openComposer');
+        } catch (error) {
+            this.logger.error('Failed to open MAGUS Council', error);
+            vscode.window.showErrorMessage('Failed to open MAGUS Council');
+            return;
+        }
+        
+        // Send file paths to WebView
+        if (this.promptComposerViewProvider) {
+            await this.promptComposerViewProvider.setPromptText(selectedFiles);
+        } else {
+            // Fallback: copy to clipboard
+            await vscode.env.clipboard.writeText(selectedFiles);
+            vscode.window.showInformationMessage(
+                'MAGUS Council is initializing. File paths copied to clipboard - please paste them into the composer.'
+            );
+        }
     }
 
     /**

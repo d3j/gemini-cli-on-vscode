@@ -146,12 +146,12 @@ qwen    # Qwenアカウント認証
 **選択テキストの送信:**
 
 - エディタでテキストを選択 → 右クリック
-- "Gemini CLI: Send Selected Text"、"Codex CLI: Send Selected Text"、または "Claude Code: Send Selected Text"
+- "Gemini CLI: Send Selected Text"、"Codex CLI: Send Selected Text"、"Claude Code: Send Selected Text"、または "MAGUS Council: Send Selected Text"
 
 **ファイル/フォルダパスの送信:**
 
 - エクスプローラーで右クリック
-- 使用したいCLI用のコマンドを選択
+- 使用したいCLI用のコマンドを選択（"MAGUS Council: Send File Path"も利用可能）
 - 複数選択可能、フォルダも送信可能
 
 **開いているすべてのファイルを送信:**
@@ -179,6 +179,8 @@ qwen    # Qwenアカウント認証
 **MAGUS Council コマンド:**
 
 - **"MAGUS Council: Open"** - 統一制御パネルを開く
+- **"MAGUS Council: Send Selected Text"** - 選択テキストをMAGUS Councilに送信
+- **"MAGUS Council: Send File Path"** - ファイル/フォルダパスをMAGUS Councilに送信
 - **"Multi-AI: Ask All"** - 選択したAIに一斉送信
 
 **既存のコマンド:**

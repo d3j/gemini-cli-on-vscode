@@ -13,6 +13,7 @@
     gap: 8px;
     height: 100%;
     overflow-y: auto;
+    scrollbar-gutter: stable; /* スクロールバー領域を予約してレイアウトシフトを防止 */
 }
 
 /* Section styles */
@@ -40,7 +41,7 @@ label {
     width: 100%;
     box-sizing: border-box;
     min-height: 80px;
-    max-height: 400px;
+    max-height: min(90vh, 400px); /* 上限を併置してサイドバー内での過大化を防止 */
     padding: 4px;
     font-family: var(--vscode-font-family);
     font-size: var(--vscode-font-size);
@@ -49,7 +50,8 @@ label {
     border: 1px solid var(--vscode-input-border);
     border-radius: 3px;
     resize: vertical;
-    overflow-y: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable; /* スクロールバー領域を予約してレイアウトシフトを防止 */
 }
 
 #prompt-input:focus {

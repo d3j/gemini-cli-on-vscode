@@ -27,6 +27,7 @@ export class ExtensionBootstrap {
     public statusBarManager!: StatusBarManager;
     public historyService!: HistoryService;
     public composerViewRegistration?: vscode.Disposable;
+    public promptComposerViewProvider?: PromptComposerViewProvider;
     private startTime: number = 0;
     
     async initialize(context: vscode.ExtensionContext): Promise<void> {
@@ -97,6 +98,11 @@ export class ExtensionBootstrap {
         // Register Sidebar Prompt Composer (after fileHandler initialization)
         this.registerComposerView(context);
         
+        // Set PromptComposerViewProvider on CommandHandler for MAGUS Council integration
+        if (this.commandHandler && this.promptComposerViewProvider) {
+            this.commandHandler.setPromptComposerViewProvider(this.promptComposerViewProvider);
+        }
+        
         // Initialize CLI Module Manager
         this.cliModuleManager = new CLIModuleManager({
             configService: this.configService,
@@ -145,10 +151,10 @@ export class ExtensionBootstrap {
             return;
         }
         
-        const composerViewProvider = new PromptComposerViewProvider(context, this.fileHandler);
+        this.promptComposerViewProvider = new PromptComposerViewProvider(context, this.fileHandler);
         this.composerViewRegistration = vscode.window.registerWebviewViewProvider(
             PromptComposerViewProvider.viewId,
-            composerViewProvider
+            this.promptComposerViewProvider
         );
         context.subscriptions.push(this.composerViewRegistration);
         isComposerViewRegistered = true;
@@ -179,6 +185,15 @@ export class ExtensionBootstrap {
             {
                 id: 'gemini-cli-vscode.multiAI.askAll',
                 handler: this.openComposer.bind(this)
+            },
+            {
+                id: 'gemini-cli-vscode.multiAI.send.selectedText',
+                handler: () => this.commandHandler.sendSelectedToMAGUSCouncil()
+            },
+            {
+                id: 'gemini-cli-vscode.multiAI.send.filePath',
+                handler: (uri: vscode.Uri | undefined, uris: vscode.Uri[] | undefined) => 
+                    this.commandHandler.sendFilePathToMAGUSCouncil(uri, uris)
             }
         ];
         

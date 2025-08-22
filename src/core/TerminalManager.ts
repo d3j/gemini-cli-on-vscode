@@ -106,22 +106,44 @@ export class TerminalManager implements vscode.Disposable {
         // Get initial delay from config
         const initialDelay = this.configService.get('magusCouncil.composer.delays.initial', 100);
         
-        // Copy text to clipboard and paste
-        await new Promise<void>(resolve => {
-            setTimeout(async () => {
-                await vscode.env.clipboard.writeText(text);
-                await vscode.commands.executeCommand('workbench.action.terminal.paste');
-                
-                // Get CLI-specific enter delay
-                const enterDelay = this.configService.getCliDelay(cli, text.length);
-                
-                // Send Enter after delay
-                setTimeout(() => {
-                    terminal.sendText('', true);
-                    resolve();
-                }, enterDelay);
-            }, initialDelay);
-        });
+        // Wait for initial delay
+        await new Promise(resolve => setTimeout(resolve, initialDelay));
+        
+        // Save current clipboard content AFTER initial delay
+        const originalClipboard = await vscode.env.clipboard.readText();
+        
+        try {
+            // Copy text to clipboard and paste
+            await vscode.env.clipboard.writeText(text);
+            await vscode.commands.executeCommand('workbench.action.terminal.paste');
+            
+            // Wait for paste completion (50ms)
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            // Conditional restore: only if clipboard still contains our text
+            const currentClipboard = await vscode.env.clipboard.readText();
+            if (currentClipboard === text) {
+                await vscode.env.clipboard.writeText(originalClipboard);
+            }
+        } catch (error) {
+            // Attempt to restore clipboard even on error
+            try {
+                const currentClipboard = await vscode.env.clipboard.readText();
+                if (currentClipboard === text) {
+                    await vscode.env.clipboard.writeText(originalClipboard);
+                }
+            } catch (restoreError) {
+                this.logger?.error('Failed to restore clipboard in pasteAndEnter', restoreError);
+            }
+            throw error;
+        }
+        
+        // Get CLI-specific enter delay
+        const enterDelay = this.configService.getCliDelay(cli, text.length);
+        
+        // Send Enter after delay
+        await new Promise(resolve => setTimeout(resolve, enterDelay));
+        terminal.sendText('', true);
     }
     
     /**
@@ -397,9 +419,34 @@ export class TerminalManager implements vscode.Disposable {
         // Wait for initial delay
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        // Copy text to clipboard and paste
-        await vscode.env.clipboard.writeText(text);
-        await vscode.commands.executeCommand('workbench.action.terminal.paste');
+        // Save current clipboard content
+        const originalClipboard = await vscode.env.clipboard.readText();
+        
+        try {
+            // Copy text to clipboard and paste
+            await vscode.env.clipboard.writeText(text);
+            await vscode.commands.executeCommand('workbench.action.terminal.paste');
+            
+            // Wait for paste completion (50ms)
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            // Conditional restore: only if clipboard still contains our text
+            const currentClipboard = await vscode.env.clipboard.readText();
+            if (currentClipboard === text) {
+                await vscode.env.clipboard.writeText(originalClipboard);
+            }
+        } catch (error) {
+            // Attempt to restore clipboard even on error
+            try {
+                const currentClipboard = await vscode.env.clipboard.readText();
+                if (currentClipboard === text) {
+                    await vscode.env.clipboard.writeText(originalClipboard);
+                }
+            } catch (restoreError) {
+                this.logger?.error('Failed to restore clipboard', restoreError);
+            }
+            throw error;
+        }
         
         // Send Enter after delay only if requested
         if (sendEnter) {
