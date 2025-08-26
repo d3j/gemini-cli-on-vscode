@@ -71,7 +71,7 @@ npm install -g @google/gemini-cli
 gemini  # Google account authentication
 
 # Install Codex CLI (for GPT-5)
-npm install -g codex
+npm i -g @openai/codex  # changed to current correct CMD
 codex   # OpenAI account authentication
 
 # Install Claude CLI (for Claude)
