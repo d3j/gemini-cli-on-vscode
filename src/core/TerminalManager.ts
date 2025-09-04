@@ -196,10 +196,12 @@ export class TerminalManager implements vscode.Disposable {
         
         const terminal = vscode.window.createTerminal(terminalOptions);
         
-        // Navigate to workspace and start CLI
+        // Navigate to workspace using configurable command and start CLI
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         if (workspaceFolder) {
-            terminal.sendText(`cd "${workspaceFolder.uri.fsPath}"`);
+            const cwdTemplate = this.configService.get<string>('terminal.cwdCommand', 'cd "{path}"') ?? 'cd "{path}"';
+            const cwdCommand = cwdTemplate.replace('{path}', workspaceFolder.uri.fsPath);
+            terminal.sendText(cwdCommand);
         }
         
         // Start the CLI
