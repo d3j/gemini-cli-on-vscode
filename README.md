@@ -344,6 +344,7 @@ For power users who want detailed control:
   
   // Terminal behavior
   "gemini-cli-vscode.terminal.groupingBehavior": "same",
+  "gemini-cli-vscode.terminal.cwdCommand": "cd \"{path}\"",
   "gemini-cli-vscode.terminal.disableFlowControl": true,
   
   // History file settings 🕐
@@ -367,6 +368,7 @@ For power users who want detailed control:
 - `contextMenu.show*`: Fine-grained control over menu items
 - `*.command` / `*.args`: Customize CLI launch commands
 - `terminal.groupingBehavior`: How terminals are grouped ("same" or "new")
+- `terminal.cwdCommand`: Command used to change to workspace directory before launching (supports `{path}` placeholder)
 - `saveToHistory.useLocalTimezone`: Use local timezone for history timestamps
 - `saveToHistory.dayBoundary`: Custom day boundary time (e.g., "02:00" for night shift workers)
 - `saveToHistory.includeTerminalName`: Include terminal name in saved history entries

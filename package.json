@@ -1,7 +1,7 @@
 {
   "name": "gemini-cli-on-vscode",
   "displayName": "Gemini CLI on VSCode",
-  "version": "0.4.0",
+  "version": "0.3.0",
   "icon": "images/icon.png",
   "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
@@ -63,12 +63,6 @@
           "id": "gemini-cli-vscode.promptComposerView",
           "name": "MAGUS Council",
           "when": "config.gemini-cli-vscode.magusCouncil.enabled"
-        },
-        {
-          "type": "webview",
-          "id": "gemini-cli-vscode.templatesView",
-          "name": "Templates",
-          "when": "config.gemini-cli-vscode.templates.enabled"
         }
       ]
     },
@@ -191,14 +185,6 @@
         "command": "gemini-cli-vscode.multiAI.askAll",
         "title": "AI: Ask All Agents",
         "category": "Multi AI"
-      },
-      {
-        "command": "gemini-cli-vscode.multiAI.send.selectedText",
-        "title": "MAGUS Council: Send Selected Text"
-      },
-      {
-        "command": "gemini-cli-vscode.multiAI.send.filePath",
-        "title": "MAGUS Council: Send File Path"
       }
     ],
     "menus": {
@@ -269,11 +255,6 @@
           "command": "gemini-cli-vscode.qwen.send.selectedText",
           "group": "5_cutcopypaste@106",
           "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
-        },
-        {
-          "command": "gemini-cli-vscode.multiAI.send.selectedText",
-          "group": "5_cutcopypaste@107",
-          "when": "editorHasSelection && config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendText && config.gemini-cli-vscode.magusCouncil.enabled"
         }
       ],
       "explorer/context": [
@@ -296,11 +277,6 @@
           "command": "gemini-cli-vscode.qwen.send.filePath",
           "group": "5_cutcopypaste@106",
           "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.qwen.enabled && config.gemini-cli-vscode.qwen.showInContextMenu"
-        },
-        {
-          "command": "gemini-cli-vscode.multiAI.send.filePath",
-          "group": "5_cutcopypaste@107",
-          "when": "config.gemini-cli-vscode.contextMenu.enabled && config.gemini-cli-vscode.contextMenu.showSendFilePath && config.gemini-cli-vscode.magusCouncil.enabled"
         }
       ],
       "editor/title/context": [
@@ -517,6 +493,13 @@
             "markdownDescription": "Disable terminal flow control to prevent `Ctrl+S` from freezing the output.\n\n**Why this matters**:\n- `Ctrl+S` normally pauses terminal output (XON/XOFF)\n- This can make the terminal appear frozen\n- Disabling allows `Ctrl+S` to work as Save in VS Code\n\n\u2699\ufe0f Runs `stty -ixon` automatically in each terminal",
             "order": 11
           },
+          "gemini-cli-vscode.terminal.cwdCommand": {
+            "type": "string",
+            "default": "cd \"{path}\"",
+            "description": "Command to change directory before launching CLIs",
+            "markdownDescription": "Customize the command used to change to the workspace directory before launching a CLI. Use `{path}` as a placeholder for the workspace path.\n\nExample: `cd {path}/..`",
+            "order": 12
+          },
           "gemini-cli-vscode.terminal.groupingBehavior": {
             "type": "string",
             "enum": [
@@ -532,6 +515,13 @@
             ],
             "order": 12
           },
+          "gemini-cli-vscode.terminal.cwdCommand": {
+            "type": "string",
+            "default": "cd \"{path}\"",
+            "description": "Command to change directory before launching CLIs",
+            "markdownDescription": "Customize the command used to change to the workspace directory before launching a CLI. Use `{path}` as a placeholder for the workspace path.\n\n**Example**:\n- `cd {path}/..`",
+            "order": 13
+          },
           "gemini-cli-vscode.magusCouncil.composer.delays.initial": {
             "type": "number",
             "default": 100,
@@ -539,7 +529,7 @@
             "maximum": 5000,
             "description": "Initial delay before sending prompt to each AI (milliseconds)",
             "markdownDescription": "Delay before sending prompts to AI terminals (in milliseconds).\n\n**When to adjust**:\n- Increase if terminals need more time to initialize\n- Decrease for faster systems\n- Set to 0 for instant sending (may cause issues)\n\n\u23f1\ufe0f Default: 100ms",
-            "order": 13
+            "order": 14
           },
           "gemini-cli-vscode.magusCouncil.composer.delays.claude.enter": {
             "type": "number",
@@ -548,7 +538,7 @@
             "maximum": 5000,
             "description": "Delay before sending Enter to Claude Code after prompt (milliseconds)",
             "markdownDescription": "\u26a0\ufe0f **Advanced Setting**\n\nDelay before pressing Enter after pasting prompt to Claude (milliseconds).\n\n**When to adjust**:\n- Increase if Claude doesn't receive the full prompt\n- Decrease for faster response\n\n\u23f1\ufe0f Default: 150ms",
-            "order": 14
+            "order": 15
           },
           "gemini-cli-vscode.magusCouncil.composer.delays.gemini.enter": {
             "type": "number",
@@ -557,14 +547,14 @@
             "maximum": 5000,
             "description": "Delay before sending Enter to Gemini CLI after prompt (milliseconds)",
             "markdownDescription": "\u26a0\ufe0f **Advanced Setting**\n\nDelay before pressing Enter after pasting prompt to Gemini (milliseconds).\n\n**When to adjust**:\n- Increase if Gemini doesn't receive the full prompt\n- Decrease for faster response\n- Gemini typically needs more time than other CLIs\n\n\u23f1\ufe0f Default: 600ms",
-            "order": 15
+            "order": 16
           },
           "gemini-cli-vscode.gemini.command": {
             "type": "string",
             "default": "gemini",
             "description": "Command to launch Gemini CLI",
             "markdownDescription": "Custom command to launch Gemini CLI.\n\n**Examples**:\n- `gemini` (default)\n- `/usr/local/bin/gemini`\n- `docker run gemini-cli`\n- Custom wrapper script\n\n\ud83d\udd27 Change only if using non-standard installation",
-            "order": 16
+            "order": 17
           },
           "gemini-cli-vscode.gemini.args": {
             "type": "array",
@@ -574,14 +564,14 @@
             },
             "description": "Additional arguments for Gemini CLI",
             "markdownDescription": "Additional command-line arguments for Gemini CLI.\n\n**Example arguments**:\n- `[\"--model\", \"gemini-pro\"]`\n- `[\"--temperature\", \"0.7\"]`\n- `[\"--max-tokens\", \"2000\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
-            "order": 17
+            "order": 18
           },
           "gemini-cli-vscode.codex.command": {
             "type": "string",
             "default": "codex",
             "description": "Command to launch Codex CLI",
             "markdownDescription": "Custom command to launch Codex CLI.\n\n**Examples**:\n- `codex` (default)\n- `/usr/local/bin/codex`\n- `npx codex-cli`\n- Custom wrapper script\n\n\ud83d\udd27 Change only if using non-standard installation",
-            "order": 18
+            "order": 19
           },
           "gemini-cli-vscode.codex.args": {
             "type": "array",
@@ -591,14 +581,14 @@
             },
             "description": "Additional arguments for Codex CLI",
             "markdownDescription": "Additional command-line arguments for Codex CLI.\n\n**Example arguments**:\n- `[\"--model\", \"gpt-4\"]`\n- `[\"--temperature\", \"0.5\"]`\n- `[\"--max-tokens\", \"4000\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
-            "order": 19
+            "order": 20
           },
           "gemini-cli-vscode.claude.command": {
             "type": "string",
             "default": "claude",
             "description": "Command to launch Claude Code CLI",
             "markdownDescription": "Custom command to launch Claude Code.\n\n**Examples**:\n- `claude` (default)\n- `npx @anthropic/claude-code`\n- `/opt/claude/bin/claude`\n- Custom wrapper script\n\n\ud83d\udd27 Change only if using non-standard installation",
-            "order": 20
+            "order": 21
           },
           "gemini-cli-vscode.claude.args": {
             "type": "array",
@@ -608,14 +598,14 @@
             },
             "description": "Additional arguments for Claude Code CLI",
             "markdownDescription": "Additional command-line arguments for Claude Code.\n\n**Example arguments**:\n- `[\"--model\", \"claude-3-opus\"]`\n- `[\"--max-tokens\", \"4000\"]`\n- `[\"--temperature\", \"0.7\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
-            "order": 21
+            "order": 22
           },
           "gemini-cli-vscode.qwen.command": {
             "type": "string",
             "default": "qwen",
             "description": "Command to launch Qwen CLI (e.g., 'qwen' or custom command)",
             "markdownDescription": "Custom command to launch Qwen CLI.\n\n**Examples**:\n- `qwen` (default)\n- `python -m qwen_cli`\n- `docker run qwen-cli`\n- Custom wrapper script\n\n\ud83d\udd27 Configure based on your Qwen installation",
-            "order": 22
+            "order": 23
           },
           "gemini-cli-vscode.qwen.args": {
             "type": "array",
@@ -625,38 +615,22 @@
             },
             "description": "Additional arguments for Qwen CLI",
             "markdownDescription": "Additional command-line arguments for Qwen CLI.\n\n**Example arguments**:\n- `[\"--model\", \"qwen-72b\"]`\n- `[\"--temperature\", \"0.8\"]`\n- `[\"--top-p\", \"0.9\"]`\n\n\ud83d\udce6 Arguments are passed directly to the CLI",
-            "order": 23
+            "order": 24
           },
           "gemini-cli-vscode.migration.v3.notified": {
             "type": "boolean",
             "default": false,
             "description": "Whether v0.3.0 migration notification has been shown",
             "markdownDescription": "Internal flag to track if the v0.3.0 command migration notification has been shown.\n\n\u26a0\ufe0f **Advanced**: Only change this if you want to reset the notification.",
-            "order": 24
-      },
-      "gemini-cli-vscode.diagnostics.performance": {
-        "type": "boolean",
-        "default": false,
-        "description": "Enable performance metrics logging",
-        "markdownDescription": "\ud83d\udcca Enable performance metrics logging to track extension and terminal operation times.\n\n**When enabled**:\n- Logs timing for extension activation\n- Tracks terminal creation time\n- Measures text send operations\n\n\u26a0\ufe0f **Advanced**: May impact performance slightly when enabled.",
-        "order": 25
-      },
-      "gemini-cli-vscode.templates.enabled": {
-        "type": "boolean",
-        "default": true,
-        "description": "Enable MAGUS Templates features",
-        "markdownDescription": "Master switch for **MAGUS Templates** features (list/preview/insert).",
-        "order": 30
-      },
-      
-      "gemini-cli-vscode.templates.files": {
-        "type": "array",
-        "default": [],
-        "items": { "type": "string" },
-        "description": "Markdown files to treat as templates (split by H1). In Settings UI, add one file path per item.",
-        "markdownDescription": "Register additional Markdown files as template sources.\n\n- Each file is split by top-level headings (`# ...`) and listed as individual templates.\n- Relative paths are resolved against the workspace root.\n- In the Settings UI, click 'Add Item' and enter one file path per item.\n- Example values (per item in UI): `.history-memo/prompts.md`, `docs/prompts.md`\n- Example in settings.json: `[\".history-memo/prompts.md\", \"docs/prompts.md\"]`",
-        "order": 32
-      }
+            "order": 25
+          },
+          "gemini-cli-vscode.diagnostics.performance": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable performance metrics logging",
+            "markdownDescription": "\ud83d\udcca Enable performance metrics logging to track extension and terminal operation times.\n\n**When enabled**:\n- Logs timing for extension activation\n- Tracks terminal creation time\n- Measures text send operations\n\n\u26a0\ufe0f **Advanced**: May impact performance slightly when enabled.",
+            "order": 26
+          }
         }
       }
     ]

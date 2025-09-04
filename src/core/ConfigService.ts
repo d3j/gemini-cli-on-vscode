@@ -46,7 +46,10 @@ const DEFAULT_VALUES: Record<string, any> = {
     'qwen.enabled': false,
     'qwen.command': 'qwen',
     'qwen.args': [],
-    
+
+    // Terminal settings
+    'terminal.cwdCommand': 'cd "{path}"',
+
     // Other settings
     'saveToHistory.enabled': true,
     'saveToHistory.includeTerminalName': false,
