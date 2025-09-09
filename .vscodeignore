@@ -55,6 +55,7 @@ CLAUDE.md
 GEMINI.md
 AGENTS.md
 QWEN.md
+aidp
 
 # Dev-only resources not bundled into extension
 resources/test-pageupdown.html

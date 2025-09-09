@@ -233,10 +233,25 @@ export class CommandHandler implements vscode.Disposable {
      * Send file path to MAGUS Council
      */
     public async sendFilePathToMAGUSCouncil(uri: vscode.Uri | undefined, uris: vscode.Uri[] | undefined): Promise<void> {
-        // Prepare file paths
-        const selectedFiles = fileHandler.prepareFilePaths(uri, uris);
-        if (!selectedFiles) {
-            return;
+        // Format file paths
+        let filePathText = '';
+        
+        if (uris && uris.length > 0) {
+            // Multiple files selected
+            const formattedPaths = uris.map(u => this.fileHandler.formatFilePath(u));
+            filePathText = formattedPaths.join(' ');
+        } else if (uri) {
+            // Single file selected
+            filePathText = this.fileHandler.formatFilePath(uri);
+        } else {
+            // Use active editor's file
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor) {
+                filePathText = this.fileHandler.formatFilePath(activeEditor.document.uri);
+            } else {
+                vscode.window.showWarningMessage('No file selected');
+                return;
+            }
         }
         
         // Open/focus MAGUS Council WebView
@@ -250,10 +265,10 @@ export class CommandHandler implements vscode.Disposable {
         
         // Send file paths to WebView
         if (this.promptComposerViewProvider) {
-            await this.promptComposerViewProvider.setPromptText(selectedFiles);
+            await this.promptComposerViewProvider.setPromptText(filePathText);
         } else {
             // Fallback: copy to clipboard
-            await vscode.env.clipboard.writeText(selectedFiles);
+            await vscode.env.clipboard.writeText(filePathText);
             vscode.window.showInformationMessage(
                 'MAGUS Council is initializing. File paths copied to clipboard - please paste them into the composer.'
             );
