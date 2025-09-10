@@ -94,30 +94,26 @@ export class HistoryService implements vscode.Disposable {
         try {
             // Prepare content with timestamp and terminal info
             const now = new Date();
-            const useLocalTimezone = this.configService.get<boolean>('saveToHistory.useLocalTimezone', true);
             
-            const timestamp = useLocalTimezone 
-                ? this.dateCalculator.formatLocalDateTime(now)
-                : now.toISOString();
-            
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            const timeStr = `${hh}:${mm}:${ss}`;
+
             // Include terminal name if configured and from terminal
             const includeTerminalName = this.configService.get<boolean>('saveToHistory.includeTerminalName', false);
-            let header = `\n## ${timestamp}`;
-            
+            let header = `\n# [${timeStr}]`;
             if (includeTerminalName && activeTerminal) {
                 header += ` - Terminal: ${activeTerminal.name}`;
             }
-            
             const content = `${header}\n\n\`\`\`\n${textToSave}\n\`\`\`\n`;
             
             // Append to history file
             if (fs.existsSync(historyPath)) {
                 fs.appendFileSync(historyPath, content, 'utf8');
             } else {
-                // Create new file with header
-                const dateStr = this.getLogicalDateString();
-                const fileHeader = `# History - ${dateStr}\n\n`;
-                fs.writeFileSync(historyPath, fileHeader + content, 'utf8');
+                // Create new file without a top header
+                fs.writeFileSync(historyPath, content, 'utf8');
             }
             
             vscode.window.showInformationMessage(`Saved to history: ${path.basename(historyPath)}`);
@@ -191,21 +187,20 @@ export class HistoryService implements vscode.Disposable {
 
         try {
             const now = new Date();
-            const useLocalTimezone = this.configService.get<boolean>('saveToHistory.useLocalTimezone', true);
             
-            const timestamp = useLocalTimezone 
-                ? this.dateCalculator.formatLocalDateTime(now)
-                : now.toISOString();
-                
-            const header = `\n## ${timestamp} - MAGUS Council Composer`;
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            const timeStr = `${hh}:${mm}:${ss}`;
+
+            const header = `\n# [${timeStr}] - MAGUS Council Composer`;
             const content = `${header}\n\n\`\`\`\n${text}\n\`\`\`\n`;
             
             if (fs.existsSync(historyPath)) {
                 fs.appendFileSync(historyPath, content, 'utf8');
             } else {
-                const dateStr = this.getLogicalDateString();
-                const fileHeader = `# History - ${dateStr}\n\n`;
-                fs.writeFileSync(historyPath, fileHeader + content, 'utf8');
+                // Create new file without a top header
+                fs.writeFileSync(historyPath, content, 'utf8');
             }
             
             this.logger.info('Saved webview text to history');

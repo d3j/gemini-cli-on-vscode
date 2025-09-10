@@ -1,7 +1,7 @@
 {
   "name": "gemini-cli-on-vscode",
   "displayName": "Gemini CLI on VSCode",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "icon": "images/icon.png",
   "description": "Run Gemini & Codex CLI (GPT-5) in editor panes like Claude Code - no more terminal switching",
   "publisher": "d3j",
@@ -661,6 +661,14 @@
         "description": "Path to shared templates directory (relative or absolute)",
         "markdownDescription": "Directory path for shared templates. **Relative paths** are resolved against the workspace root. **Absolute paths** are used as-is.",
         "order": 33
+      },
+      "gemini-cli-vscode.templates.files": {
+        "type": "array",
+        "default": [],
+        "items": { "type": "string" },
+        "description": "Markdown files to treat as templates (split by H1). In Settings UI, add one file path per item.",
+        "markdownDescription": "Register additional Markdown files as template sources.\n\n- Each file is split by top-level headings (`# ...`) and listed as individual templates.\n- Relative paths are resolved against the workspace root.\n- In the Settings UI, click 'Add Item' and enter one file path per item.\n- Example values (per item in UI): `.history-memo/prompts.md`, `docs/prompts.md`\n- Example in settings.json: `[\".history-memo/prompts.md\", \"docs/prompts.md\"]`",
+        "order": 34
       }
         }
       }

@@ -38,13 +38,15 @@ export class TemplateService {
     }
 
     async list(query: ListQuery = {}): Promise<{ templates: TemplateMeta[]; total: number; hasMore: boolean }> {
-        const sources = query.sources ?? ['shared', 'history'];
+        const sources = query.sources ?? ['shared', 'history', 'user'];
         let items: TemplateMeta[] = [];
         for (const s of sources) {
             if (s === 'shared') {
                 items.push(...this.listShared());
             } else if (s === 'history') {
                 items.push(...this.listHistory());
+            } else if (s === 'user') {
+                items.push(...this.listUserFiles());
             }
         }
         // filter
@@ -79,10 +81,29 @@ export class TemplateService {
     }
 
     async get(id: string): Promise<Template | undefined> {
-        // Only from shared for now
-        const filePath = this.resolveIdToSharedPath(id);
-        if (!filePath || !fs.existsSync(filePath)) return undefined;
-        return this.readTemplateFromFile(filePath, 'shared');
+        // Support shared and history sources
+        if (id.startsWith('shared:')) {
+            const filePath = this.resolveIdToSharedPath(id);
+            if (!filePath || !fs.existsSync(filePath)) return undefined;
+            return this.readTemplateFromFile(filePath, 'shared');
+        }
+        if (id.startsWith('history:')) {
+            const { filePath, sectionIndex } = this.resolveIdToHistoryTarget(id) || {} as any;
+            if (!filePath || !fs.existsSync(filePath)) return undefined;
+            if (typeof sectionIndex === 'number') {
+                return this.readHistorySectionAsTemplate(filePath, sectionIndex);
+            }
+            return this.readHistoryAsTemplate(filePath);
+        }
+        if (id.startsWith('user:')) {
+            const target = this.resolveIdToUserTarget(id);
+            if (!target || !fs.existsSync(target.filePath)) return undefined;
+            if (typeof target.sectionIndex === 'number') {
+                return this.readUserSectionAsTemplate(target.filePath, target.sectionIndex);
+            }
+            return this.readUserFileAsTemplate(target.filePath);
+        }
+        return undefined;
     }
 
     async preview(id: string, values?: Record<string, any>): Promise<{ preview: string; html: string }> {
@@ -135,14 +156,90 @@ export class TemplateService {
         const dir = path.join(root, '.history-memo');
         if (!fs.existsSync(dir)) return [];
         const entries = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
-        return entries.map(f => ({
-            id: `history:${path.basename(f, '.md')}`,
-            name: `History ${path.basename(f, '.md')}`,
-            description: 'History memo',
+        if (!entries.length) return [];
+
+        const parsed = entries.map(f => {
+            const base = path.basename(f, '.md');
+            const m = base.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            const full = path.join(dir, f);
+            let key: number | undefined = undefined;
+            if (m) {
+                key = Number(`${m[1]}${m[2]}${m[3]}`);
+            }
+            let mtime = 0;
+            try { mtime = fs.statSync(full).mtimeMs; } catch {}
+            return { file: f, full, base, dateKey: key, mtime };
+        });
+
+        // Prefer filename date; fallback to mtime
+        let latest = parsed
+            .filter(p => typeof p.dateKey === 'number')
+            .sort((a, b) => (b.dateKey! - a.dateKey!))[0];
+        if (!latest) {
+            latest = parsed.sort((a, b) => b.mtime - a.mtime)[0];
+        }
+        if (!latest) return [];
+
+        const date = latest.base;
+        const metas: TemplateMeta[] = [];
+        // Whole day meta
+        metas.push({
+            id: `history:${date}`,
+            name: `History ${date}`,
+            description: 'History memo (full day)',
             source: 'history' as TemplateSource,
-            tags: [],
+            tags: ['day'],
             parameterized: false
-        }));
+        });
+        // Section metas
+        const sections = this.parseHistorySections(safeRead(latest.full));
+        sections.forEach(sec => {
+            metas.push({
+                id: `history:${date}#${sec.index}`,
+                name: `History ${date} — ${sec.title}`,
+                description: 'History memo section',
+                source: 'history' as TemplateSource,
+                tags: ['section'],
+                parameterized: false
+            });
+        });
+        return metas;
+    }
+
+    private listUserFiles(): TemplateMeta[] {
+        const cfg = vscode.workspace.getConfiguration('gemini-cli-vscode.templates');
+        const files = (cfg.get<string[]>('files', []) || []).filter(Boolean);
+        if (!files.length) return [];
+        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        const metas: TemplateMeta[] = [];
+        for (const entry of files) {
+            const resolved = this.resolvePath(entry, root);
+            if (!resolved || !fs.existsSync(resolved)) continue;
+            const raw = safeRead(resolved);
+            const sections = this.parseHistorySections(raw); // H1-based split
+            const base = path.basename(resolved);
+            const idBase = this.encodePathForId(resolved);
+            if (sections.length === 0) {
+                metas.push({
+                    id: `user:${idBase}`,
+                    name: base,
+                    description: 'User template file',
+                    source: 'user',
+                    tags: ['user-file'],
+                    parameterized: false
+                });
+            } else {
+                sections.forEach(sec => metas.push({
+                    id: `user:${idBase}#${sec.index}`,
+                    name: `${base} — ${sec.title}`,
+                    description: 'User template section',
+                    source: 'user',
+                    tags: ['user-file', 'section'],
+                    parameterized: false
+                }));
+            }
+        }
+        return metas;
     }
 
     private resolveIdToSharedPath(id: string): string | undefined {
@@ -153,6 +250,30 @@ export class TemplateService {
         const candidate = path.join(dir, `${base}.md`);
         if (fs.existsSync(candidate)) return candidate;
         return undefined;
+    }
+
+    private resolveIdToHistoryTarget(id: string): { filePath: string; sectionIndex?: number } | undefined {
+        if (!id.startsWith('history:')) return undefined;
+        const rest = id.substring('history:'.length);
+        const [date, section] = rest.split('#', 2);
+        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!root || !date) return undefined;
+        const dir = path.join(root, '.history-memo');
+        const filePath = path.join(dir, `${date}.md`);
+        if (!fs.existsSync(filePath)) return undefined;
+        const sectionIndex = section ? Number(section) : undefined;
+        return { filePath, sectionIndex: Number.isFinite(sectionIndex) ? sectionIndex : undefined };
+    }
+
+    private resolveIdToUserTarget(id: string): { filePath: string; sectionIndex?: number } | undefined {
+        if (!id.startsWith('user:')) return undefined;
+        const rest = id.substring('user:'.length);
+        const [encoded, section] = rest.split('#', 2);
+        if (!encoded) return undefined;
+        const filePath = this.decodePathFromId(encoded);
+        if (!filePath) return undefined;
+        const sectionIndex = section ? Number(section) : undefined;
+        return { filePath, sectionIndex: Number.isFinite(sectionIndex) ? sectionIndex : undefined };
     }
 
     private readTemplateFromFile(filePath: string, source: TemplateSource): Template {
@@ -178,6 +299,136 @@ export class TemplateService {
             origin: { path: filePath }
         };
         return t;
+    }
+
+    private readHistoryAsTemplate(filePath: string): Template {
+        // History memos are plain Markdown (no front matter expected)
+        const raw = safeRead(filePath);
+        const stat = fs.statSync(filePath);
+        const base = path.basename(filePath, path.extname(filePath));
+        const t: Template = {
+            id: `history:${base}`,
+            name: `History ${base}`,
+            description: 'History memo',
+            source: 'history',
+            tags: [],
+            parameterized: false,
+            content: raw,
+            metadata: {
+                createdAt: stat.birthtime,
+                updatedAt: stat.mtime
+            },
+            trust: { signed: false },
+            origin: { path: filePath }
+        };
+        return t;
+    }
+
+    private readHistorySectionAsTemplate(filePath: string, sectionIndex: number): Template {
+        const raw = safeRead(filePath);
+        const stat = fs.statSync(filePath);
+        const base = path.basename(filePath, path.extname(filePath));
+        const sections = this.parseHistorySections(raw);
+        const sec = sections.find(s => s.index === sectionIndex);
+        const content = sec ? raw.slice(sec.startOffset, sec.endOffset) : '';
+        const title = sec ? sec.title : `Section ${sectionIndex}`;
+        const t: Template = {
+            id: `history:${base}#${sectionIndex}`,
+            name: `History ${base} — ${title}`,
+            description: 'History memo section',
+            source: 'history',
+            tags: ['section'],
+            parameterized: false,
+            content,
+            metadata: {
+                createdAt: stat.birthtime,
+                updatedAt: stat.mtime
+            },
+            trust: { signed: false },
+            origin: { path: filePath }
+        };
+        return t;
+    }
+
+    private readUserFileAsTemplate(filePath: string): Template {
+        const raw = safeRead(filePath);
+        const stat = fs.statSync(filePath);
+        const idBase = this.encodePathForId(filePath);
+        const t: Template = {
+            id: `user:${idBase}`,
+            name: path.basename(filePath),
+            description: 'User template file',
+            source: 'user',
+            tags: ['user-file'],
+            parameterized: false,
+            content: raw,
+            metadata: { createdAt: stat.birthtime, updatedAt: stat.mtime },
+            trust: { signed: false },
+            origin: { path: filePath }
+        };
+        return t;
+    }
+
+    private readUserSectionAsTemplate(filePath: string, sectionIndex: number): Template {
+        const raw = safeRead(filePath);
+        const stat = fs.statSync(filePath);
+        const sections = this.parseHistorySections(raw);
+        const sec = sections.find(s => s.index === sectionIndex);
+        const content = sec ? raw.slice(sec.startOffset, sec.endOffset) : '';
+        const title = sec ? sec.title : `Section ${sectionIndex}`;
+        const idBase = this.encodePathForId(filePath);
+        const t: Template = {
+            id: `user:${idBase}#${sectionIndex}`,
+            name: `${path.basename(filePath)} — ${title}`,
+            description: 'User template section',
+            source: 'user',
+            tags: ['user-file', 'section'],
+            parameterized: false,
+            content,
+            metadata: { createdAt: stat.birthtime, updatedAt: stat.mtime },
+            trust: { signed: false },
+            origin: { path: filePath }
+        };
+        return t;
+    }
+
+    private resolvePath(p: string, root?: string): string | undefined {
+        const trimmed = (p || '').trim();
+        if (!trimmed) return undefined;
+        if (path.isAbsolute(trimmed)) return trimmed;
+        const base = root || '';
+        return path.resolve(base, trimmed.startsWith('./') ? trimmed.substring(2) : trimmed);
+    }
+
+    private encodePathForId(p: string): string {
+        try { return Buffer.from(p, 'utf8').toString('base64url'); } catch { return encodeURIComponent(p); }
+    }
+    private decodePathFromId(s: string): string {
+        try { return Buffer.from(s, 'base64url').toString('utf8'); } catch { try { return decodeURIComponent(s); } catch { return ''; } }
+    }
+
+    private parseHistorySections(raw: string): Array<{ index: number; title: string; startOffset: number; endOffset: number }>{
+        const sections: Array<{ index: number; title: string; startOffset: number; endOffset: number }> = [];
+        if (!raw) return sections;
+        const lines = raw.split(/\r?\n/);
+        let offsets: number[] = [];
+        let acc = 0;
+        for (const line of lines) { offsets.push(acc); acc += line.length + 1; }
+        // Find section headers: H1 only ('# ')
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (/^#\s+/.test(line)) {
+                const title = line.replace(/^#\s+/, '').trim();
+                sections.push({ index: sections.length + 1, title, startOffset: offsets[i], endOffset: raw.length });
+            }
+        }
+        // compute end offsets (next section start)
+        for (let i = 0; i < sections.length; i++) {
+            if (i + 1 < sections.length) {
+                sections[i].endOffset = sections[i + 1].startOffset;
+            }
+        }
+        return sections;
     }
 
     private toSafeHtml(markdown: string): string {

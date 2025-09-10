@@ -8,40 +8,24 @@ All notable changes to this project will be documented in this file.
 
 - New “Templates” view in the MAGUS Council sidebar (enable via `gemini-cli-vscode.templates.enabled`).
 - Accordion UI (single-expand): click a title to expand → preview → insert inline.
-  - Insert positions: [Head] / [Cursor] / [Tail] with [ ] Replace selection.
+  - Insert positions: [Head] / [Cursor] / [Tail] / [Replace]
   - Uses `composer/insertTemplate` → Composer `composer/insert` for safe text insertion.
 - Incremental search with inline toggle [×/⟳]
   - [×] clears when input is non-empty; [⟳] refreshes when input is empty.
 - Preview is generated lazily on expand and cached; shown with CSP/DOMPurify sanitization.
 
 ### Added
-
-- TemplateService (minimal): reads `.magus-templates/shared/*.md`; supports list/get/preview/render.
-- RenderEngine (minimal): logic-less (mustache/liquid-lite), input validation, size/timeout limits.
-- Front matter parser (minimal): separates YAML-like header from Markdown body.
-- New IPC (WebView ⇄ Extension):
-  - WebView→Ext: `templates/list|get|preview|render`, `composer/insertTemplate`
-  - Ext→WebView(Composer): `composer/insert`
-- Settings:
-  - `gemini-cli-vscode.templates.enabled`
-  - `gemini-cli-vscode.templates.sources.shared.enabled`
-  - `gemini-cli-vscode.templates.sources.shared.path`
-- Unit tests: frontMatter, renderEngine, templateService.list, ipcTypes.
+- Templates view in the MAGUS Council sidebar with accordion UI, preview, and Head/Cursor/Tail/Replace insertion.
+- Template sources: shared (`.magus-templates/shared`), history (latest day only; H1 sections), and user files via `gemini-cli-vscode.templates.files` (H1 split).
+- TemplateService / RenderEngine / front-matter parser and IPC endpoints (`templates/*`, `composer/insertTemplate`).
+- Settings: `templates.enabled`, `templates.sources.shared.enabled`, `templates.sources.shared.path`, `templates.files`.
+- Unit tests for templates, render engine, and history/user sources.
 
 ### Changed
-
-- Optimized Templates UI for narrow sidebar: single-column accordion, inline actions.
-- Simplified search UI: removed Refresh button; integrated [×/⟳] into the search field.
+- History format: each entry saved as H1 `# [HH:MM:SS] ...`; no per-file top header for new files. Old files remain unchanged.
 
 ### Docs
-
-- Updated design/spec docs (ui-design, feature-design, design, architecture, test-scenarios).
-- Added UI design link to README.
-
-### Notes
-
-- No breaking changes to existing features.
-- v5 enhancements (Form Drawer, Packs, Trust, Worker search, Virtual list) will roll out in future milestones.
+- Updated templates documentation and Settings descriptions
 
 ## [0.3.1] - 2025-08-22
 

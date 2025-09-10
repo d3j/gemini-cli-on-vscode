@@ -26,7 +26,7 @@
 
     async function loadList(){
         const query = searchEl.value.trim();
-        const res = await request('templates/list', { sources: ['shared'], query, limit: 200 });
+        const res = await request('templates/list', { sources: ['shared', 'history', 'user'], query, limit: 200 });
         templates = res.templates || [];
         listEl.innerHTML = '';
         for(const t of templates){

@@ -243,15 +243,19 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
 
         const dateStr = new Date().toISOString().split('T')[0];
         const historyPath = path.join(historyDir, `${dateStr}.md`);
-        const timestamp = new Date().toTimeString().split(' ')[0];
+        const timestamp = new Date();
+        const hh = String(timestamp.getHours()).padStart(2, '0');
+        const mm = String(timestamp.getMinutes()).padStart(2, '0');
+        const ss = String(timestamp.getSeconds()).padStart(2, '0');
+        const timeStr = `${hh}:${mm}:${ss}`;
         const agentList = agents.join(', ');
-        const header = `\n## [${timestamp}] - MAGUS Council → ${agentList}\n`;
+        const header = `\n# [${timeStr}] - MAGUS Council → ${agentList}\n\n`;
         const content = prompt.trim();
         const formattedContent = `${header}${content}\n`;
 
         if (!fs.existsSync(historyPath)) {
-            const fileHeader = `# History Memo - ${dateStr}\n`;
-            fs.writeFileSync(historyPath, fileHeader);
+            // Create new file without any header; filename already conveys the date
+            fs.writeFileSync(historyPath, '');
         }
         fs.appendFileSync(historyPath, formattedContent);
     }
