@@ -12,6 +12,7 @@ import { CLIModuleManager } from '../modules/CLIModuleManager';
 import { TerminalCleanup } from './TerminalCleanup';
 import { StatusBarManager } from '../ui/StatusBarManager';
 import { HistoryService } from './HistoryService';
+import { TemplatesViewProvider } from '../templates/templatesView';
 
 // Track global registration state to prevent duplicates
 let isComposerViewRegistered = false;
@@ -28,6 +29,8 @@ export class ExtensionBootstrap {
     public historyService!: HistoryService;
     public composerViewRegistration?: vscode.Disposable;
     public promptComposerViewProvider?: PromptComposerViewProvider;
+    public templatesViewRegistration?: vscode.Disposable;
+    public templatesViewProvider?: TemplatesViewProvider;
     private startTime: number = 0;
     
     async initialize(context: vscode.ExtensionContext): Promise<void> {
@@ -97,6 +100,8 @@ export class ExtensionBootstrap {
         
         // Register Sidebar Prompt Composer (after fileHandler initialization)
         this.registerComposerView(context);
+        // Register Templates Panel
+        this.registerTemplatesView(context);
         
         // Set PromptComposerViewProvider on CommandHandler for MAGUS Council integration
         if (this.commandHandler && this.promptComposerViewProvider) {
@@ -158,6 +163,36 @@ export class ExtensionBootstrap {
         );
         context.subscriptions.push(this.composerViewRegistration);
         isComposerViewRegistered = true;
+    }
+
+    private registerTemplatesView(context: vscode.ExtensionContext): void {
+        try {
+            this.templatesViewProvider = new TemplatesViewProvider(context);
+            this.templatesViewRegistration = vscode.window.registerWebviewViewProvider(
+                TemplatesViewProvider.viewId,
+                this.templatesViewProvider
+            );
+            context.subscriptions.push(this.templatesViewRegistration);
+            // Wire insert handler to forward to PromptComposer
+            this.templatesViewProvider.setInsertHandler(async ({ content, position, replaceSelection, sourceId }) => {
+                // Ensure composer is visible then send
+                try {
+                    await vscode.commands.executeCommand('workbench.view.extension.gemini-cli-vscode');
+                    await vscode.commands.executeCommand('gemini-cli-vscode.promptComposerView.focus');
+                } catch {}
+                // Post message to composer webview if available
+                try {
+                    const payload: any = { type: 'composer/insert', payload: { content, position, replacePrompt: !!replaceSelection, sourceId } };
+                    this.promptComposerViewProvider?.postMessageToWebview(payload);
+                } catch (e) {
+                    this.logger?.warn('Failed to post composer/insert to webview, fallback to clipboard', e);
+                    await vscode.env.clipboard.writeText(content);
+                    vscode.window.showInformationMessage('Content copied. Paste it into the MAGUS Council prompt.');
+                }
+            });
+        } catch (error) {
+            this.logger?.error('Failed to register TemplatesView:', error);
+        }
     }
     
     private registerCommands(context: vscode.ExtensionContext): void {
@@ -250,6 +285,10 @@ export class ExtensionBootstrap {
             this.composerViewRegistration.dispose();
             this.composerViewRegistration = undefined;
             isComposerViewRegistered = false;
+        }
+        if (this.templatesViewRegistration) {
+            this.templatesViewRegistration.dispose();
+            this.templatesViewRegistration = undefined;
         }
     }
 }

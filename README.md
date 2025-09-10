@@ -167,6 +167,45 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 - Right-click in editor
 - Choose "Send Open File Path" for your preferred CLI
 
+### 📚 Using Templates (0.4.0+)
+
+1) Enable in Settings
+- `gemini-cli-vscode.templates.enabled`: true
+- `gemini-cli-vscode.templates.sources.shared.enabled`: true
+- `gemini-cli-vscode.templates.sources.shared.path`: `.magus-templates/shared` (relative or absolute)
+
+2) Place shared templates
+- Create `./.magus-templates/shared/` at your workspace root
+- Add your template files (e.g., `greeting.md`)
+
+3) Search → Preview → Insert
+- In the Templates view, click a title to expand and preview
+- Choose [Head]/[Cursor]/[Tail] + [ ] Replace to send into MAGUS Council's prompt
+- Clear search with [×]; when empty, use [⟳] to refresh
+
+Supported sources
+- shared: `./.magus-templates/shared/*.md` (supports both relative and absolute paths)
+
+Template format
+- YAML front matter + Markdown
+- Example:
+
+```md
+---
+name: Greeting
+description: Simple greeting
+tags:
+- sample
+- demo
+inputs:
+- key: name
+  label: Name
+  type: string
+  required: true
+---
+Hello, {{ name }}!
+```
+
 ### 🔮 Using MAGUS Council
 
 **From Unified Control Panel:**
@@ -182,7 +221,7 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 - Traditional file sending features
 - Context menu operations
 
-### ⌨️ Command Palette
+## 📋 Command List
 
 **MAGUS Council Commands:**
 
@@ -336,6 +375,15 @@ For power users who want detailed control:
 - `saveToHistory.useLocalTimezone`: Use local timezone for history timestamps
 - `saveToHistory.dayBoundary`: Custom day boundary time (e.g., "02:00" for night shift workers)
 - `saveToHistory.includeTerminalName`: Include terminal name in saved history entries
+
+### Template Settings (0.4.0+)
+
+- `gemini-cli-vscode.templates.enabled` (default: true)
+  - Master ON/OFF for the Templates feature
+- `gemini-cli-vscode.templates.sources.shared.enabled` (default: true)
+  - Whether to use the shared source (shared)
+- `gemini-cli-vscode.templates.sources.shared.path` (default: `.magus-templates/shared`)
+  - Path to the shared directory. Relative paths are resolved from the workspace root; absolute paths are used as-is
 
 ## 🤝 Contributing
 

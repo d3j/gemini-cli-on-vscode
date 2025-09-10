@@ -160,7 +160,9 @@ describe('CommandHandler - sendSelectedToMAGUSCouncil', () => {
                 document: { getText: () => text }
             };
             sandbox.stub(vscode.window, 'activeTextEditor').value(mockEditor);
-            sandbox.stub(vscode.env.clipboard, 'writeText').resolves();
+            // Some VS Code builds expose clipboard.writeText as non-configurable; use replace instead of stub
+            // Replace the clipboard getter to avoid non-configurable descriptor issues
+            (sinon as any).replaceGetter(vscode.env as any, 'clipboard', () => ({ writeText: async (_t: string) => undefined }));
             // Provider not set
             
             await commandHandler.sendSelectedToMAGUSCouncil();

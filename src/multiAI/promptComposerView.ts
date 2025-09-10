@@ -10,6 +10,7 @@ import {
     TerminalInfo
 } from '../types/ipc';
 import { createNonce, getCspMeta, asWebviewUri, getLocalResourceRoots } from '../ui/webviewUtils';
+import { TemplateService } from '../templates/templateService';
 
 export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewId = 'gemini-cli-vscode.promptComposerView';
@@ -17,12 +18,19 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
     private view: vscode.WebviewView | undefined;
     private contextManager: ContextManager;
     private isReady = false;
+    private templateService: TemplateService;
 
     constructor(
         private readonly context: vscode.ExtensionContext,
         private readonly fileHandler: FileHandler
     ) {
         this.contextManager = new ContextManager();
+        this.templateService = new TemplateService();
+    }
+
+    public postMessageToWebview(message: any): void {
+        if (!this.view) return;
+        this.view.webview.postMessage(message);
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
@@ -113,7 +121,33 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
                         terminals: message.terminals
                     });
                     break;
-                    
+                case 'templates/list': {
+                    const { templates, total, hasMore } = await this.templateService.list(message.payload);
+                    await this.sendResponse(requestId, { type: 'result', data: { templates, total, hasMore } });
+                    break;
+                }
+                case 'templates/get': {
+                    const t = await this.templateService.get(message.payload.id);
+                    await this.sendResponse(requestId, { type: 'result', data: { template: t } });
+                    break;
+                }
+                case 'templates/preview': {
+                    const res = await this.templateService.preview(message.payload.id, message.payload.values);
+                    await this.sendResponse(requestId, { type: 'result', data: res });
+                    break;
+                }
+                case 'templates/render': {
+                    const res = await this.templateService.render(message.payload.id, message.payload.values);
+                    await this.sendResponse(requestId, { type: 'result', data: res });
+                    break;
+                }
+                case 'history/list': {
+                    // For now, use TemplateService.list with source history
+                    const { templates } = await this.templateService.list({ sources: ['history'] });
+                    await this.sendResponse(requestId, { type: 'result', data: { entries: templates } });
+                    break;
+                }
+                
                 default:
                     // exhaustiveness check
                     throw new Error(`Unknown command: ${(message as any).command}`);
@@ -127,11 +161,12 @@ export class PromptComposerViewProvider implements vscode.WebviewViewProvider {
     }
     
     private async sendResponse(
-        requestId: string | undefined, 
-        payload: { type: 'stateUpdate'; terminals: TerminalInfo[] } | 
+        requestId: string | undefined,
+        payload: { type: 'stateUpdate'; terminals: TerminalInfo[] } |
                  { type: 'result'; success: boolean; error?: string } |
                  { type: 'error'; error: string; code?: string } |
-                 { type: 'terminalsUpdate'; terminals: string[] }
+                 { type: 'terminalsUpdate'; terminals: string[] } |
+                 { type: 'result'; data: any }
     ): Promise<void> {
         if (!this.view) return;
         

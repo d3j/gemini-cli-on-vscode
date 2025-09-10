@@ -137,6 +137,9 @@
         const message = event.data;
         
         switch (message.type) {
+            case 'composer/insert':
+                handleComposerInsert(message.payload || {});
+                break;
             case 'composer/state':
                 handleStateUpdate(message.payload);
                 break;
@@ -154,6 +157,60 @@
                 break;
         }
     });
+
+    function handleComposerInsert(payload) {
+        const content = String(payload.content || '');
+        const position = payload.position || 'cursor';
+        const replaceSelection = !!payload.replaceSelection; // legacy
+        const replacePrompt = !!payload.replacePrompt;
+        if (!content) return;
+
+        const ta = promptInput;
+        const original = ta.value || '';
+        let start = ta.selectionStart || 0;
+        let end = ta.selectionEnd || 0;
+        let updated = original;
+
+        if (replacePrompt) {
+            ta.value = content;
+            ta.setSelectionRange(ta.value.length, ta.value.length);
+            updateStats();
+            autoResizeTextarea();
+            saveState();
+            ta.focus();
+            return;
+        }
+
+        if (position === 'head') {
+            const sep = original.length ? (original.startsWith('\n') ? '' : '\n') : '';
+            updated = content + (content.endsWith('\n') ? '' : '\n') + sep + original;
+            ta.value = updated;
+            ta.setSelectionRange(content.length, content.length);
+        } else if (position === 'tail') {
+            const sep = original.length && !original.endsWith('\n') ? '\n' : '';
+            updated = original + sep + content;
+            ta.value = updated;
+            ta.setSelectionRange(updated.length, updated.length);
+        } else {
+            // cursor
+            if (replaceSelection && start !== end) {
+                updated = original.slice(0, start) + content + original.slice(end);
+                ta.value = updated;
+                const pos = start + content.length;
+                ta.setSelectionRange(pos, pos);
+            } else {
+                updated = original.slice(0, start) + content + original.slice(start);
+                ta.value = updated;
+                const pos = start + content.length;
+                ta.setSelectionRange(pos, pos);
+            }
+        }
+
+        updateStats();
+        autoResizeTextarea();
+        saveState();
+        ta.focus();
+    }
     
     function handleStateUpdate(state) {
         // Set default agents (v4.2 - using toggle buttons)

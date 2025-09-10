@@ -63,6 +63,12 @@
           "id": "gemini-cli-vscode.promptComposerView",
           "name": "MAGUS Council",
           "when": "config.gemini-cli-vscode.magusCouncil.enabled"
+        },
+        {
+          "type": "webview",
+          "id": "gemini-cli-vscode.templatesView",
+          "name": "Templates",
+          "when": "config.gemini-cli-vscode.templates.enabled"
         }
       ]
     },
@@ -627,14 +633,35 @@
             "description": "Whether v0.3.0 migration notification has been shown",
             "markdownDescription": "Internal flag to track if the v0.3.0 command migration notification has been shown.\n\n\u26a0\ufe0f **Advanced**: Only change this if you want to reset the notification.",
             "order": 24
-          },
-          "gemini-cli-vscode.diagnostics.performance": {
-            "type": "boolean",
-            "default": false,
-            "description": "Enable performance metrics logging",
-            "markdownDescription": "\ud83d\udcca Enable performance metrics logging to track extension and terminal operation times.\n\n**When enabled**:\n- Logs timing for extension activation\n- Tracks terminal creation time\n- Measures text send operations\n\n\u26a0\ufe0f **Advanced**: May impact performance slightly when enabled.",
-            "order": 25
-          }
+      },
+      "gemini-cli-vscode.diagnostics.performance": {
+        "type": "boolean",
+        "default": false,
+        "description": "Enable performance metrics logging",
+        "markdownDescription": "\ud83d\udcca Enable performance metrics logging to track extension and terminal operation times.\n\n**When enabled**:\n- Logs timing for extension activation\n- Tracks terminal creation time\n- Measures text send operations\n\n\u26a0\ufe0f **Advanced**: May impact performance slightly when enabled.",
+        "order": 25
+      },
+      "gemini-cli-vscode.templates.enabled": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable MAGUS Templates features",
+        "markdownDescription": "Master switch for **MAGUS Templates** features (list/preview/insert).",
+        "order": 30
+      },
+      "gemini-cli-vscode.templates.sources.shared.enabled": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable shared templates source",
+        "markdownDescription": "Enable reading templates from `.magus-templates/shared` (or a custom path).",
+        "order": 32
+      },
+      "gemini-cli-vscode.templates.sources.shared.path": {
+        "type": "string",
+        "default": ".magus-templates/shared",
+        "description": "Path to shared templates directory (relative or absolute)",
+        "markdownDescription": "Directory path for shared templates. **Relative paths** are resolved against the workspace root. **Absolute paths** are used as-is.",
+        "order": 33
+      }
         }
       }
     ]

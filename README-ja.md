@@ -59,6 +59,36 @@
 - **個別CLIコマンド**: 各CLIに専用の送信コマンド
 - **詳細な設定オプション**: 各CLIの有効/無効、メニュー表示制御など
 
+### 🧩 テンプレート（0.4.0+）
+
+- MAGUS Council に プロンプトテンプレートを追加
+- アコーディオンで「選ぶ → 決める → 挿入」が完結
+- 挿入位置は [Head] / [Cursor] / [Tail] / [Replace]
+- テンプレート検索はインクリメンタル。検索欄右側のトグル [×/⟳] で「クリア/リフレッシュ」
+
+対応ソース
+- shared: `./.magus-templates/shared/*.md`（相対/絶対パスに両対応）
+
+テンプレ形式
+- YAML front matter + Markdown
+- 例：
+
+```md
+---
+name: Greeting
+description: Simple greeting
+tags:
+- sample
+- demo
+inputs:
+- key: name
+  label: Name
+  type: string
+  required: true
+---
+Hello, {{ name }}!
+```
+
 ## 🚀 クイックスタート
 
 ### 前提条件
@@ -159,6 +189,22 @@ qwen    # Qwenアカウント認証
 - エディタで右クリック
 - 使用したいCLI用の "Send Open File Path" を選択
 
+### 📚 Templates の使い方（0.4.0+）
+
+1) 有効化（設定）
+- `gemini-cli-vscode.templates.enabled`: true
+- `gemini-cli-vscode.templates.sources.shared.enabled`: true
+- `gemini-cli-vscode.templates.sources.shared.path`: `.magus-templates/shared`（相対/絶対どちらでも可）
+
+2) 共有テンプレを配置
+- ワークスペース直下に `./.magus-templates/shared/` を作成
+- 上のサンプル `greeting.md` を保存
+
+3) 検索→展開→挿入
+- Templates ビューでタイトルをクリックして展開（プレビュー表示）
+- [Head]/[Cursor]/[Tail] + [ ] Replace を選択して MAGUS Council のPromptへ転記
+- 検索欄の [×] でクリア、空欄時は [⟳] で再取得
+
 ### 🔮 MAGUS Council の使い方
 
 **統一制御パネルから:**
@@ -174,7 +220,29 @@ qwen    # Qwenアカウント認証
 - 従来通りのファイル送信機能
 - コンテキストメニューからの操作
 
-### ⌨️ コマンドパレット
+## 🆚 他の選択肢との比較
+
+### 🎯 最適なユースケース
+
+- **Claude CodeのUXが好きだがGeminiやGPT-5を使いたい**開発者
+- ターミナルとエディタの切り替えに**うんざりしている**人
+
+### 📊 比較表
+
+| 機能 | この拡張 | Gemini Code Assist | Gemini CLI | Codex CLI | Claude Code |
+|------|----------|--------------------------|-------------------|-------------------|----------------|
+| **統一AI管理** | ✅ MAGUS Council | ❌ | ❌ | ❌ | ❌ |
+| **同時プロンプト送信** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **コード生成** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **エディタペインで動作** | ✅ | ❌（サイドバー） | ❌（ターミナル） | ❌（ターミナル） | ✅ |
+| **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **OpenAIモデル対応** | ✅ | ❌ | ❌ | ✅ | ❌ |
+| **Claudeモデル対応** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Qwenモデル対応** | ✅ | ❌ | ❌ | ❌ | ❌ |
+
+
+
+## ⌨️ コマンドパレット
 
 **MAGUS Council コマンド:**
 
@@ -187,7 +255,9 @@ qwen    # Qwenアカウント認証
 
 - **"Launch All CLIs"** - 複数のCLIを一括起動（同じグループにタブとして配置）
 
-**CLIコマンド（v0.2.1+ 階層構造）:**
+## 📋 コマンド一覧
+
+**CLIコマンド:**
 
 すべてのコマンドは一貫したパターンに従います: `{拡張機能}.{CLI}.{アクション}.{対象}`
 
@@ -235,26 +305,6 @@ qwen    # Qwenアカウント認証
 
 **注意:** v0.2.0以前のバージョンからカスタムキーバインディングを使用している場合は、[MIGRATION.md](./MIGRATION.md)を参照して更新手順をご確認ください。
 
-## 🆚 他の選択肢との比較
-
-### 🎯 最適なユースケース
-
-- **Claude CodeのUXが好きだがGeminiやGPT-5を使いたい**開発者
-- ターミナルとエディタの切り替えに**うんざりしている**人
-
-### 📊 比較表
-
-| 機能 | この拡張 | Gemini Code Assist | Gemini CLI | Codex CLI | Claude Code |
-|------|----------|--------------------------|-------------------|-------------------|----------------|
-| **統一AI管理** | ✅ MAGUS Council | ❌ | ❌ | ❌ | ❌ |
-| **同時プロンプト送信** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **コード生成** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **エディタペインで動作** | ✅ | ❌（サイドバー） | ❌（ターミナル） | ❌（ターミナル） | ✅ |
-| **Geminiモデル対応** | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **OpenAIモデル対応** | ✅ | ❌ | ❌ | ✅ | ❌ |
-| **Claudeモデル対応** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Qwenモデル対応** | ✅ | ❌ | ❌ | ❌ | ❌ |
-
 ## ⚙️ 設定オプション
 
 設定は使いやすさのために2階層に整理されています：
@@ -274,7 +324,7 @@ qwen    # Qwenアカウント認証
   // コア機能
   "gemini-cli-vscode.magusCouncil.enabled": true,
   "gemini-cli-vscode.contextMenu.enabled": true,
-  "gemini-cli-vscode.saveToHistory.enabled": true
+ "gemini-cli-vscode.saveToHistory.enabled": true
 }
 ```
 
@@ -328,6 +378,15 @@ qwen    # Qwenアカウント認証
 - `saveToHistory.useLocalTimezone`: 履歴タイムスタンプでローカルタイムゾーンを使用
 - `saveToHistory.dayBoundary`: カスタム日付境界時刻（例: 夜勤者向けに"02:00"）
 - `saveToHistory.includeTerminalName`: 保存された履歴エントリにターミナル名を含める
+
+### テンプレート設定（0.4.0+）
+
+- `gemini-cli-vscode.templates.enabled`（既定: true）
+  - Templates 機能のマスターON/OFF
+- `gemini-cli-vscode.templates.sources.shared.enabled`（既定: true）
+  - 共有ソース（shared）の使用可否
+- `gemini-cli-vscode.templates.sources.shared.path`（既定: `.magus-templates/shared`）
+  - 共有ディレクトリのパス。相対はワークスペース基準／絶対はそのまま使用
 
 ## 🤝 コントリビューション
 
