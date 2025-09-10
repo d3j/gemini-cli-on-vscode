@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { parseFrontMatter } from './frontMatter';
 import { ParameterInput, Template, TemplateMeta, TemplateSource, ListQuery } from './types';
 import { RenderEngine, RenderOptions } from './renderEngine';
-import { SharedWorkspaceService } from './sharedWorkspaceService';
+// import { SharedWorkspaceService } from './sharedWorkspaceService';
 
 interface FrontMatterV5 {
     name?: string;
@@ -18,7 +18,7 @@ interface FrontMatterV5 {
 
 export class TemplateService {
     private renderOptions: RenderOptions;
-    private sharedService: SharedWorkspaceService | undefined;
+    // private sharedService: SharedWorkspaceService | undefined;
 
     constructor(renderOptions?: Partial<RenderOptions>, workspaceRoot?: string) {
         const cfg = vscode.workspace.getConfiguration('gemini-cli-vscode.templates');
@@ -32,18 +32,14 @@ export class TemplateService {
             ...renderOptions
         };
         const root = workspaceRoot ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-        if (root) {
-            this.sharedService = new SharedWorkspaceService(root);
-        }
+        void root; // reserved for future use
     }
 
     async list(query: ListQuery = {}): Promise<{ templates: TemplateMeta[]; total: number; hasMore: boolean }> {
-        const sources = query.sources ?? ['shared', 'history', 'user'];
+        const sources = query.sources ?? ['user', 'history'];
         let items: TemplateMeta[] = [];
         for (const s of sources) {
-            if (s === 'shared') {
-                items.push(...this.listShared());
-            } else if (s === 'history') {
+            if (s === 'history') {
                 items.push(...this.listHistory());
             } else if (s === 'user') {
                 items.push(...this.listUserFiles());
@@ -57,21 +53,20 @@ export class TemplateService {
         if (query.tags && query.tags.length) {
             items = items.filter(t => (t.tags || []).some(tag => query.tags!.includes(tag)));
         }
-        // sort
-        const sortBy = query.sortBy ?? 'name';
-        const sortOrder = query.sortOrder ?? 'asc';
+        // group-aware sort: groupOrder -> groupId -> order -> name
         items.sort((a, b) => {
-            let va: any; let vb: any;
-            switch (sortBy) {
-                case 'used': va = a.useCount || 0; vb = b.useCount || 0; break;
-                case 'updated': va = 0; vb = 0; break;
-                case 'created': va = 0; vb = 0; break;
-                case 'name':
-                default:
-                    va = a.name.toLowerCase(); vb = b.name.toLowerCase();
-            }
-            const cmp = va < vb ? -1 : va > vb ? 1 : 0;
-            return sortOrder === 'asc' ? cmp : -cmp;
+            const ga = a.groupOrder ?? Number.MAX_SAFE_INTEGER;
+            const gb = b.groupOrder ?? Number.MAX_SAFE_INTEGER;
+            if (ga !== gb) return ga - gb;
+            const gidA = a.groupId || '';
+            const gidB = b.groupId || '';
+            if (gidA !== gidB) return gidA < gidB ? -1 : 1;
+            const oa = a.order ?? Number.MAX_SAFE_INTEGER;
+            const ob = b.order ?? Number.MAX_SAFE_INTEGER;
+            if (oa !== ob) return oa - ob;
+            const na = (a.name || '').toLowerCase();
+            const nb = (b.name || '').toLowerCase();
+            return na < nb ? -1 : na > nb ? 1 : 0;
         });
         const total = items.length;
         const offset = query.offset ?? 0;
@@ -81,12 +76,7 @@ export class TemplateService {
     }
 
     async get(id: string): Promise<Template | undefined> {
-        // Support shared and history sources
-        if (id.startsWith('shared:')) {
-            const filePath = this.resolveIdToSharedPath(id);
-            if (!filePath || !fs.existsSync(filePath)) return undefined;
-            return this.readTemplateFromFile(filePath, 'shared');
-        }
+        // Support history and user sources
         if (id.startsWith('history:')) {
             const { filePath, sectionIndex } = this.resolveIdToHistoryTarget(id) || {} as any;
             if (!filePath || !fs.existsSync(filePath)) return undefined;
@@ -127,27 +117,7 @@ export class TemplateService {
     }
 
     // Helpers
-    private listShared(): TemplateMeta[] {
-        if (!this.sharedService) return [];
-        const files = this.sharedService.listMarkdownFiles();
-        return files.map(fp => {
-            const base = path.basename(fp, path.extname(fp));
-            const raw = safeRead(fp);
-            const { attributes } = parseFrontMatter<FrontMatterV5>(raw);
-            const name = attributes.name || base;
-            return {
-                id: `shared:${base}`,
-                name,
-                description: attributes.description,
-                source: 'shared' as TemplateSource,
-                tags: Array.isArray(attributes.tags) ? attributes.tags as string[] : [],
-                parameterized: Array.isArray(attributes.inputs) && attributes.inputs.length > 0,
-                author: undefined,
-                license: undefined,
-                trust: attributes.trust?.signed ? { signed: true, verifiedBy: attributes.trust?.verifiedBy } : { signed: false },
-            } satisfies TemplateMeta;
-        });
-    }
+    // private listShared(): TemplateMeta[] { return []; }
 
     private listHistory(): TemplateMeta[] {
         // History entries as lightweight templates, id prefix history:YYYY-MM-DD
@@ -182,14 +152,18 @@ export class TemplateService {
 
         const date = latest.base;
         const metas: TemplateMeta[] = [];
-        // Whole day meta
+        // Whole day meta (group header-like)
         metas.push({
             id: `history:${date}`,
             name: `History ${date}`,
             description: 'History memo (full day)',
             source: 'history' as TemplateSource,
             tags: ['day'],
-            parameterized: false
+            parameterized: false,
+            groupId: `history:${date}`,
+            groupName: `History ${date}`,
+            groupOrder: Number.MAX_SAFE_INTEGER - 1,
+            order: 0
         });
         // Section metas
         const sections = this.parseHistorySections(safeRead(latest.full));
@@ -200,7 +174,11 @@ export class TemplateService {
                 description: 'History memo section',
                 source: 'history' as TemplateSource,
                 tags: ['section'],
-                parameterized: false
+                parameterized: false,
+                groupId: `history:${date}`,
+                groupName: `History ${date}`,
+                groupOrder: Number.MAX_SAFE_INTEGER - 1,
+                order: sec.index
             });
         });
         return metas;
@@ -212,45 +190,64 @@ export class TemplateService {
         if (!files.length) return [];
         const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
         const metas: TemplateMeta[] = [];
-        for (const entry of files) {
+        for (let i = 0; i < files.length; i++) {
+            const entry = files[i];
             const resolved = this.resolvePath(entry, root);
             if (!resolved || !fs.existsSync(resolved)) continue;
-            const raw = safeRead(resolved);
-            const sections = this.parseHistorySections(raw); // H1-based split
             const base = path.basename(resolved);
             const idBase = this.encodePathForId(resolved);
-            if (sections.length === 0) {
+            const raw = safeRead(resolved);
+            const hasFront = raw.trimStart().startsWith('---');
+            if (hasFront) {
+                const { attributes } = parseFrontMatter<FrontMatterV5>(raw);
+                const name = attributes.name || base;
                 metas.push({
                     id: `user:${idBase}`,
-                    name: base,
-                    description: 'User template file',
+                    name,
+                    description: attributes.description,
                     source: 'user',
-                    tags: ['user-file'],
-                    parameterized: false
+                    tags: Array.isArray(attributes.tags) ? attributes.tags as string[] : ['user-file'],
+                    parameterized: Array.isArray(attributes.inputs) && attributes.inputs.length > 0,
+                    groupId: `userfile:${idBase}`,
+                    groupName: base,
+                    groupOrder: i,
+                    order: 0
                 });
             } else {
-                sections.forEach(sec => metas.push({
-                    id: `user:${idBase}#${sec.index}`,
-                    name: `${base} — ${sec.title}`,
-                    description: 'User template section',
-                    source: 'user',
-                    tags: ['user-file', 'section'],
-                    parameterized: false
-                }));
+                const sections = this.parseHistorySections(raw);
+                if (sections.length === 0) {
+                    metas.push({
+                        id: `user:${idBase}`,
+                        name: base,
+                        description: 'User template file',
+                        source: 'user',
+                        tags: ['user-file'],
+                        parameterized: false,
+                        groupId: `userfile:${idBase}`,
+                        groupName: base,
+                        groupOrder: i,
+                        order: 0
+                    });
+                } else {
+                    sections.forEach(sec => metas.push({
+                        id: `user:${idBase}#${sec.index}`,
+                        name: `${base} — ${sec.title}`,
+                        description: 'User template section',
+                        source: 'user',
+                        tags: ['user-file', 'section'],
+                        parameterized: false,
+                        groupId: `userfile:${idBase}`,
+                        groupName: base,
+                        groupOrder: i,
+                        order: sec.index
+                    }));
+                }
             }
         }
         return metas;
     }
 
-    private resolveIdToSharedPath(id: string): string | undefined {
-        if (!this.sharedService) return undefined;
-        if (!id.startsWith('shared:')) return undefined;
-        const base = id.substring('shared:'.length);
-        const dir = this.sharedService.getSharedDirectory();
-        const candidate = path.join(dir, `${base}.md`);
-        if (fs.existsSync(candidate)) return candidate;
-        return undefined;
-    }
+    // private resolveIdToSharedPath(id: string): string | undefined { return undefined; }
 
     private resolveIdToHistoryTarget(id: string): { filePath: string; sectionIndex?: number } | undefined {
         if (!id.startsWith('history:')) return undefined;
@@ -276,30 +273,7 @@ export class TemplateService {
         return { filePath, sectionIndex: Number.isFinite(sectionIndex) ? sectionIndex : undefined };
     }
 
-    private readTemplateFromFile(filePath: string, source: TemplateSource): Template {
-        const raw = safeRead(filePath);
-        const { attributes, body } = parseFrontMatter<FrontMatterV5>(raw);
-        const stat = fs.statSync(filePath);
-        const name = attributes.name || path.basename(filePath, path.extname(filePath));
-        const inputs = normalizeInputs(attributes.inputs);
-        const t: Template = {
-            id: `${source}:${path.basename(filePath, path.extname(filePath))}`,
-            name,
-            description: attributes.description,
-            source,
-            tags: Array.isArray(attributes.tags) ? attributes.tags as string[] : [],
-            parameterized: Array.isArray(inputs) && inputs.length > 0,
-            inputs,
-            content: body,
-            metadata: {
-                createdAt: stat.birthtime,
-                updatedAt: stat.mtime
-            },
-            trust: attributes.trust?.signed ? { signed: true, verifiedBy: attributes.trust?.verifiedBy } : { signed: false },
-            origin: { path: filePath }
-        };
-        return t;
-    }
+    // removed unused readTemplateFromFile
 
     private readHistoryAsTemplate(filePath: string): Template {
         // History memos are plain Markdown (no front matter expected)
@@ -445,40 +419,4 @@ function safeRead(p: string): string {
     try { return fs.readFileSync(p, 'utf8'); } catch { return ''; }
 }
 
-function normalizeInputs(value: any): ParameterInput[] | undefined {
-    if (!value) return undefined;
-    if (Array.isArray(value) && value.length === 0) return [];
-    // Already objects
-    if (Array.isArray(value) && typeof value[0] === 'object') {
-        return value as ParameterInput[];
-    }
-    // Our minimal frontMatter parser returns an array of strings like
-    // ["key: name", "label: Name", "type: string", "required: true", "key: age", ...]
-    if (Array.isArray(value) && typeof value[0] === 'string') {
-        const out: ParameterInput[] = [] as any;
-        let cur: any = undefined;
-        for (const item of value as string[]) {
-            const m = item.match(/^([^:]+):\s*(.*)$/);
-            if (!m) continue;
-            const k = m[1].trim();
-            const vraw = m[2].trim();
-            const v = coerceScalar(vraw);
-            if (k === 'key') {
-                if (cur && cur.key) out.push(cur as ParameterInput);
-                cur = { key: String(v) };
-            } else if (cur) {
-                cur[k] = v;
-            }
-        }
-        if (cur && cur.key) out.push(cur as ParameterInput);
-        return out.length ? (out as ParameterInput[]) : undefined;
-    }
-    return undefined;
-}
-
-function coerceScalar(s: string): any {
-    const unq = s.replace(/^['"](.*)['"]$/s, '$1');
-    if (/^(true|false)$/i.test(unq)) return /^true$/i.test(unq);
-    if (/^-?\d+(\.\d+)?$/.test(unq)) return Number(unq);
-    return unq;
-}
+// normalizeInputs/coerceScalar are no longer needed here (front-matter rendering is handled downstream)

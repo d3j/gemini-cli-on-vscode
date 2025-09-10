@@ -171,40 +171,35 @@ Save all terminal output to `.history-memo/YYYY-MM-DD.md`:
 
 1) Enable in Settings
 - `gemini-cli-vscode.templates.enabled`: true
-- `gemini-cli-vscode.templates.sources.shared.enabled`: true
-- `gemini-cli-vscode.templates.sources.shared.path`: `.magus-templates/shared` (relative or absolute)
 
-2) Place shared templates
-- Create `./.magus-templates/shared/` at your workspace root
-- Add your template files (e.g., `greeting.md`)
-
-3) Search → Preview → Insert
-- In the Templates view, click a title to expand and preview
-- Choose [Head]/[Cursor]/[Tail] + [ ] Replace to send into MAGUS Council's prompt
-- Clear search with [×]; when empty, use [⟳] to refresh
-
-Supported sources
-- shared: `./.magus-templates/shared/*.md` (supports both relative and absolute paths)
-
-Template format
-- YAML front matter + Markdown
-- Example:
-
-```md
----
-name: Greeting
-description: Simple greeting
-tags:
-- sample
-- demo
-inputs:
-- key: name
-  label: Name
-  type: string
-  required: true
----
-Hello, {{ name }}!
+2) Register template files (Settings UI)
+- Setting key: `gemini-cli-vscode.templates.files`
+- In the Settings UI, click “Add Item” and enter one file path per item (relative paths resolve from workspace root)
+- Example values (one per item):
+  - `.history-memo/prompts.md`
+  - `docs/prompts.md`
+- Example in settings.json:
+```json
+{
+  "gemini-cli-vscode.templates.files": [
+    ".history-memo/prompts.md",
+    "docs/prompts.md"
+  ]
+}
 ```
+
+3) Formats and handling
+- MAGUS format (front matter at file start `---`): treated as a single template
+- Plain Markdown: split by top-level H1 (`# ...`) and listed as multiple templates
+- History: only the latest `.history-memo/YYYY-MM-DD.md` is listed and split by H1
+  - New history format writes H1 entries like `# [10:24:32] - MAGUS Council → gemini, codex, claude`
+  - No per-file top header is written (date is obvious from the filename)
+
+4) Grouping, order, and usage
+- Templates are grouped per file; groups can be collapsed/expanded
+- Group order follows the `templates.files` order you set
+- Order inside a group follows H1 appearance (MAGUS format is a single item)
+- In the Templates view: expand a group → select an item → preview → insert via [Head]/[Cursor]/[Tail]/[Replace]
 
 ### 🔮 Using MAGUS Council
 
@@ -380,10 +375,10 @@ For power users who want detailed control:
 
 - `gemini-cli-vscode.templates.enabled` (default: true)
   - Master ON/OFF for the Templates feature
-- `gemini-cli-vscode.templates.sources.shared.enabled` (default: true)
-  - Whether to use the shared source (shared)
-- `gemini-cli-vscode.templates.sources.shared.path` (default: `.magus-templates/shared`)
-  - Path to the shared directory. Relative paths are resolved from the workspace root; absolute paths are used as-is
+- `gemini-cli-vscode.templates.files` (array, default: [])
+  - Register additional Markdown files as template sources
+  - In the Settings UI, click “Add Item” and enter one file path per item (relative paths resolve from workspace root)
+  - MAGUS format becomes a single template; plain Markdown is split by H1
 
 ## 🤝 Contributing
 
@@ -427,3 +422,4 @@ MIT License - See [LICENSE](LICENSE) file for details
 ## 👤 Author
 
 **Joji Jorge Senda** ([@d3j](https://github.com/d3j))
+- For design details, see docs/templates-design.md

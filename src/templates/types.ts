@@ -18,6 +18,11 @@ export interface TemplateMeta {
     license?: string;
     packId?: string;
     trust?: TrustInfo;
+    // Grouping (optional)
+    groupId?: string;
+    groupName?: string;
+    groupOrder?: number;
+    order?: number; // order within group
 }
 
 export interface ParameterInput {
@@ -57,4 +62,3 @@ export interface ListQuery {
     sortBy?: 'name' | 'created' | 'updated' | 'used';
     sortOrder?: 'asc' | 'desc';
 }
-

@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.0] - TBA
+## [0.4.0] - 2025-09-11
 
-### 🎉 Major Feature: Templates Panel (M1)
+### 🎉 Major Feature: Templates Panel
 
 - New “Templates” view in the MAGUS Council sidebar (enable via `gemini-cli-vscode.templates.enabled`).
 - Accordion UI (single-expand): click a title to expand → preview → insert inline.

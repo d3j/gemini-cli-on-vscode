@@ -61,33 +61,23 @@
 
 ### 🧩 テンプレート（0.4.0+）
 
-- MAGUS Council に プロンプトテンプレートを追加
-- アコーディオンで「選ぶ → 決める → 挿入」が完結
+- MAGUS Council にプロンプトテンプレートを追加
+- アコーディオンで「選ぶ → プレビュー → 挿入」が完結
 - 挿入位置は [Head] / [Cursor] / [Tail] / [Replace]
-- テンプレート検索はインクリメンタル。検索欄右側のトグル [×/⟳] で「クリア/リフレッシュ」
+- 検索はインクリメンタル。検索欄の [×/⟳] で「クリア/リフレッシュ」
 
-対応ソース
-- shared: `./.magus-templates/shared/*.md`（相対/絶対パスに両対応）
+対応ソース（0.4.0+）
+- user: 設定 `gemini-cli-vscode.templates.files` で登録したMarkdown
+  - MAGUSテンプレ形式（冒頭に front matter `---`）なら1件のテンプレートとして扱う
+  - 通常のMarkdownなら H1（`# ...`）ごとに分割してテンプレ化
+- history: `.history-memo/YYYY-MM-DD.md` の「最新日」だけを表示（H1セクションごと）
+  - 新しい履歴フォーマットは H1 行（例: `# [10:24:32] - MAGUS Council → gemini, codex, claude`）
+  - ファイル冒頭の `# History Memo - YYYY-MM-DD` は書き出しません（ファイル名で自明）
 
-テンプレ形式
-- YAML front matter + Markdown
-- 例：
-
-```md
----
-name: Greeting
-description: Simple greeting
-tags:
-- sample
-- demo
-inputs:
-- key: name
-  label: Name
-  type: string
-  required: true
----
-Hello, {{ name }}!
-```
+グループ化と並び順
+- テンプレートは「ファイルごと」にグループ化され、折りたたみ/展開できます
+- グループの並び順は `templates.files` の設定順に従います
+- グループ内の並びはH1の出現順（MAGUS形式は1件）
 
 ## 🚀 クイックスタート
 
@@ -193,16 +183,31 @@ qwen    # Qwenアカウント認証
 
 1) 有効化（設定）
 - `gemini-cli-vscode.templates.enabled`: true
-- `gemini-cli-vscode.templates.sources.shared.enabled`: true
-- `gemini-cli-vscode.templates.sources.shared.path`: `.magus-templates/shared`（相対/絶対どちらでも可）
 
-2) 共有テンプレを配置
-- ワークスペース直下に `./.magus-templates/shared/` を作成
-- 上のサンプル `greeting.md` を保存
+2) テンプレートファイルを登録（Settings UI）
+- 設定キー: `gemini-cli-vscode.templates.files`
+- UIでは「Add Item」で1行=1ファイルパスを追加（相対はワークスペース基準）
+- 例（UIで各行の値）:
+  - `.history-memo/prompts.md`
+  - `docs/prompts.md`
+- settings.json 直編集の例:
+```json
+{
+  "gemini-cli-vscode.templates.files": [
+    ".history-memo/prompts.md",
+    "docs/prompts.md"
+  ]
+}
+```
 
-3) 検索→展開→挿入
-- Templates ビューでタイトルをクリックして展開（プレビュー表示）
-- [Head]/[Cursor]/[Tail] + [ ] Replace を選択して MAGUS Council のPromptへ転記
+3) 形式と扱い
+- MAGUS形式（front matterあり）: 1件のテンプレートとして扱う
+- 通常Markdown: H1（`# ...`）ごとに分割して複数テンプレとして表示
+- 履歴: 最新日の `.history-memo/YYYY-MM-DD.md` をH1ごとに分割（冒頭ヘッダは生成しません）
+
+4) 検索→展開→挿入
+- Templates ビューでグループ（ファイル名）を展開し、アイテムを選択
+- プレビュー確認後、[Head]/[Cursor]/[Tail]/[Replace] で MAGUS Council のプロンプトに挿入
 - 検索欄の [×] でクリア、空欄時は [⟳] で再取得
 
 ### 🔮 MAGUS Council の使い方
@@ -383,10 +388,10 @@ qwen    # Qwenアカウント認証
 
 - `gemini-cli-vscode.templates.enabled`（既定: true）
   - Templates 機能のマスターON/OFF
-- `gemini-cli-vscode.templates.sources.shared.enabled`（既定: true）
-  - 共有ソース（shared）の使用可否
-- `gemini-cli-vscode.templates.sources.shared.path`（既定: `.magus-templates/shared`）
-  - 共有ディレクトリのパス。相対はワークスペース基準／絶対はそのまま使用
+- `gemini-cli-vscode.templates.files`（配列、既定: []）
+  - 追加のMarkdownファイルを登録
+  - UIでは「Add Item」で1件ずつ追加（相対パスはワークスペース基準）
+  - MAGUS形式は1テンプレ、通常MarkdownはH1分割
 
 ## 🤝 コントリビューション
 
@@ -432,3 +437,4 @@ MIT License - 詳細は[LICENSE](LICENSE)ファイルを参照
 **Joji Jorge Senda** ([@d3j](https://github.com/d3j))
 
 ---
+- 設計詳細: docs/templates-design.md を参照

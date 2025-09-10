@@ -26,13 +26,42 @@
 
     async function loadList(){
         const query = searchEl.value.trim();
-        const res = await request('templates/list', { sources: ['shared', 'history', 'user'], query, limit: 200 });
+        const res = await request('templates/list', { sources: ['user', 'history'], query, limit: 500 });
         templates = res.templates || [];
-        listEl.innerHTML = '';
-        for(const t of templates){
-            listEl.appendChild(createItemElement(t));
-        }
+        renderGroupedList(templates);
         setSelection(null, '');
+    }
+
+    function renderGroupedList(items){
+        listEl.innerHTML = '';
+        const groups = new Map();
+        for(const t of items){
+            const gid = t.groupId || 'ungrouped';
+            if(!groups.has(gid)) groups.set(gid, { name: t.groupName || (t.source || 'Templates'), items: [] });
+            groups.get(gid).items.push(t);
+        }
+        for(const [gid, g] of groups){
+            const gEl = document.createElement('div');
+            gEl.className = 'tpl-group';
+            const gHeader = document.createElement('div');
+            gHeader.className = 'tpl-group-header';
+            gHeader.innerHTML = `<div class="name">${escapeHtml(g.name || 'Templates')}</div>`;
+            const gBody = document.createElement('div');
+            gBody.className = 'tpl-group-body';
+            // default collapsed except first group
+            gEl.appendChild(gHeader);
+            gEl.appendChild(gBody);
+            let expanded = listEl.children.length === 0; // expand first by default
+            if (!expanded) gBody.style.display = 'none';
+            gHeader.addEventListener('click', ()=>{
+                expanded = !expanded;
+                gBody.style.display = expanded ? '' : 'none';
+            });
+            for(const t of g.items){
+                gBody.appendChild(createItemElement(t));
+            }
+            listEl.appendChild(gEl);
+        }
     }
 
     function createItemElement(t){
