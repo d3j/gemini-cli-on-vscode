@@ -13,6 +13,7 @@ describe('TerminalManager', () => {
     let sandbox: sinon.SinonSandbox;
     let mockTerminals: Map<string, vscode.Terminal>;
     let createTerminalStub: sinon.SinonStub;
+    let getStub: sinon.SinonStub;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
@@ -26,6 +27,7 @@ describe('TerminalManager', () => {
         
         // Mock ConfigService
         configService = sandbox.createStubInstance(ConfigService) as any;
+        getStub = (configService.get as sinon.SinonStub).callsFake((_key: string, defaultValue: any) => defaultValue);
         (configService.getCliDelay as sinon.SinonStub).callsFake((cli, textLength) => {
             if (cli === 'claude') {
                 if (textLength > 2000) return 2500;
@@ -220,6 +222,27 @@ describe('TerminalManager', () => {
                 assert.deepStrictEqual(createOptions.env, {},
                     `${cli}: env should be empty`);
             }
+        });
+    });
+
+    describe('Working directory command', () => {
+        it('should send default cwd command with workspace path', async () => {
+            sandbox.stub(vscode.workspace, 'workspaceFolders').value([{ uri: vscode.Uri.file('/test/workspace') } as any]);
+
+            const terminal = await terminalManager.getOrCreate('gemini', 'active');
+
+            const sendTextStub = terminal.sendText as sinon.SinonStub;
+            assert.strictEqual(sendTextStub.firstCall.args[0], 'cd "/test/workspace"');
+        });
+
+        it('should allow customizing cwd command', async () => {
+            sandbox.stub(vscode.workspace, 'workspaceFolders').value([{ uri: vscode.Uri.file('/test/workspace') } as any]);
+            getStub.withArgs('terminal.cwdCommand', sinon.match.any).returns('cd {path}/..');
+
+            const terminal = await terminalManager.getOrCreate('gemini', 'active');
+
+            const sendTextStub = terminal.sendText as sinon.SinonStub;
+            assert.strictEqual(sendTextStub.firstCall.args[0], 'cd /test/workspace/..');
         });
     });
 
